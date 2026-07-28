@@ -1,10 +1,6 @@
-import Fastify, {
-  type FastifyInstance,
-  type FastifyReply,
-  type FastifyRequest,
-} from "fastify";
 import cors from "@fastify/cors";
 import { config } from "dotenv";
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 
 // TODO: Import your feature-based routes here later (e.g., accessControlRoutes, masterRoutes)
 
@@ -57,21 +53,17 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   }));
 
   // Global error handler
-  fastify.setErrorHandler(
-    (error: Error, _request: FastifyRequest, reply: FastifyReply) => {
-      fastify.log.error(error, "Unhandled error");
-      void reply.code(500).send({
-        success: false,
-        error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message:
-            process.env.NODE_ENV === "development"
-              ? error.message
-              : "An unexpected error occurred",
-        },
-      });
-    }
-  );
+  fastify.setErrorHandler((error: Error, _request: FastifyRequest, reply: FastifyReply) => {
+    fastify.log.error(error, "Unhandled error");
+    void reply.code(500).send({
+      success: false,
+      error: {
+        code: "INTERNAL_SERVER_ERROR",
+        message:
+          process.env.NODE_ENV === "development" ? error.message : "An unexpected error occurred",
+      },
+    });
+  });
 
   return fastify;
 };

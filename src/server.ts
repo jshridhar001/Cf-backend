@@ -1,4 +1,4 @@
-import { buildApp } from "./app";
+import { buildApp } from "./app.js";
 
 const start = async () => {
   try {
@@ -15,8 +15,7 @@ const start = async () => {
     // Note: You do not need console.log here. Fastify's internal logger
     // will automatically print the startup URL and initialized routes.
   } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : "Unknown error occurred";
+    const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
 
     // Fallback to native console if the Fastify logger fails to boot
     console.error("🚨 Failed to start Bhatti Agritech backend:", errorMessage);

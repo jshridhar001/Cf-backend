@@ -1,10 +1,13 @@
 import cors from "@fastify/cors";
+import { fromNodeHeaders } from "better-auth/node";
 import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
-
-// TODO: Import your feature-based routes here later (e.g., accessControlRoutes, masterRoutes)
+import { auth } from "./lib/auth.js";
+import { authPlugin } from "./plugins/auth.js";
 
 config();
+
+const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 export const buildApp = async (): Promise<FastifyInstance> => {
   const isDev = process.env.NODE_ENV === "development";
@@ -27,32 +30,41 @@ export const buildApp = async (): Promise<FastifyInstance> => {
         },
   });
 
-  // Register CORS (Crucial for your Vite SPA to communicate with this API)
   await fastify.register(cors, {
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-    credentials: true, // Required for Better Auth session cookies to pass through
+    origin: process.env.CORS_ORIGIN || clientOrigin,
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    maxAge: 86400,
   });
 
-  // --- Register Plugins & Routes Below ---
+  await fastify.register(authPlugin);
 
-  // TODO: Register Better Auth adapter here
+  fastify.get("/api/me", async (request: FastifyRequest, reply: FastifyReply) => {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    });
 
-  // TODO: Register your Contract Farming modules here
+    if (!session) {
+      return reply.status(401).send({
+        success: false,
+        error: { code: "UNAUTHORIZED", message: "Unauthorized" },
+      });
+    }
+
+    return reply.send(session);
+  });
+
+  // TODO: Register Contract Farming modules here
   // await fastify.register(accessControlRoutes, { prefix: "/api/v1/access-control" });
   // await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
 
-  // ---------------------------------------
-
-  // Health check endpoint (Updated for Bhatti Agritech)
   fastify.get("/health", () => ({
     status: "ok",
     timestamp: new Date().toISOString(),
     service: "Bhatti-Agritech-Contract-Farming-Service",
   }));
 
-  // Global error handler
   fastify.setErrorHandler((error: Error, _request: FastifyRequest, reply: FastifyReply) => {
     fastify.log.error(error, "Unhandled error");
     void reply.code(500).send({

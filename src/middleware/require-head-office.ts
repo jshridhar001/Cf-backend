@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { isHeadOfficeRole } from "../lib/roles.js";
-import { requireAuth } from "./require-auth.js";
+import { isHeadOfficeRole } from "@/lib/roles.js";
+import { requireAuth } from "@/middleware/require-auth.js";
 
 export async function requireHeadOffice(request: FastifyRequest, reply: FastifyReply) {
   await requireAuth(request, reply);

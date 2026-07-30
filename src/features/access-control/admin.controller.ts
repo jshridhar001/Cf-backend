@@ -5,8 +5,8 @@ import type {
   CreateUserBody,
   EditUserBody,
   UserIdParam,
-} from "./admin.schema.js";
-import * as adminService from "./admin.service.js";
+} from "@/features/access-control/admin.schema.js";
+import * as adminService from "@/features/access-control/admin.service.js";
 
 export async function getUsers(_request: FastifyRequest, reply: FastifyReply) {
   const users = await adminService.fetchUsers();

@@ -29,6 +29,19 @@
       "preset": "recommended",
       "suspicious": {
         "noExplicitAny": "warn"
+      },
+      "style": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": ["./*", "../*"],
+                "message": "Use `@/` imports instead of relative paths."
+              }
+            ]
+          }
+        }
       }
     }
   },

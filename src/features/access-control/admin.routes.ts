@@ -1,13 +1,13 @@
 import type { FastifyInstance } from "fastify";
-import { requireHeadOffice } from "../../middleware/require-head-office.js";
-import * as adminController from "./admin.controller.js";
+import * as adminController from "@/features/access-control/admin.controller.js";
 import {
   banUserBodySchema,
   bulkDeleteUsersBodySchema,
   createUserBodySchema,
   editUserBodySchema,
   userIdParamSchema,
-} from "./admin.schema.js";
+} from "@/features/access-control/admin.schema.js";
+import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function adminRoutes(fastify: FastifyInstance) {
   // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER

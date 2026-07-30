@@ -1,9 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray, ne } from "drizzle-orm";
-import { db } from "../../db/index.js";
-import { session, user } from "../../db/schema/access-control.js";
-import { SUPER_DEVELOPER_ROLE } from "../../lib/roles.js";
-import type { BanUserBody, CreateUserBody, EditUserBody } from "./admin.schema.js";
+import { db } from "@/db/index.js";
+import { session, user } from "@/db/schema/access-control.js";
+import type {
+  BanUserBody,
+  CreateUserBody,
+  EditUserBody,
+} from "@/features/access-control/admin.schema.js";
+import { SUPER_DEVELOPER_ROLE } from "@/lib/roles.js";
 
 // --- READ ---
 export async function fetchUsers() {

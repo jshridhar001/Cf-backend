@@ -1,2 +1,2 @@
-export * from "./access-control.js";
-export * from "./masters.js";
+export * from "@/db/schema/access-control.js";
+export * from "@/db/schema/masters.js";

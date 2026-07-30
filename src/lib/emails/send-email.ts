@@ -19,6 +19,11 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
+  if (process.env.DISABLE_AUTH_EMAILS === "true") {
+    console.log(`[email skipped] to=${to} subject=${subject}`);
+    return { success: true as const, messageId: "disabled" };
+  }
+
   try {
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || '"Bhatti Agritech" <no-reply@example.com>',

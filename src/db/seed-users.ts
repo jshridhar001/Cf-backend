@@ -4,54 +4,49 @@ import { sql } from "drizzle-orm";
 import { auth } from "../lib/auth.js";
 import { db } from "./index.js";
 
-const defaultPassword = process.env.SEED_DEFAULT_PASSWORD || "ChangeMe123!";
-
 const SEED_USERS = [
   {
-    name: process.env.SEED_SUPER_DEV_NAME || "Super Developer",
-    email: process.env.SEED_SUPER_DEV_EMAIL || "super.dev@example.com",
-    password: defaultPassword,
+    name: "Super Developer",
+    email: "dhairyasehgal2307@gmail.com",
+    password: "12345678",
     role: "SUPER_DEVELOPER",
   },
   {
-    name: "Managing Director",
-    email: "managing.director@example.com",
-    password: defaultPassword,
-    role: "MANAGING_DIRECTOR",
+    name: "Deepak Satwal",
+    email: "deepak.satwal@gmail.com",
+    password: "12345678",
+    role: "FIELD_OFFICER",
   },
   {
-    name: "Programme Manager",
-    email: "programme.manager@example.com",
-    password: defaultPassword,
-    role: "PROGRAMME_MANAGER",
-  },
-  {
-    name: "Accounts Settlements Manager",
-    email: "accounts.settlements@example.com",
-    password: defaultPassword,
-    role: "ACCOUNTS_SETTLEMENTS_MANAGER",
-  },
-  {
-    name: "Field Operations Manager",
-    email: "field.operations@example.com",
-    password: defaultPassword,
-    role: "FIELD_OPERATIONS_MANAGER",
-  },
-  {
-    name: "Accounts Seeds Supply Manager",
+    name: "Harjot Singh",
     email: "accounts.seeds@example.com",
-    password: defaultPassword,
+    password: "12345678",
     role: "ACCOUNTS_SEEDS_SUPPLY_MANAGER",
   },
   {
-    name: "Field Officer",
-    email: "field.officer@example.com",
-    password: defaultPassword,
-    role: "FIELD_OFFICER",
+    name: "Jyot Singh",
+    email: "field.operations@example.com",
+    password: "12345678",
+    role: "FIELD_OPERATIONS_MANAGER",
+  },
+  {
+    name: "Dr Sridhar",
+    email: "programme.manager@example.com",
+    password: "12345678",
+    role: "PROGRAMME_MANAGER",
+  },
+  {
+    name: "Tanvir Bhatti",
+    email: "managing.director@example.com",
+    password: "12345678",
+    role: "MANAGING_DIRECTOR",
   },
 ] as const;
 
 export async function seedUsers() {
+  // Suppress welcome / verification emails triggered by auth.api.createUser
+  process.env.DISABLE_AUTH_EMAILS = "true";
+
   console.log("Seeding users...");
 
   await db.execute(sql`TRUNCATE TABLE "session" CASCADE`);

@@ -2,6 +2,8 @@ import cors from "@fastify/cors";
 import { fromNodeHeaders } from "better-auth/node";
 import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
 
@@ -30,6 +32,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
         },
   });
 
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
+
   await fastify.register(cors, {
     origin: process.env.CORS_ORIGIN || clientOrigin,
     credentials: true,
@@ -55,8 +60,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     return reply.send(session);
   });
 
+  await fastify.register(adminRoutes, { prefix: "/api/v1/access-control" });
+
   // TODO: Register Contract Farming modules here
-  // await fastify.register(accessControlRoutes, { prefix: "/api/v1/access-control" });
   // await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
 
   fastify.get("/health", () => ({

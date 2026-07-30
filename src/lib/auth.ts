@@ -46,6 +46,7 @@ export const auth = betterAuth({
   emailVerification: {
     autoSignInAfterVerification: true,
     sendOnSignUp: true,
+    sendOnSignIn: false,
     sendVerificationEmail: async ({ user, url }) => {
       const verificationUrl = new URL(url);
       verificationUrl.searchParams.set("callbackURL", `${clientOrigin}/dashboard`);
@@ -53,9 +54,10 @@ export const auth = betterAuth({
     },
   },
   rateLimit: {
-    enabled: true,
+    enabled: process.env.NODE_ENV === "production",
   },
   session: {
+    expiresIn: 60 * 60 * 24 * 7,
     cookieCache: {
       enabled: true,
       maxAge: 60 * 5,

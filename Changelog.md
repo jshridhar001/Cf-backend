@@ -1,6 +1,15 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### 0.2.1 (2026-07-30)
+
+
+### Features
+
+*  admin routes 3a60534
+* add better-auth and bump to 0.2.0 40c6ff9
+* setup authentication flow with better auth b7e7fb5
 
 ## [0.2.0] - 2026-07-29
 

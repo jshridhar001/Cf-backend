@@ -2,8 +2,12 @@ import { relations } from "drizzle-orm";
 import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 // --- Enums ---
-// Enforces strict types for where a facility can be used
-export const facilityUsageEnum = pgEnum("facility_usage", ["DISPATCH", "STORAGE", "PROCESSING"]);
+// Mirrors facilityUsageZodEnum (Zod is the source of truth)
+export const facilityUsageEnum = pgEnum("facility_usage", [
+  "SEED-REQUISITION",
+  "SEED-DISPATCH",
+  "FIELD-STEP",
+]);
 
 // --- Tables ---
 
@@ -67,10 +71,10 @@ export const facilities = pgTable("facility", {
     .notNull(),
 });
 
-export const sizes = pgTable("size", {
+export const seedSizes = pgTable("seed_size", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull().unique(),
-  bagsPerAcre: integer("bags_per_acre"),
+  seedBagsPerAcre: integer("seed_bags_per_acre"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

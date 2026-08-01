@@ -15,13 +15,7 @@ import { varieties } from "@/db/schema/masters.js";
 // Import dispatches to link the relations later
 import { dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
 
-export const reqStatusEnum = pgEnum("req_status", [
-  "PENDING",
-  "APPROVED",
-  "REJECTED",
-  "FULFILLED",
-  "PARTIALLY_FULFILLED",
-]);
+export const reqStatusEnum = pgEnum("req_status", ["PENDING", "APPROVED", "REJECTED"]);
 
 export const seedRequisitions = pgTable(
   "seed_requisition",
@@ -36,9 +30,9 @@ export const seedRequisitions = pgTable(
 
     status: reqStatusEnum("status").default("PENDING").notNull(),
 
-    // Changed to Integer for bags
-    requestedBags: integer("requested_bags").notNull(),
-    requestedAcres: decimal("requested_acres", { precision: 10, scale: 2 }).notNull(),
+    // Exactly one of bags or acres is set (enforced in Zod)
+    requestedBags: integer("requested_bags"),
+    requestedAcres: decimal("requested_acres", { precision: 10, scale: 2 }),
 
     // Track fulfillment progress
     fulfilledBags: integer("fulfilled_bags").default(0).notNull(),

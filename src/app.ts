@@ -6,6 +6,8 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { farmerRoutes } from "./features/farmers/farmers.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
+import { lotReceiptRoutes } from "./features/seed-dispatch/lot-receipt.routes.js";
+import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
@@ -67,6 +69,8 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
   await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
   await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
+  await fastify.register(seedDispatchRoutes, { prefix: "/api/v1/seed-dispatches" });
+  await fastify.register(lotReceiptRoutes, { prefix: "/api/dispatch-lots" });
 
   fastify.get("/health", () => ({
     status: "ok",

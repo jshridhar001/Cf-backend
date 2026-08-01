@@ -115,6 +115,6 @@ export const localityRelations = relations(localities, ({ one }) => ({
   }),
 }));
 
-export const facilityRelations = relations(facilities, ({ many }) => ({
+export const facilityRelations = relations(facilities, () => ({
   // dispatchesFrom: many(dispatches),
 }));

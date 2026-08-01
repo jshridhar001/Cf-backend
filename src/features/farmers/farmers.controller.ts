@@ -61,6 +61,19 @@ export class FarmersController {
     return reply.send({ success: true, data: farmer });
   }
 
+  static async getFarmerProfile(
+    request: FastifyRequest<{ Params: FarmerIdParam }>,
+    reply: FastifyReply,
+  ) {
+    const profile = await farmersService.getFarmerProfile(request.params.id);
+
+    if (!profile) {
+      return reply.status(404).send({ success: false, error: "Farmer not found." });
+    }
+
+    return reply.send({ success: true, data: profile });
+  }
+
   static async updateFarmer(
     request: FastifyRequest<{ Params: FarmerIdParam; Body: UpdateFarmerBody }>,
     reply: FastifyReply,

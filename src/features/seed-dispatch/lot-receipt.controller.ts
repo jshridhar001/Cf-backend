@@ -36,8 +36,8 @@ export const lotReceiptController = {
         return reply.code(401).send({ ok: false, error: "Unauthorized" });
       }
 
-      await confirmLotReceiptForLot(lotId, otp, userId);
-      return reply.send({ ok: true });
+      const result = await confirmLotReceiptForLot(lotId, otp, userId);
+      return reply.send(result);
     } catch (error: unknown) {
       if (error instanceof LotReceiptError) {
         return reply.code(400).send({ ok: false, error: error.message });

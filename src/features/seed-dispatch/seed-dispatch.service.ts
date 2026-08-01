@@ -18,6 +18,7 @@ import {
   sumAcresFromBagLines,
 } from "@/features/seed-dispatch/quantity.js";
 import type { CreateDispatchInput } from "@/features/seed-dispatch/seed-dispatch.schema.js";
+import { debitFarmerStockFromLot } from "@/features/seed-dispatch/stock-balance.js";
 
 export const seedDispatchService = {
   // 1. CREATE DISPATCH (Atomic Transaction)
@@ -283,6 +284,14 @@ export const seedDispatchService = {
       for (const stop of dispatch.dispatchRequisitions) {
         const requisition = stop.requisition;
         if (!requisition) continue;
+
+        if (stop.status === "RECEIVED") {
+          await debitFarmerStockFromLot(tx, {
+            dispatchRequisitionId: stop.id,
+            farmerId: requisition.farmerId,
+            varietyId: requisition.varietyId,
+          });
+        }
 
         const bagTotal = stop.sizeLines.reduce((sum, line) => sum + line.bagQuantity, 0);
         const nextFulfilledBags = Math.max(0, (requisition.fulfilledBags ?? 0) - bagTotal);

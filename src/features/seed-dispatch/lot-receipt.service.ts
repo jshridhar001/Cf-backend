@@ -1,6 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { dispatches, dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
+import { creditFarmerStockFromLot } from "@/features/seed-dispatch/stock-balance.js";
 import {
   getOtpProvider,
   LOT_RECEIPT_OTP_PURPOSE,
@@ -88,7 +89,11 @@ export async function confirmLotReceiptForLot(lotId: string, otp: string, userId
   if (!lot) throw new LotReceiptError("Lot not found.");
 
   if (lot.status === "RECEIVED") {
-    return { ok: true as const, alreadyReceived: true as const };
+    return {
+      ok: true as const,
+      alreadyReceived: true as const,
+      farmerId: lot.requisition.farmerId,
+    };
   }
 
   if (lot.dispatch.status !== "IN_TRANSIT") {
@@ -136,8 +141,11 @@ export async function confirmLotReceiptForLot(lotId: string, otp: string, userId
       })
       .where(eq(dispatchRequisitions.id, lotId));
 
-    // TODO: creditFarmerStockFromLot(tx, { dispatchRequisitionId, farmerId, varietyId })
-    // once farmer_stock_balance helpers exist.
+    await creditFarmerStockFromLot(tx, {
+      dispatchRequisitionId: lotId,
+      farmerId: lot.requisition.farmerId,
+      varietyId: lot.requisition.varietyId,
+    });
 
     const pendingSibling = await tx.query.dispatchRequisitions.findFirst({
       where: and(
@@ -154,5 +162,8 @@ export async function confirmLotReceiptForLot(lotId: string, otp: string, userId
     }
   });
 
-  return { ok: true as const };
+  return {
+    ok: true as const,
+    farmerId: lot.requisition.farmerId,
+  };
 }

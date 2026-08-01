@@ -21,6 +21,12 @@ export async function farmerRoutes(fastify: FastifyInstance) {
   // Register /all before /:id so "all" is not treated as an id
   fastify.delete("/all", FarmersController.deleteAllFarmers);
 
+  fastify.get(
+    "/:id/profile",
+    { schema: { params: farmerIdParamSchema } },
+    FarmersController.getFarmerProfile,
+  );
+
   fastify.get("/:id", { schema: { params: farmerIdParamSchema } }, FarmersController.getFarmerById);
 
   fastify.put(

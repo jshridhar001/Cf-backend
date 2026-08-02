@@ -56,6 +56,17 @@ export async function getFieldByIdHandler(
   return reply.send({ success: true, data: field });
 }
 
+export async function getFieldActivitiesByIdHandler(
+  request: FastifyRequest<{ Params: FieldIdParam }>,
+  reply: FastifyReply,
+) {
+  const field = await fieldsService.getFieldActivitiesById(request.params.id);
+  if (!field) {
+    return reply.code(404).send({ success: false, message: "Field not found" });
+  }
+  return reply.send({ success: true, data: field });
+}
+
 export async function updateFieldHandler(
   request: FastifyRequest<{ Params: FieldIdParam; Body: UpdateFieldBody }>,
   reply: FastifyReply,

@@ -1,6 +1,15 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
-import { farmerFields } from "@/db/schema/fields.js";
+import {
+  farmerFields,
+  fieldDehaulmings,
+  fieldHarvests,
+  fieldIrrigations,
+  fieldPlantations,
+  fieldRougings,
+  fieldStripTests,
+  fieldVisits,
+} from "@/db/schema/fields.js";
 import type {
   CreateFieldBody,
   GetFieldsQuery,
@@ -40,6 +49,57 @@ export async function getFieldById(id: string) {
       farmer: true,
       assignedOfficer: {
         columns: { id: true, name: true, email: true },
+      },
+    },
+  });
+}
+
+export async function getFieldActivitiesById(id: string) {
+  return db.query.farmerFields.findFirst({
+    where: eq(farmerFields.id, id),
+    with: {
+      farmer: true,
+      assignedOfficer: {
+        columns: { id: true, name: true, email: true },
+      },
+      visits: {
+        with: { createdBy: { columns: { id: true, name: true } } },
+        orderBy: [desc(fieldVisits.startDate)],
+      },
+      plantations: {
+        with: {
+          variety: { columns: { id: true, name: true } },
+          size: { columns: { id: true, name: true } },
+          createdBy: { columns: { id: true, name: true } },
+        },
+        orderBy: [desc(fieldPlantations.startDate)],
+      },
+      irrigations: {
+        with: { createdBy: { columns: { id: true, name: true } } },
+        orderBy: [desc(fieldIrrigations.startDate)],
+      },
+      rougings: {
+        with: { createdBy: { columns: { id: true, name: true } } },
+        orderBy: [desc(fieldRougings.startDate)],
+      },
+      dehaulmings: {
+        with: { createdBy: { columns: { id: true, name: true } } },
+        orderBy: [desc(fieldDehaulmings.startDate)],
+      },
+      stripTests: {
+        with: {
+          tuberRecords: {
+            with: {
+              tuberSize: { columns: { id: true, name: true } },
+            },
+          },
+          createdBy: { columns: { id: true, name: true } },
+        },
+        orderBy: [desc(fieldStripTests.startDate)],
+      },
+      harvests: {
+        with: { createdBy: { columns: { id: true, name: true } } },
+        orderBy: [desc(fieldHarvests.startDate)],
       },
     },
   });

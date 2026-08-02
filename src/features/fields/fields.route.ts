@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import {
   createFieldHandler,
   deleteFieldHandler,
+  getFieldActivitiesByIdHandler,
   getFieldByIdHandler,
   getFieldsHandler,
   updateFieldHandler,
@@ -20,6 +21,12 @@ export async function fieldRoutes(fastify: FastifyInstance) {
   fastify.post("/", { schema: { body: createFieldBodySchema } }, createFieldHandler);
 
   fastify.get("/", { schema: { querystring: getFieldsQuerySchema } }, getFieldsHandler);
+
+  fastify.get(
+    "/:id/activities",
+    { schema: { params: fieldIdParamSchema } },
+    getFieldActivitiesByIdHandler,
+  );
 
   fastify.get("/:id", { schema: { params: fieldIdParamSchema } }, getFieldByIdHandler);
 

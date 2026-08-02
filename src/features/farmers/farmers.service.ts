@@ -2,6 +2,7 @@ import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { farmerStockBalances } from "@/db/schema/farmer-stock.js";
 import { farmerFamilies, farmers } from "@/db/schema/farmers.js";
+import { farmerFields } from "@/db/schema/fields.js";
 import { generations, seedSizes, varieties } from "@/db/schema/masters.js";
 import {
   dispatches,
@@ -163,7 +164,7 @@ export const farmersService = {
     const farmer = await this.getFarmerById(id);
     if (!farmer) return null;
 
-    const [stockRows, requisitionRows, dispatchRows] = await Promise.all([
+    const [stockRows, requisitionRows, dispatchRows, fieldRows] = await Promise.all([
       db
         .select({
           id: farmerStockBalances.id,
@@ -213,6 +214,16 @@ export const farmersService = {
         )
         .where(eq(seedRequisitions.farmerId, id))
         .orderBy(desc(dispatches.dispatchDate), desc(dispatches.createdAt)),
+      db
+        .select({
+          id: farmerFields.id,
+          name: farmerFields.name,
+          acres: farmerFields.acres,
+          geoLocation: farmerFields.geoLocation,
+        })
+        .from(farmerFields)
+        .where(eq(farmerFields.farmerId, id))
+        .orderBy(asc(farmerFields.name)),
     ]);
 
     const stock = stockRows.map((row) => ({
@@ -290,8 +301,12 @@ export const farmersService = {
         acres: agg.acres,
       }));
 
-    const fields: Array<{ id: string; name: string; acres: number; geoLocation: string | null }> =
-      [];
+    const fields = fieldRows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      acres: round2(parseDecimal(row.acres)),
+      geoLocation: row.geoLocation,
+    }));
 
     const metrics = {
       totalStockBags: round2(stock.reduce((sum, row) => sum + row.balance, 0)),
@@ -302,8 +317,8 @@ export const farmersService = {
       dispatchTotal: farmerDispatches.length,
       dispatchDelivering: farmerDispatches.filter((row) => row.status === "delivering").length,
       dispatchDelivered: farmerDispatches.filter((row) => row.status === "delivered").length,
-      fieldCount: 0,
-      totalAcres: 0,
+      fieldCount: fields.length,
+      totalAcres: round2(fields.reduce((sum, row) => sum + row.acres, 0)),
     };
 
     return {

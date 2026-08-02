@@ -9,6 +9,7 @@ import { fieldRoutes } from "./features/fields/fields.route.js";
 import { irrigationRoutes } from "./features/irrigation/irrigation.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { plantationRoutes } from "./features/plantation/plantation.routes.js";
+import { rougingRoutes } from "./features/rouging/rouging.routes.js";
 import { lotReceiptRoutes } from "./features/seed-dispatch/lot-receipt.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
@@ -74,6 +75,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(fieldRoutes, { prefix: "/api/v1/fields" });
   await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(irrigationRoutes, { prefix: "/api/v1/irrigations" });
+  await fastify.register(rougingRoutes, { prefix: "/api/v1/rougings" });
   await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
   await fastify.register(seedDispatchRoutes, { prefix: "/api/v1/seed-dispatches" });
   await fastify.register(lotReceiptRoutes, { prefix: "/api/dispatch-lots" });

@@ -6,6 +6,7 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { dehaulmingRoutes } from "./features/dehaulming/dehaulming.routes.js";
 import { farmerRoutes } from "./features/farmers/farmers.routes.js";
+import { fieldVisitRoutes } from "./features/field-visit/field-visit.routes.js";
 import { fieldRoutes } from "./features/fields/fields.route.js";
 import { harvestRoutes } from "./features/harvest/harvest.routes.js";
 import { irrigationRoutes } from "./features/irrigation/irrigation.routes.js";
@@ -76,6 +77,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
   await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
   await fastify.register(fieldRoutes, { prefix: "/api/v1/fields" });
+  await fastify.register(fieldVisitRoutes, { prefix: "/api/v1/field-visits" });
   await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(irrigationRoutes, { prefix: "/api/v1/irrigations" });
   await fastify.register(rougingRoutes, { prefix: "/api/v1/rougings" });

@@ -4,8 +4,10 @@ import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
+import { dehaulmingRoutes } from "./features/dehaulming/dehaulming.routes.js";
 import { farmerRoutes } from "./features/farmers/farmers.routes.js";
 import { fieldRoutes } from "./features/fields/fields.route.js";
+import { harvestRoutes } from "./features/harvest/harvest.routes.js";
 import { irrigationRoutes } from "./features/irrigation/irrigation.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { plantationRoutes } from "./features/plantation/plantation.routes.js";
@@ -13,6 +15,7 @@ import { rougingRoutes } from "./features/rouging/rouging.routes.js";
 import { lotReceiptRoutes } from "./features/seed-dispatch/lot-receipt.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
+import { stripTestRoutes } from "./features/strip-test/strip-test.routes.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
 
@@ -76,6 +79,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(irrigationRoutes, { prefix: "/api/v1/irrigations" });
   await fastify.register(rougingRoutes, { prefix: "/api/v1/rougings" });
+  await fastify.register(stripTestRoutes, { prefix: "/api/v1/strip-tests" });
+  await fastify.register(dehaulmingRoutes, { prefix: "/api/v1/dehaulmings" });
+  await fastify.register(harvestRoutes, { prefix: "/api/v1/harvests" });
   await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
   await fastify.register(seedDispatchRoutes, { prefix: "/api/v1/seed-dispatches" });
   await fastify.register(lotReceiptRoutes, { prefix: "/api/dispatch-lots" });

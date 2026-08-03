@@ -3,6 +3,7 @@ import type {
   CreateStripTestBody,
   FieldIdParam,
   StripTestIdParam,
+  UpdateStripTestBody,
 } from "@/features/strip-test/strip-test.schema.js";
 import * as stripTestService from "@/features/strip-test/strip-test.service.js";
 
@@ -58,6 +59,27 @@ export async function getStripTestByIdHandler(
     return reply.code(404).send({ success: false, message: "Strip Test record not found" });
   }
   return reply.send({ success: true, data: stripTest });
+}
+
+export async function updateStripTestHandler(
+  request: FastifyRequest<{ Params: StripTestIdParam; Body: UpdateStripTestBody }>,
+  reply: FastifyReply,
+) {
+  try {
+    const stripTest = await stripTestService.updateStripTest(request.params.id, request.body);
+    if (!stripTest) {
+      return reply.code(404).send({ success: false, message: "Strip Test record not found" });
+    }
+    return reply.send({ success: true, data: stripTest });
+  } catch (error: unknown) {
+    if (isUniqueTuberSizeViolation(error)) {
+      return reply.code(409).send({
+        success: false,
+        message: "Each tuber size can only appear once per strip test.",
+      });
+    }
+    throw error;
+  }
 }
 
 export async function deleteStripTestHandler(

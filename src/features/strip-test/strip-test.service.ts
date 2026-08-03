@@ -1,7 +1,10 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { fieldStripTests, stripTestTuberRecords } from "@/db/schema/fields.js";
-import type { CreateStripTestBody } from "@/features/strip-test/strip-test.schema.js";
+import type {
+  CreateStripTestBody,
+  UpdateStripTestBody,
+} from "@/features/strip-test/strip-test.schema.js";
 
 export async function createStripTest(data: CreateStripTestBody, createdById: string) {
   const { tuberRecords, ...stripTestData } = data;
@@ -58,6 +61,54 @@ export async function getStripTestById(id: string) {
       },
       createdBy: { columns: { id: true, name: true } },
     },
+  });
+}
+
+export async function updateStripTest(id: string, data: UpdateStripTestBody) {
+  const { tuberRecords, ...stripTestData } = data;
+
+  return db.transaction(async (tx) => {
+    let updatedStripTest: typeof fieldStripTests.$inferSelect | undefined;
+
+    if (Object.keys(stripTestData).length > 0) {
+      [updatedStripTest] = await tx
+        .update(fieldStripTests)
+        .set(stripTestData)
+        .where(eq(fieldStripTests.id, id))
+        .returning();
+    } else {
+      updatedStripTest = await tx.query.fieldStripTests.findFirst({
+        where: eq(fieldStripTests.id, id),
+      });
+    }
+
+    if (!updatedStripTest) {
+      return undefined;
+    }
+
+    let resultTuberRecords: (typeof stripTestTuberRecords.$inferSelect)[];
+    if (tuberRecords !== undefined) {
+      await tx.delete(stripTestTuberRecords).where(eq(stripTestTuberRecords.stripTestId, id));
+
+      const recordsToInsert = tuberRecords.map((record) => ({
+        ...record,
+        stripTestId: id,
+      }));
+
+      resultTuberRecords = await tx
+        .insert(stripTestTuberRecords)
+        .values(recordsToInsert)
+        .returning();
+    } else {
+      resultTuberRecords = await tx.query.stripTestTuberRecords.findMany({
+        where: eq(stripTestTuberRecords.stripTestId, id),
+      });
+    }
+
+    return {
+      ...updatedStripTest,
+      tuberRecords: resultTuberRecords,
+    };
   });
 }
 

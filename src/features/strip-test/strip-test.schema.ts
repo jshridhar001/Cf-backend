@@ -28,6 +28,8 @@ export const createStripTestBodySchema = z.object({
   tuberRecords: z.array(tuberRecordSchema).min(1, "At least one tuber record is required"),
 });
 
+export const updateStripTestBodySchema = createStripTestBodySchema.partial();
+
 export const stripTestIdParamSchema = z.object({
   id: z.string().uuid("Invalid Strip Test ID"),
 });
@@ -37,5 +39,6 @@ export const fieldIdParamSchema = z.object({
 });
 
 export type CreateStripTestBody = z.infer<typeof createStripTestBodySchema>;
+export type UpdateStripTestBody = z.infer<typeof updateStripTestBodySchema>;
 export type StripTestIdParam = z.infer<typeof stripTestIdParamSchema>;
 export type FieldIdParam = z.infer<typeof fieldIdParamSchema>;

@@ -5,11 +5,13 @@ import {
   deleteStripTestHandler,
   getStripTestByIdHandler,
   getStripTestsByFieldIdHandler,
+  updateStripTestHandler,
 } from "@/features/strip-test/strip-test.controller.js";
 import {
   createStripTestBodySchema,
   fieldIdParamSchema,
   stripTestIdParamSchema,
+  updateStripTestBodySchema,
 } from "@/features/strip-test/strip-test.schema.js";
 import { requireAuth } from "@/middleware/require-auth.js";
 
@@ -32,6 +34,12 @@ export async function stripTestRoutes(fastify: FastifyInstance) {
   );
 
   fastify.get("/:id", { schema: { params: stripTestIdParamSchema } }, getStripTestByIdHandler);
+
+  fastify.patch(
+    "/:id",
+    { schema: { params: stripTestIdParamSchema, body: updateStripTestBodySchema } },
+    updateStripTestHandler,
+  );
 
   fastify.delete("/:id", { schema: { params: stripTestIdParamSchema } }, deleteStripTestHandler);
 }

@@ -1,17 +1,27 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { fieldRougings } from "@/db/schema/fields.js";
+import { completeFieldTask } from "@/features/field-tasks/field-tasks.service.js";
 import type { CreateRougingBody, UpdateRougingBody } from "@/features/rouging/rouging.schema.js";
 
 export async function createRouging(data: CreateRougingBody, createdById: string) {
-  const [newRouging] = await db
-    .insert(fieldRougings)
-    .values({
-      ...data,
-      createdById,
-    })
-    .returning();
-  return newRouging;
+  return db.transaction(async (tx) => {
+    const [newRouging] = await tx
+      .insert(fieldRougings)
+      .values({
+        ...data,
+        createdById,
+      })
+      .returning();
+
+    await completeFieldTask(tx, {
+      fieldId: data.fieldId,
+      activityType: "ROUGING",
+      completion: { completedRougingId: newRouging.id },
+    });
+
+    return newRouging;
+  });
 }
 
 export async function getRougingsByFieldId(fieldId: string) {

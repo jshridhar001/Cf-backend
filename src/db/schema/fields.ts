@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
 import { farmers } from "@/db/schema/farmers.js";
+import { fieldTasks } from "@/db/schema/field-tasks.js";
 import { seedSizes, tuberSizes, varieties } from "@/db/schema/masters.js";
 
 // --- Enums ---
@@ -285,6 +286,7 @@ export const farmerFieldsRelations = relations(farmerFields, ({ one, many }) => 
   dehaulmings: many(fieldDehaulmings),
   stripTests: many(fieldStripTests),
   harvests: many(fieldHarvests),
+  tasks: many(fieldTasks),
 }));
 
 export const fieldVisitsRelations = relations(fieldVisits, ({ one }) => ({
@@ -298,7 +300,7 @@ export const fieldVisitsRelations = relations(fieldVisits, ({ one }) => ({
   }),
 }));
 
-export const fieldPlantationsRelations = relations(fieldPlantations, ({ one }) => ({
+export const fieldPlantationsRelations = relations(fieldPlantations, ({ one, many }) => ({
   field: one(farmerFields, {
     fields: [fieldPlantations.fieldId],
     references: [farmerFields.id],
@@ -315,6 +317,7 @@ export const fieldPlantationsRelations = relations(fieldPlantations, ({ one }) =
     fields: [fieldPlantations.createdById],
     references: [user.id],
   }),
+  tasks: many(fieldTasks),
 }));
 
 export const fieldIrrigationsRelations = relations(fieldIrrigations, ({ one }) => ({

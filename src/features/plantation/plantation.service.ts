@@ -1,20 +1,40 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
-import { fieldPlantations } from "@/db/schema/fields.js";
+import { farmerFields, fieldPlantations } from "@/db/schema/fields.js";
+import { scheduleEssentialTasks } from "@/features/field-tasks/field-tasks.service.js";
 import type {
   CreatePlantationBody,
   UpdatePlantationBody,
 } from "@/features/plantation/plantation.schema.js";
 
 export async function createPlantation(data: CreatePlantationBody, createdById: string) {
-  const [newPlantation] = await db
-    .insert(fieldPlantations)
-    .values({
-      ...data,
-      createdById,
-    })
-    .returning();
-  return newPlantation;
+  return db.transaction(async (tx) => {
+    const [newPlantation] = await tx
+      .insert(fieldPlantations)
+      .values({
+        ...data,
+        createdById,
+      })
+      .returning();
+
+    const field = await tx.query.farmerFields.findFirst({
+      where: eq(farmerFields.id, data.fieldId),
+      columns: { assignedOfficerId: true },
+    });
+
+    if (!field) {
+      throw new Error("Field not found for plantation.");
+    }
+
+    await scheduleEssentialTasks(tx, {
+      fieldId: data.fieldId,
+      plantationId: newPlantation.id,
+      assignedOfficerId: field.assignedOfficerId,
+      startDate: data.startDate,
+    });
+
+    return newPlantation;
+  });
 }
 
 export async function getPlantationsByFieldId(fieldId: string) {

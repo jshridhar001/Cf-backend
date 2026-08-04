@@ -1,10 +1,18 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { fieldStripTests, stripTestTuberRecords } from "@/db/schema/fields.js";
+import {
+  completeFieldTask,
+  type TaskActivityType,
+} from "@/features/field-tasks/field-tasks.service.js";
 import type {
   CreateStripTestBody,
   UpdateStripTestBody,
 } from "@/features/strip-test/strip-test.schema.js";
+
+function stripTestActivityType(round: CreateStripTestBody["round"]): TaskActivityType {
+  return round === "PRE_DEHAULMING" ? "STRIP_TEST_PRE_DEHAULMING" : "STRIP_TEST_POST_DEHAULMING";
+}
 
 export async function createStripTest(data: CreateStripTestBody, createdById: string) {
   const { tuberRecords, ...stripTestData } = data;
@@ -27,6 +35,12 @@ export async function createStripTest(data: CreateStripTestBody, createdById: st
       .insert(stripTestTuberRecords)
       .values(recordsToInsert)
       .returning();
+
+    await completeFieldTask(tx, {
+      fieldId: data.fieldId,
+      activityType: stripTestActivityType(data.round),
+      completion: { completedStripTestId: newStripTest.id },
+    });
 
     return {
       ...newStripTest,

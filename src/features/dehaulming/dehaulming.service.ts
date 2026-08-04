@@ -5,16 +5,26 @@ import type {
   CreateDehaulmingBody,
   UpdateDehaulmingBody,
 } from "@/features/dehaulming/dehaulming.schema.js";
+import { completeFieldTask } from "@/features/field-tasks/field-tasks.service.js";
 
 export async function createDehaulming(data: CreateDehaulmingBody, createdById: string) {
-  const [newDehaulming] = await db
-    .insert(fieldDehaulmings)
-    .values({
-      ...data,
-      createdById,
-    })
-    .returning();
-  return newDehaulming;
+  return db.transaction(async (tx) => {
+    const [newDehaulming] = await tx
+      .insert(fieldDehaulmings)
+      .values({
+        ...data,
+        createdById,
+      })
+      .returning();
+
+    await completeFieldTask(tx, {
+      fieldId: data.fieldId,
+      activityType: "DEHAULMING",
+      completion: { completedDehaulmingId: newDehaulming.id },
+    });
+
+    return newDehaulming;
+  });
 }
 
 export async function getDehaulmingsByFieldId(fieldId: string) {

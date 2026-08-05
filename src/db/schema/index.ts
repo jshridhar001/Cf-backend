@@ -1,6 +1,7 @@
 export * from "@/db/schema/access-control.js";
 export * from "@/db/schema/farmer-stock.js";
 export * from "@/db/schema/farmers.js";
+export * from "@/db/schema/field-instructions.js";
 export * from "@/db/schema/field-tasks.js";
 export * from "@/db/schema/fields.js";
 export * from "@/db/schema/masters.js";

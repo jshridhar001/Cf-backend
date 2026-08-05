@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
 import { farmers } from "@/db/schema/farmers.js";
+import { fieldInstructions } from "@/db/schema/field-instructions.js";
 import { fieldTasks } from "@/db/schema/field-tasks.js";
 import { seedSizes, tuberSizes, varieties } from "@/db/schema/masters.js";
 
@@ -287,6 +288,7 @@ export const farmerFieldsRelations = relations(farmerFields, ({ one, many }) => 
   stripTests: many(fieldStripTests),
   harvests: many(fieldHarvests),
   tasks: many(fieldTasks),
+  instructions: many(fieldInstructions),
 }));
 
 export const fieldVisitsRelations = relations(fieldVisits, ({ one }) => ({

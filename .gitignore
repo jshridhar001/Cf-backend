@@ -53,3 +53,9 @@ coverage/
 Thumbs.db
 
 curls
+Backup
+
+# =========================================
+# Seed scripts (local/dev data loaders)
+# =========================================
+src/db/seed-*.ts

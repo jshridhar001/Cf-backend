@@ -1,5 +1,15 @@
 import { relations } from "drizzle-orm";
-import { date, index, pgEnum, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  date,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
 import {
   farmerFields,
@@ -21,6 +31,9 @@ export const taskActivityTypeEnum = pgEnum("task_activity_type", [
 
 // Lifecycle statuses. OVERDUE = past dueDate and still unfinished (set by app when dueDate < today).
 export const taskStatusEnum = pgEnum("task_status", ["PENDING", "OVERDUE", "DONE", "CANCELLED"]);
+
+// gantt-task-react Task.type values
+export const ganttTaskTypeEnum = pgEnum("gantt_task_type", ["task", "milestone", "project"]);
 
 // --- 2. The Task Table ---
 
@@ -44,6 +57,15 @@ export const fieldTasks = pgTable(
     activityType: taskActivityTypeEnum("activity_type").notNull(),
     status: taskStatusEnum("status").default("PENDING").notNull(),
     dueDate: date("due_date").notNull(),
+
+    // Gantt domain fields (UI-only fields like styles stay on the frontend)
+    name: text("name").notNull(),
+    type: ganttTaskTypeEnum("type").default("task").notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    progress: integer("progress").default(0).notNull(),
+    dependencies: uuid("dependencies").array(),
+    project: text("project"),
 
     // Strict, safe linkages to the actual completed records
     // Only ONE of these should be populated when status === 'DONE'

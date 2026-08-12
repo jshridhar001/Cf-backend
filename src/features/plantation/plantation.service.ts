@@ -31,6 +31,7 @@ export async function createPlantation(data: CreatePlantationBody, createdById: 
       plantationId: newPlantation.id,
       assignedOfficerId: field.assignedOfficerId,
       startDate: data.startDate,
+      endDate: data.endDate,
     });
 
     return newPlantation;

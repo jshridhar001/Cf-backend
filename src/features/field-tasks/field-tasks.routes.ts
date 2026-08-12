@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import {
+  getAllTasksHandler,
   getOfficerTasksHandler,
   getTaskSummaryHandler,
 } from "@/features/field-tasks/field-tasks.controller.js";
@@ -14,6 +15,8 @@ export async function fieldTasksRoutes(fastify: FastifyInstance) {
   // Head-office monitoring
   await fastify.register(async (headOfficeScope) => {
     headOfficeScope.addHook("preHandler", requireHeadOffice);
+
+    headOfficeScope.get("/", getAllTasksHandler);
 
     headOfficeScope.get(
       "/task-summary",

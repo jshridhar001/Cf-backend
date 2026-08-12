@@ -19,7 +19,9 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed-users.ts && tsx src/db/seed-masters.ts",
     "db:seed:users": "tsx src/db/seed-users.ts",
-    "db:seed:masters": "tsx src/db/seed-masters.ts"
+    "db:seed:masters": "tsx src/db/seed-masters.ts",
+    "db:seed:operations": "tsx src/db/seed-operations.ts",
+    "db:clear:fields": "tsx src/db/clear-fields.ts"
   },
   "lint-staged": {
     "src/**/*.ts": [

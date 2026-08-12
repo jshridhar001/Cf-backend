@@ -14,6 +14,11 @@ export async function getTaskSummaryHandler(
   return reply.send({ success: true, data: summary });
 }
 
+export async function getAllTasksHandler(_request: FastifyRequest, reply: FastifyReply) {
+  const tasks = await fieldTasksService.getAllTasks();
+  return reply.send({ success: true, data: tasks });
+}
+
 export async function getOfficerTasksHandler(
   request: FastifyRequest<{ Params: OfficerIdParam }>,
   reply: FastifyReply,

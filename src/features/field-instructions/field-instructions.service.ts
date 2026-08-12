@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { fieldInstructionReplies, fieldInstructions } from "@/db/schema/field-instructions.js";
 import { farmerFields } from "@/db/schema/fields.js";
@@ -7,6 +7,9 @@ import type {
   CreateReplyInput,
   UpdateInstructionStatusInput,
 } from "@/features/field-instructions/field-instructions.schema.js";
+
+/** Instruction counts as message 1; max 9 replies → 10 messages total. */
+const MAX_REPLIES = 9;
 
 const instructionDetailWith = {
   field: {
@@ -108,6 +111,24 @@ export async function addReply(
   input: CreateReplyInput,
   createdById: string,
 ) {
+  const instruction = await db.query.fieldInstructions.findFirst({
+    where: eq(fieldInstructions.id, instructionId),
+    columns: { id: true },
+  });
+
+  if (!instruction) {
+    throw new Error("Instruction not found");
+  }
+
+  const [{ replyCount }] = await db
+    .select({ replyCount: count() })
+    .from(fieldInstructionReplies)
+    .where(eq(fieldInstructionReplies.instructionId, instructionId));
+
+  if (Number(replyCount) >= MAX_REPLIES) {
+    throw new Error("Thread is full (maximum 10 messages including the instruction)");
+  }
+
   const [reply] = await db
     .insert(fieldInstructionReplies)
     .values({

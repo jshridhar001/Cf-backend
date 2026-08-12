@@ -81,10 +81,21 @@ export async function addReplyHandler(
     });
   }
 
-  const replyData = await fieldInstructionsService.addReply(
-    request.params.instructionId,
-    request.body,
-    currentUserId,
-  );
-  return reply.status(201).send({ success: true, data: replyData });
+  try {
+    const replyData = await fieldInstructionsService.addReply(
+      request.params.instructionId,
+      request.body,
+      currentUserId,
+    );
+    return reply.status(201).send({ success: true, data: replyData });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to add reply";
+    if (message === "Instruction not found") {
+      return reply.code(404).send({ success: false, message });
+    }
+    if (message.startsWith("Thread is full")) {
+      return reply.code(400).send({ success: false, message });
+    }
+    return reply.code(500).send({ success: false, message });
+  }
 }

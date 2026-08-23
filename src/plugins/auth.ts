@@ -9,7 +9,10 @@ export const authPlugin = fp(async (fastify: FastifyInstance) => {
     url: "/api/auth/*",
     async handler(request: FastifyRequest, reply: FastifyReply) {
       try {
-        const protocol = request.protocol;
+        const forwardedProto = request.headers["x-forwarded-proto"];
+        const protocol =
+          (typeof forwardedProto === "string" ? forwardedProto.split(",")[0]?.trim() : undefined) ||
+          request.protocol;
         const host = request.headers.host || "localhost:8080";
         const url = new URL(request.url, `${protocol}://${host}`);
 
@@ -24,7 +27,16 @@ export const authPlugin = fp(async (fastify: FastifyInstance) => {
         const response = await auth.handler(req);
 
         reply.status(response.status);
+
+        const setCookies = response.headers.getSetCookie();
+        if (setCookies.length > 0) {
+          reply.header("set-cookie", setCookies);
+        }
+
         response.headers.forEach((value, key) => {
+          if (key.toLowerCase() === "set-cookie") {
+            return;
+          }
           reply.header(key, value);
         });
 

@@ -19,17 +19,16 @@ import { lotReceiptRoutes } from "./features/seed-dispatch/lot-receipt.routes.js
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
 import { stripTestRoutes } from "./features/strip-test/strip-test.routes.js";
-import { auth } from "./lib/auth.js";
+import { auth, trustedOrigins } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
 
 config();
-
-const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 export const buildApp = async (): Promise<FastifyInstance> => {
   const isDev = process.env.NODE_ENV === "development";
 
   const fastify: FastifyInstance = Fastify({
+    trustProxy: true,
     logger: isDev
       ? {
           level: process.env.LOG_LEVEL || "info",
@@ -51,10 +50,11 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   fastify.setSerializerCompiler(serializerCompiler);
 
   await fastify.register(cors, {
-    origin: process.env.CORS_ORIGIN || clientOrigin,
+    origin: trustedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: ["set-auth-token"],
     maxAge: 86400,
   });
 

@@ -1,12 +1,12 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
-import { admin } from "better-auth/plugins";
-import { db } from "../db/index.js";
-import * as schema from "../db/schema/index.js";
-import { sendWelcomeEmail } from "./emails/send-welcome-email.js";
-import { sendPasswordResetEmail } from "./emails/sendPasswordResetEmail.js";
-import { sendVerificationEmail } from "./emails/sendVerificationEmail.js";
+import { admin, bearer } from "better-auth/plugins";
+import { db } from "@/db/index.js";
+import * as schema from "@/db/schema/index.js";
+import { sendWelcomeEmail } from "@/lib/emails/send-welcome-email.js";
+import { sendPasswordResetEmail } from "@/lib/emails/sendPasswordResetEmail.js";
+import { sendVerificationEmail } from "@/lib/emails/sendVerificationEmail.js";
 import {
   ac,
   accountsSeedSupplyManager,
@@ -16,10 +16,27 @@ import {
   managingDirector,
   programManager,
   superDeveloper,
-} from "./permissions.js";
-import { DEFAULT_ROLE } from "./roles.js";
+} from "@/lib/permissions.js";
+import { DEFAULT_ROLE } from "@/lib/roles.js";
 
 const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:8080";
+const isSecure = baseURL.startsWith("https://");
+
+function parseOrigins(...values: Array<string | undefined>): string[] {
+  return [
+    ...new Set(
+      values.flatMap((value) =>
+        (value ?? "")
+          .split(",")
+          .map((origin) => origin.trim())
+          .filter(Boolean),
+      ),
+    ),
+  ];
+}
+
+export const trustedOrigins = parseOrigins(process.env.CORS_ORIGIN, clientOrigin);
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -64,6 +81,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    bearer(),
     admin({
       ac,
       defaultRole: DEFAULT_ROLE,
@@ -79,9 +97,21 @@ export const auth = betterAuth({
       },
     }),
   ],
-  trustedOrigins: [process.env.CORS_ORIGIN || clientOrigin],
+  trustedOrigins,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:8080",
+  baseURL,
+  advanced: {
+    useSecureCookies: isSecure,
+    defaultCookieAttributes: isSecure
+      ? {
+          sameSite: "none",
+          secure: true,
+          partitioned: true,
+        }
+      : {
+          sameSite: "lax",
+        },
+  },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       const isSignUp = ctx.path.startsWith("/sign-up");

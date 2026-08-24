@@ -13,6 +13,10 @@ export const createFieldBodySchema = z.object({
 
 export const updateFieldBodySchema = createFieldBodySchema.partial();
 
+export const updateBoundaryBodySchema = z.object({
+  geoLocation: z.string().min(1, "Geo location is required"),
+});
+
 export const fieldIdParamSchema = z.object({
   id: z.string().uuid("Invalid Field ID"),
 });
@@ -24,5 +28,6 @@ export const getFieldsQuerySchema = z.object({
 
 export type CreateFieldBody = z.infer<typeof createFieldBodySchema>;
 export type UpdateFieldBody = z.infer<typeof updateFieldBodySchema>;
+export type UpdateBoundaryBody = z.infer<typeof updateBoundaryBodySchema>;
 export type FieldIdParam = z.infer<typeof fieldIdParamSchema>;
 export type GetFieldsQuery = z.infer<typeof getFieldsQuerySchema>;

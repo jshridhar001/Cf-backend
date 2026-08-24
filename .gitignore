@@ -58,4 +58,9 @@ Backup
 # =========================================
 # Seed scripts (local/dev data loaders)
 # =========================================
+src/db/seed-users.ts
+src/db/seed-masters.ts
+src/db/seed-operations.ts
 src/db/seed-*.ts
+src/db/seed-*.js
+dist/db/seed-*.js

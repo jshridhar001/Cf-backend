@@ -3,6 +3,7 @@ import type {
   CreateFieldBody,
   FieldIdParam,
   GetFieldsQuery,
+  UpdateBoundaryBody,
   UpdateFieldBody,
 } from "@/features/fields/fields.schema.js";
 import * as fieldsService from "@/features/fields/fields.service.js";
@@ -86,6 +87,20 @@ export async function updateFieldHandler(
     }
     throw error;
   }
+}
+
+export async function updateFieldBoundaryHandler(
+  request: FastifyRequest<{ Params: FieldIdParam; Body: UpdateBoundaryBody }>,
+  reply: FastifyReply,
+) {
+  const field = await fieldsService.updateFieldBoundary(
+    request.params.id,
+    request.body.geoLocation,
+  );
+  if (!field) {
+    return reply.code(404).send({ success: false, message: "Field not found" });
+  }
+  return reply.send({ success: true, data: field });
 }
 
 export async function deleteFieldHandler(

@@ -5,12 +5,14 @@ import {
   getFieldActivitiesByIdHandler,
   getFieldByIdHandler,
   getFieldsHandler,
+  updateFieldBoundaryHandler,
   updateFieldHandler,
 } from "@/features/fields/fields.controller.js";
 import {
   createFieldBodySchema,
   fieldIdParamSchema,
   getFieldsQuerySchema,
+  updateBoundaryBodySchema,
   updateFieldBodySchema,
 } from "@/features/fields/fields.schema.js";
 import { requireAuth } from "@/middleware/require-auth.js";
@@ -29,6 +31,12 @@ export async function fieldRoutes(fastify: FastifyInstance) {
   );
 
   fastify.get("/:id", { schema: { params: fieldIdParamSchema } }, getFieldByIdHandler);
+
+  fastify.patch(
+    "/:id/boundary",
+    { schema: { params: fieldIdParamSchema, body: updateBoundaryBodySchema } },
+    updateFieldBoundaryHandler,
+  );
 
   fastify.patch(
     "/:id",

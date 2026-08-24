@@ -21,7 +21,8 @@
     "db:seed:users": "tsx src/db/seed-users.ts",
     "db:seed:masters": "tsx src/db/seed-masters.ts",
     "db:seed:operations": "tsx src/db/seed-operations.ts",
-    "db:clear:fields": "tsx src/db/clear-fields.ts"
+    "db:clear:fields": "tsx src/db/clear-fields.ts",
+    "db:clear:dispatches": "tsx src/db/clear-dispatches.ts"
   },
   "lint-staged": {
     "src/**/*.ts": [

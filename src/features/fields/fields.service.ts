@@ -114,6 +114,15 @@ export async function updateField(id: string, data: UpdateFieldBody) {
   return updatedField;
 }
 
+export async function updateFieldBoundary(id: string, geoJsonString: string) {
+  const [updatedField] = await db
+    .update(farmerFields)
+    .set({ geoLocation: geoJsonString })
+    .where(eq(farmerFields.id, id))
+    .returning();
+  return updatedField;
+}
+
 export async function deleteField(id: string) {
   const [deletedField] = await db.delete(farmerFields).where(eq(farmerFields.id, id)).returning();
   return deletedField;

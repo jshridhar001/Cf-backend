@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { decimalStringSchema } from "@/shared/decimal.js";
 
 export const fieldActivityRoundZodEnum = z.enum(["PRE_DEHAULMING", "POST_DEHAULMING"]);
 
 const tuberRecordSchema = z.object({
   tuberSizeId: z.string().uuid("Invalid Tuber Size ID"),
   quantity: z.number().int().min(0, "Quantity cannot be negative"),
-  weightKg: z.string().regex(/^\d+(\.\d{1,2})?$/, "Weight must be a valid number"),
+  weightKg: decimalStringSchema,
 });
 
 export const createStripTestBodySchema = z.object({
@@ -17,8 +18,8 @@ export const createStripTestBodySchema = z.object({
 
   geoLocation: z.string().optional(),
 
-  stripLength: z.string().regex(/^\d+(\.\d{1,2})?$/, "Length must be a valid number"),
-  stripWidth: z.string().regex(/^\d+(\.\d{1,2})?$/, "Width must be a valid number"),
+  stripLength: decimalStringSchema,
+  stripWidth: decimalStringSchema,
   numberOfPlants: z.number().int().min(1, "Must have at least 1 plant"),
   stemsPerPlant: z.number().int().optional(),
 

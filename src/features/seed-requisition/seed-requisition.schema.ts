@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { decimalNumberSchema } from "@/shared/decimal.js";
 
 // --- Params Validation ---
 export const requisitionIdParamSchema = z.object({
@@ -25,7 +26,7 @@ const createSeedRequisitionObjectSchema = z
     farmerId: z.string().uuid("Invalid Farmer ID"),
     varietyId: z.string().uuid("Invalid Variety ID"),
     requestedBags: z.number().int().positive("Must request at least 1 bag").optional(),
-    requestedAcres: z.number().positive("Acres must be greater than 0").optional(),
+    requestedAcres: decimalNumberSchema.positive("Acres must be greater than 0").optional(),
     requisitionDate: z.string().datetime(),
     requestedDeliveryDate: z.string().datetime(),
     remarks: z.string().optional(),
@@ -44,7 +45,7 @@ const updateSeedRequisitionObjectSchema = z
     farmerId: z.string().uuid("Invalid Farmer ID").optional(),
     varietyId: z.string().uuid("Invalid Variety ID").optional(),
     requestedBags: z.number().int().positive("Must request at least 1 bag").optional(),
-    requestedAcres: z.number().positive("Acres must be greater than 0").optional(),
+    requestedAcres: decimalNumberSchema.positive("Acres must be greater than 0").optional(),
     requisitionDate: z.string().datetime().optional(),
     requestedDeliveryDate: z.string().datetime().optional(),
     remarks: z.string().optional(),

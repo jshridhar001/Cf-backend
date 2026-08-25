@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { decimalNumberSchema } from "@/shared/decimal.js";
 
 // --- CREATE DISPATCH ---
 const sizeLineSchema = z.object({
@@ -19,9 +20,9 @@ export const createDispatchSchema = z.object({
   driverMobile: z.string().optional(),
   manualGatePassNumber: z.string().optional(),
   weightSlipNumber: z.string().optional(),
-  grossWeight: z.number().optional(),
-  tareWeight: z.number().optional(),
-  netWeight: z.number().optional(),
+  grossWeight: decimalNumberSchema.optional(),
+  tareWeight: decimalNumberSchema.optional(),
+  netWeight: decimalNumberSchema.optional(),
   remarks: z.string().optional(),
   requisitions: z.array(requisitionStopSchema).min(1, "Dispatch must have at least one stop"),
 });

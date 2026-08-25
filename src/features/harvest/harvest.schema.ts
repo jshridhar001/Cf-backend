@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { decimalStringSchema } from "@/shared/decimal.js";
 
 export const createHarvestBodySchema = z.object({
   fieldId: z.string().uuid("Invalid Field ID"),
@@ -9,10 +10,7 @@ export const createHarvestBodySchema = z.object({
   geoLocation: z.string().optional(),
 
   // Handled as a string to maintain strict decimal precision in Postgres
-  yieldEstimateKg: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, "Yield estimate must be a valid number")
-    .optional(),
+  yieldEstimateKg: decimalStringSchema.optional(),
 
   mediaUrls: z.array(z.string().url("Must be a valid URL")).optional(),
   remarks: z.string().optional(),

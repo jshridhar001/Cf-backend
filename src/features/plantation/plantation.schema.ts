@@ -1,12 +1,13 @@
 import { z } from "zod";
+import { decimalStringSchema } from "@/shared/decimal.js";
 
 export const createPlantationBodySchema = z.object({
   fieldId: z.string().uuid("Invalid Field ID"),
   varietyId: z.string().uuid("Invalid Variety ID"),
   sizeId: z.string().uuid("Invalid Size ID"),
   // Decimals handled as strings to maintain precision
-  bagCount: z.string().regex(/^\d+(\.\d{1,2})?$/, "Bag count must be a valid number"),
-  acresPlanted: z.string().regex(/^\d+(\.\d{1,2})?$/, "Acres planted must be a valid number"),
+  bagCount: decimalStringSchema,
+  acresPlanted: decimalStringSchema,
 
   startDate: z.string().date("Start date must be a valid YYYY-MM-DD date"),
   endDate: z.string().date("End date must be a valid YYYY-MM-DD date"),

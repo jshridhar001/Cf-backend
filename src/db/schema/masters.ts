@@ -114,7 +114,3 @@ export const localityRelations = relations(localities, ({ one }) => ({
     references: [stations.id],
   }),
 }));
-
-export const facilityRelations = relations(facilities, ({ many }) => ({
-  // dispatchesFrom: many(dispatches),
-}));

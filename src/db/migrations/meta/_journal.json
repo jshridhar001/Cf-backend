@@ -8,6 +8,13 @@
       "when": 1785270057138,
       "tag": "0000_narrow_magus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787893657014,
+      "tag": "0001_dapper_justice",
+      "breakpoints": true
     }
   ]
 }

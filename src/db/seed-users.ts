@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { pathToFileURL } from "node:url";
 import { sql } from "drizzle-orm";
+import { db } from "@/db/index.js";
 import { auth } from "../lib/auth.js";
-import { db } from "./index.js";
 
 const SEED_USERS = [
   {

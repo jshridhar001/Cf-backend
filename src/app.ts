@@ -39,9 +39,10 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
   await fastify.register(cors, {
     origin: process.env.CORS_ORIGIN || clientOrigin,
-    credentials: true,
+    credentials: false,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: ["set-auth-token"],
     maxAge: 86400,
   });
 

@@ -1,12 +1,12 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
-import { admin } from "better-auth/plugins";
-import { db } from "../db/index.js";
-import * as schema from "../db/schema/index.js";
-import { sendWelcomeEmail } from "./emails/send-welcome-email.js";
-import { sendPasswordResetEmail } from "./emails/sendPasswordResetEmail.js";
-import { sendVerificationEmail } from "./emails/sendVerificationEmail.js";
+import { admin, bearer } from "better-auth/plugins";
+import { db } from "@/db/index.js";
+import * as schema from "@/db/schema/index.js";
+import { sendWelcomeEmail } from "@/lib/emails/send-welcome-email.js";
+import { sendPasswordResetEmail } from "@/lib/emails/sendPasswordResetEmail.js";
+import { sendVerificationEmail } from "@/lib/emails/sendVerificationEmail.js";
 import {
   ac,
   accountsSeedSupplyManager,
@@ -16,8 +16,8 @@ import {
   managingDirector,
   programManager,
   superDeveloper,
-} from "./permissions.js";
-import { DEFAULT_ROLE } from "./roles.js";
+} from "@/lib/permissions.js";
+import { DEFAULT_ROLE } from "@/lib/roles.js";
 
 const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
@@ -44,12 +44,12 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    autoSignInAfterVerification: true,
+    autoSignInAfterVerification: false,
     sendOnSignUp: true,
     sendOnSignIn: false,
     sendVerificationEmail: async ({ user, url }) => {
       const verificationUrl = new URL(url);
-      verificationUrl.searchParams.set("callbackURL", `${clientOrigin}/dashboard`);
+      verificationUrl.searchParams.set("callbackURL", `${clientOrigin}/`);
       await sendVerificationEmail(user.email, verificationUrl.toString());
     },
   },
@@ -58,12 +58,9 @@ export const auth = betterAuth({
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7,
-    cookieCache: {
-      enabled: true,
-      maxAge: 60 * 5,
-    },
   },
   plugins: [
+    bearer(),
     admin({
       ac,
       defaultRole: DEFAULT_ROLE,

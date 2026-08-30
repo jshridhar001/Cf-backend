@@ -1,7 +1,24 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
-import { farmerFamilies, farmers } from "@/db/schema/farmers.js";
-import type { CreateFarmerBody, UpdateFarmerBody } from "@/features/farmers/farmers.schema.js";
+import { farmerContracts, farmerFamilies, farmers } from "@/db/schema/farmers.js";
+import type {
+  CreateFarmerBody,
+  CreateFarmerContractBody,
+  UpdateFarmerBody,
+  UpdateFarmerContractBody,
+} from "@/features/farmers/farmers.schema.js";
+
+const farmerDetailRelations = {
+  family: {
+    with: {
+      station: true,
+      locality: true,
+    },
+  },
+  station: true,
+  locality: true,
+  contracts: true,
+} as const;
 
 export const farmersService = {
   // --- Families (read-only for picker) ---
@@ -34,7 +51,9 @@ export const farmersService = {
             status: data.status,
             stationId: data.stationId,
             localityId: data.localityId,
-            contractUrl: data.contractUrl,
+            bankName: data.bankName,
+            ifscCode: data.ifscCode,
+            bankAccountNumber: data.bankAccountNumber,
             familyId: null,
           })
           .returning();
@@ -64,7 +83,9 @@ export const farmersService = {
             status: data.status,
             stationId: data.stationId,
             localityId: data.localityId,
-            contractUrl: data.contractUrl,
+            bankName: data.bankName,
+            ifscCode: data.ifscCode,
+            bankAccountNumber: data.bankAccountNumber,
             familyId: family.id,
           })
           .returning();
@@ -95,7 +116,9 @@ export const farmersService = {
           status: data.status,
           stationId: data.stationId,
           localityId: data.localityId,
-          contractUrl: data.contractUrl,
+          bankName: data.bankName,
+          ifscCode: data.ifscCode,
+          bankAccountNumber: data.bankAccountNumber,
           familyId: data.familyId,
         })
         .returning();
@@ -105,22 +128,14 @@ export const farmersService = {
 
   async getFarmers() {
     return await db.query.farmers.findMany({
-      with: {
-        family: true,
-        station: true,
-        locality: true,
-      },
+      with: farmerDetailRelations,
     });
   },
 
   async getFarmerById(id: string) {
     return await db.query.farmers.findFirst({
       where: eq(farmers.id, id),
-      with: {
-        family: true,
-        station: true,
-        locality: true,
-      },
+      with: farmerDetailRelations,
     });
   },
 
@@ -203,5 +218,47 @@ export const farmersService = {
 
   async deleteAllFarmers() {
     return await db.delete(farmers).returning();
+  },
+
+  // --- Farmer contracts ---
+  async createFarmerContract(farmerId: string, data: CreateFarmerContractBody) {
+    const farmer = await db.query.farmers.findFirst({
+      where: eq(farmers.id, farmerId),
+    });
+    if (!farmer) return undefined;
+
+    const [contract] = await db
+      .insert(farmerContracts)
+      .values({
+        farmerId,
+        variety: data.variety,
+        date: data.date,
+        acres: data.acres,
+        contractUrl: data.contractUrl,
+      })
+      .returning();
+    return contract;
+  },
+
+  async updateFarmerContract(farmerId: string, contractId: string, data: UpdateFarmerContractBody) {
+    const [updated] = await db
+      .update(farmerContracts)
+      .set({
+        ...(data.variety !== undefined ? { variety: data.variety } : {}),
+        ...(data.date !== undefined ? { date: data.date } : {}),
+        ...(data.acres !== undefined ? { acres: data.acres } : {}),
+        ...(data.contractUrl !== undefined ? { contractUrl: data.contractUrl } : {}),
+      })
+      .where(and(eq(farmerContracts.id, contractId), eq(farmerContracts.farmerId, farmerId)))
+      .returning();
+    return updated;
+  },
+
+  async deleteFarmerContract(farmerId: string, contractId: string) {
+    const [deleted] = await db
+      .delete(farmerContracts)
+      .where(and(eq(farmerContracts.id, contractId), eq(farmerContracts.farmerId, farmerId)))
+      .returning();
+    return deleted;
   },
 };

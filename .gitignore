@@ -52,4 +52,9 @@ coverage/
 .LSOverride
 Thumbs.db
 
+# =========================================
+# Local-only files
+# =========================================
 curls
+src/db/seed-users.ts
+src/db/seed-master.ts

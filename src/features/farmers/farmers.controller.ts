@@ -1,8 +1,13 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import {
+  type CreateFarmerContractBody,
+  createFarmerContractSchema,
   createFarmerSchema,
+  type FarmerContractIdParam,
   type FarmerIdParam,
   type UpdateFarmerBody,
+  type UpdateFarmerContractBody,
+  updateFarmerContractSchema,
   updateFarmerSchema,
 } from "@/features/farmers/farmers.schema.js";
 import { farmersService } from "@/features/farmers/farmers.service.js";
@@ -102,5 +107,54 @@ export class FarmersController {
   static async deleteAllFarmers(_request: FastifyRequest, reply: FastifyReply) {
     await farmersService.deleteAllFarmers();
     return reply.send({ success: true, message: "All farmers deleted permanently." });
+  }
+
+  // --- Farmer contracts ---
+  static async createFarmerContract(
+    request: FastifyRequest<{ Params: FarmerIdParam; Body: CreateFarmerContractBody }>,
+    reply: FastifyReply,
+  ) {
+    const validatedData = createFarmerContractSchema.parse(request.body);
+    const contract = await farmersService.createFarmerContract(request.params.id, validatedData);
+
+    if (!contract) {
+      return reply.status(404).send({ success: false, error: "Farmer not found." });
+    }
+
+    return reply.status(201).send({ success: true, data: contract });
+  }
+
+  static async updateFarmerContract(
+    request: FastifyRequest<{ Params: FarmerContractIdParam; Body: UpdateFarmerContractBody }>,
+    reply: FastifyReply,
+  ) {
+    const validatedData = updateFarmerContractSchema.parse(request.body);
+    const contract = await farmersService.updateFarmerContract(
+      request.params.id,
+      request.params.contractId,
+      validatedData,
+    );
+
+    if (!contract) {
+      return reply.status(404).send({ success: false, error: "Contract not found." });
+    }
+
+    return reply.send({ success: true, data: contract });
+  }
+
+  static async deleteFarmerContract(
+    request: FastifyRequest<{ Params: FarmerContractIdParam }>,
+    reply: FastifyReply,
+  ) {
+    const deleted = await farmersService.deleteFarmerContract(
+      request.params.id,
+      request.params.contractId,
+    );
+
+    if (!deleted) {
+      return reply.status(404).send({ success: false, error: "Contract not found." });
+    }
+
+    return reply.send({ success: true, message: "Contract deleted successfully." });
   }
 }

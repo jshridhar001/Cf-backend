@@ -15,6 +15,20 @@
       "when": 1787893657014,
       "tag": "0001_dapper_justice",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788003767196,
+      "tag": "0002_hesitant_black_crow",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788023258022,
+      "tag": "0003_powerful_rafael_vega",
+      "breakpoints": true
     }
   ]
 }

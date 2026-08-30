@@ -4,6 +4,16 @@ import { z } from "zod";
 const accountTypeEnum = z.enum(["INDIVIDUAL", "FAMILY_PRIMARY", "FAMILY_MEMBER"]);
 const statusEnum = z.enum(["ACTIVE", "INACTIVE", "BLACKLISTED"]);
 
+const ifscCodeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Must be a valid 11-character IFSC code");
+
+const bankAccountNumberSchema = z
+  .string()
+  .regex(/^[0-9]{9,18}$/, "Must be a 9–18 digit bank account number");
+
 const farmerBaseFields = {
   name: z.string().min(2, "Name is required"),
   accountNumber: z.string().min(1, "Account number is required"),
@@ -13,7 +23,9 @@ const farmerBaseFields = {
   status: statusEnum.default("ACTIVE"),
   stationId: z.string().uuid("Invalid Station ID"),
   localityId: z.string().uuid("Invalid Locality ID"),
-  contractUrl: z.string().url("Must be a valid URL").optional(),
+  bankName: z.string().min(2, "Bank name is required").optional(),
+  ifscCode: ifscCodeSchema.optional(),
+  bankAccountNumber: bankAccountNumberSchema.optional(),
 };
 
 // --- Create: discriminated by accountType ---
@@ -53,7 +65,9 @@ export const updateFarmerSchema = z.object({
   stationId: z.string().uuid("Invalid Station ID").optional(),
   localityId: z.string().uuid("Invalid Locality ID").optional(),
   familyId: z.string().uuid("Invalid Family ID").optional().nullable(),
-  contractUrl: z.string().url("Must be a valid URL").optional().nullable(),
+  bankName: z.string().min(2, "Bank name is required").optional().nullable(),
+  ifscCode: ifscCodeSchema.optional().nullable(),
+  bankAccountNumber: bankAccountNumberSchema.optional().nullable(),
   familyName: z.string().min(2, "Family name must be at least 2 characters").optional(),
   familyAccountNumber: z.string().min(1, "Family account number is required").optional(),
 });
@@ -62,6 +76,32 @@ export const farmerIdParamSchema = z.object({
   id: z.string().uuid("Invalid farmer ID"),
 });
 
+const acresSchema = z.string().regex(/^\d+(\.\d{1,2})?$/, "Must be a decimal with up to 2 places");
+
+const contractDateSchema = z.iso.date("Must be a date in YYYY-MM-DD format");
+
+export const createFarmerContractSchema = z.object({
+  variety: z.string().min(1, "Variety is required"),
+  date: contractDateSchema,
+  acres: acresSchema,
+  contractUrl: z.string().url("Must be a valid URL"),
+});
+
+export const updateFarmerContractSchema = z.object({
+  variety: z.string().min(1, "Variety is required").optional(),
+  date: contractDateSchema.optional(),
+  acres: acresSchema.optional(),
+  contractUrl: z.string().url("Must be a valid URL").optional(),
+});
+
+export const farmerContractIdParamSchema = z.object({
+  id: z.string().uuid("Invalid farmer ID"),
+  contractId: z.string().uuid("Invalid contract ID"),
+});
+
 export type CreateFarmerBody = z.infer<typeof createFarmerSchema>;
 export type UpdateFarmerBody = z.infer<typeof updateFarmerSchema>;
 export type FarmerIdParam = z.infer<typeof farmerIdParamSchema>;
+export type CreateFarmerContractBody = z.infer<typeof createFarmerContractSchema>;
+export type UpdateFarmerContractBody = z.infer<typeof updateFarmerContractSchema>;
+export type FarmerContractIdParam = z.infer<typeof farmerContractIdParamSchema>;

@@ -1,8 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import { FarmersController } from "@/features/farmers/farmers.controller.js";
 import {
+  createFarmerContractSchema,
   createFarmerSchema,
+  farmerContractIdParamSchema,
   farmerIdParamSchema,
+  updateFarmerContractSchema,
   updateFarmerSchema,
 } from "@/features/farmers/farmers.schema.js";
 import { requireHeadOffice } from "@/middleware/require-head-office.js";
@@ -33,5 +36,24 @@ export async function farmerRoutes(fastify: FastifyInstance) {
     "/:id",
     { schema: { params: farmerIdParamSchema } },
     FarmersController.deleteFarmer,
+  );
+
+  // --- Farmer contract routes ---
+  fastify.post(
+    "/:id/contracts",
+    { schema: { params: farmerIdParamSchema, body: createFarmerContractSchema } },
+    FarmersController.createFarmerContract,
+  );
+
+  fastify.put(
+    "/:id/contracts/:contractId",
+    { schema: { params: farmerContractIdParamSchema, body: updateFarmerContractSchema } },
+    FarmersController.updateFarmerContract,
+  );
+
+  fastify.delete(
+    "/:id/contracts/:contractId",
+    { schema: { params: farmerContractIdParamSchema } },
+    FarmersController.deleteFarmerContract,
   );
 }

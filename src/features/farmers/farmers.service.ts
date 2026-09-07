@@ -221,6 +221,31 @@ export const farmersService = {
   },
 
   // --- Farmer contracts ---
+  async getFarmerContracts(farmerId: string) {
+    const farmer = await db.query.farmers.findFirst({
+      where: eq(farmers.id, farmerId),
+    });
+    if (!farmer) return undefined;
+
+    return await db.query.farmerContracts.findMany({
+      where: eq(farmerContracts.farmerId, farmerId),
+    });
+  },
+
+  async getFarmerContract(farmerId: string, contractId: string) {
+    const farmer = await db.query.farmers.findFirst({
+      where: eq(farmers.id, farmerId),
+    });
+    if (!farmer) return { farmerFound: false as const };
+
+    const contract = await db.query.farmerContracts.findFirst({
+      where: and(eq(farmerContracts.id, contractId), eq(farmerContracts.farmerId, farmerId)),
+    });
+    if (!contract) return { farmerFound: true as const, contract: undefined };
+
+    return { farmerFound: true as const, contract };
+  },
+
   async createFarmerContract(farmerId: string, data: CreateFarmerContractBody) {
     const farmer = await db.query.farmers.findFirst({
       where: eq(farmers.id, farmerId),
@@ -234,7 +259,7 @@ export const farmersService = {
         variety: data.variety,
         date: data.date,
         acres: data.acres,
-        contractUrl: data.contractUrl,
+        ...(data.contractUrl !== undefined ? { contractUrl: data.contractUrl } : {}),
       })
       .returning();
     return contract;

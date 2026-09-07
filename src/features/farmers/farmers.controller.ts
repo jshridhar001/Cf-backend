@@ -110,6 +110,19 @@ export class FarmersController {
   }
 
   // --- Farmer contracts ---
+  static async getFarmerContracts(
+    request: FastifyRequest<{ Params: FarmerIdParam }>,
+    reply: FastifyReply,
+  ) {
+    const contracts = await farmersService.getFarmerContracts(request.params.id);
+
+    if (contracts === undefined) {
+      return reply.status(404).send({ success: false, error: "Farmer not found." });
+    }
+
+    return reply.send({ success: true, data: contracts });
+  }
+
   static async createFarmerContract(
     request: FastifyRequest<{ Params: FarmerIdParam; Body: CreateFarmerContractBody }>,
     reply: FastifyReply,

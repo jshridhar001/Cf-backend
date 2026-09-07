@@ -8,6 +8,7 @@ import {
   updateFarmerContractSchema,
   updateFarmerSchema,
 } from "@/features/farmers/farmers.schema.js";
+import { googleDriveRoutes } from "@/features/farmers/google-drive/google-drive.routes.js";
 import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function farmerRoutes(fastify: FastifyInstance) {
@@ -39,6 +40,12 @@ export async function farmerRoutes(fastify: FastifyInstance) {
   );
 
   // --- Farmer contract routes ---
+  fastify.get(
+    "/:id/contracts",
+    { schema: { params: farmerIdParamSchema } },
+    FarmersController.getFarmerContracts,
+  );
+
   fastify.post(
     "/:id/contracts",
     { schema: { params: farmerIdParamSchema, body: createFarmerContractSchema } },
@@ -56,4 +63,6 @@ export async function farmerRoutes(fastify: FastifyInstance) {
     { schema: { params: farmerContractIdParamSchema } },
     FarmersController.deleteFarmerContract,
   );
+
+  await fastify.register(googleDriveRoutes);
 }

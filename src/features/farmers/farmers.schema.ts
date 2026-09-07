@@ -84,14 +84,14 @@ export const createFarmerContractSchema = z.object({
   variety: z.string().min(1, "Variety is required"),
   date: contractDateSchema,
   acres: acresSchema,
-  contractUrl: z.string().url("Must be a valid URL"),
+  contractUrl: z.string().url("Must be a valid URL").optional().nullable(),
 });
 
 export const updateFarmerContractSchema = z.object({
   variety: z.string().min(1, "Variety is required").optional(),
   date: contractDateSchema.optional(),
   acres: acresSchema.optional(),
-  contractUrl: z.string().url("Must be a valid URL").optional(),
+  contractUrl: z.string().url("Must be a valid URL").optional().nullable(),
 });
 
 export const farmerContractIdParamSchema = z.object({

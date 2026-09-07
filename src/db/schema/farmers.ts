@@ -84,7 +84,7 @@ export const farmerContracts = pgTable(
     variety: text("variety").notNull(),
     date: pgDate("date").notNull(),
     acres: decimal("acres", { precision: 10, scale: 2 }).notNull(),
-    contractUrl: text("contract_url").notNull(),
+    contractUrl: text("contract_url"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

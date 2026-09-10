@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
   decimal,
   index,
   date as pgDate,
@@ -85,6 +86,8 @@ export const farmerContracts = pgTable(
     date: pgDate("date").notNull(),
     acres: decimal("acres", { precision: 10, scale: 2 }).notNull(),
     contractUrl: text("contract_url"),
+    hindiContractUrl: text("hindi_contract_url"),
+    isNotarized: boolean("is_notarized").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

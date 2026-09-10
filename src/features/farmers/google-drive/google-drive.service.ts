@@ -247,4 +247,46 @@ export const googleDriveService = {
 
     return { status: "ok", contract } as const;
   },
+
+  async uploadHindiContractDocument(
+    farmerId: string,
+    contractId: string,
+    file: ContractUploadFile,
+  ) {
+    const fileError = validateFile(file);
+    if (fileError) {
+      return { status: "invalid_file", error: fileError } as const;
+    }
+
+    const lookup = await farmersService.getFarmerContract(farmerId, contractId);
+    if (!lookup.farmerFound) {
+      return { status: "farmer_not_found" } as const;
+    }
+    if (!lookup.contract) {
+      return { status: "contract_not_found" } as const;
+    }
+
+    const { drive, folderId } = getDriveClient();
+    const previousFileId = parseDriveFileId(lookup.contract.hindiContractUrl);
+    if (previousFileId) {
+      await deleteDriveFile(drive, previousFileId);
+    }
+
+    const hindiContractUrl = await uploadToDrive(
+      drive,
+      folderId,
+      `${contractId}-hindi-${safeFileName(file.filename)}`,
+      file.mimetype,
+      file.buffer,
+    );
+
+    const contract = await farmersService.updateFarmerContract(farmerId, contractId, {
+      hindiContractUrl,
+    });
+    if (!contract) {
+      return { status: "contract_not_found" } as const;
+    }
+
+    return { status: "ok", contract } as const;
+  },
 };

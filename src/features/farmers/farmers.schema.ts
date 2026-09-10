@@ -85,6 +85,7 @@ export const createFarmerContractSchema = z.object({
   date: contractDateSchema,
   acres: acresSchema,
   contractUrl: z.string().url("Must be a valid URL").optional().nullable(),
+  hindiContractUrl: z.string().url("Must be a valid URL").optional().nullable(),
 });
 
 export const updateFarmerContractSchema = z.object({
@@ -92,6 +93,8 @@ export const updateFarmerContractSchema = z.object({
   date: contractDateSchema.optional(),
   acres: acresSchema.optional(),
   contractUrl: z.string().url("Must be a valid URL").optional().nullable(),
+  hindiContractUrl: z.string().url("Must be a valid URL").optional().nullable(),
+  isNotarized: z.boolean().optional(),
 });
 
 export const farmerContractIdParamSchema = z.object({

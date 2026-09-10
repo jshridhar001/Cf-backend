@@ -31,4 +31,10 @@ export async function googleDriveRoutes(fastify: FastifyInstance) {
     { schema: { params: farmerContractIdParamSchema } },
     GoogleDriveController.uploadContractDocument,
   );
+
+  fastify.post(
+    "/:id/contracts/:contractId/upload-hindi",
+    { schema: { params: farmerContractIdParamSchema } },
+    GoogleDriveController.uploadHindiContractDocument,
+  );
 }

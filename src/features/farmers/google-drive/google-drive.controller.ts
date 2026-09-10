@@ -4,7 +4,10 @@ import {
   CONTRACT_UPLOAD_MAX_BYTES,
   type GoogleDriveCallbackQuery,
 } from "@/features/farmers/google-drive/google-drive.schema.js";
-import { googleDriveService } from "@/features/farmers/google-drive/google-drive.service.js";
+import {
+  type ContractUploadFile,
+  googleDriveService,
+} from "@/features/farmers/google-drive/google-drive.service.js";
 
 function isFileTooLarge(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;
@@ -48,43 +51,58 @@ export class GoogleDriveController {
     request: FastifyRequest<{ Params: FarmerContractIdParam }>,
     reply: FastifyReply,
   ) {
-    try {
-      const uploaded = await request.file();
-      if (!uploaded) {
-        return reply.status(400).send({ success: false, error: "File is required." });
-      }
+    return handleContractUpload(request, reply, googleDriveService.uploadContractDocument);
+  }
 
-      const buffer = await uploaded.toBuffer();
-      if (uploaded.file.truncated || buffer.length > CONTRACT_UPLOAD_MAX_BYTES) {
-        return reply.status(400).send({ success: false, error: "File exceeds the 10MB limit." });
-      }
+  static async uploadHindiContractDocument(
+    request: FastifyRequest<{ Params: FarmerContractIdParam }>,
+    reply: FastifyReply,
+  ) {
+    return handleContractUpload(request, reply, googleDriveService.uploadHindiContractDocument);
+  }
+}
 
-      const result = await googleDriveService.uploadContractDocument(
-        request.params.id,
-        request.params.contractId,
-        {
-          filename: uploaded.filename,
-          mimetype: uploaded.mimetype,
-          buffer,
-        },
-      );
-
-      if (result.status === "farmer_not_found") {
-        return reply.status(404).send({ success: false, error: "Farmer not found." });
-      }
-      if (result.status === "contract_not_found") {
-        return reply.status(404).send({ success: false, error: "Contract not found." });
-      }
-      if (result.status === "invalid_file") {
-        return reply.status(400).send({ success: false, error: result.error });
-      }
-
-      return reply.send({ success: true, data: result.contract });
-    } catch (error: unknown) {
-      if (isFileTooLarge(error)) {
-        return reply.status(400).send({ success: false, error: "File exceeds the 10MB limit." });
-      }
-      throw error;
+async function handleContractUpload(
+  request: FastifyRequest<{ Params: FarmerContractIdParam }>,
+  reply: FastifyReply,
+  upload: (
+    farmerId: string,
+    contractId: string,
+    file: ContractUploadFile,
+  ) => ReturnType<typeof googleDriveService.uploadContractDocument>,
+) {
+  try {
+    const uploaded = await request.file();
+    if (!uploaded) {
+      return reply.status(400).send({ success: false, error: "File is required." });
     }
+
+    const buffer = await uploaded.toBuffer();
+    if (uploaded.file.truncated || buffer.length > CONTRACT_UPLOAD_MAX_BYTES) {
+      return reply.status(400).send({ success: false, error: "File exceeds the 10MB limit." });
+    }
+
+    const result = await upload(request.params.id, request.params.contractId, {
+      filename: uploaded.filename,
+      mimetype: uploaded.mimetype,
+      buffer,
+    });
+
+    if (result.status === "farmer_not_found") {
+      return reply.status(404).send({ success: false, error: "Farmer not found." });
+    }
+    if (result.status === "contract_not_found") {
+      return reply.status(404).send({ success: false, error: "Contract not found." });
+    }
+    if (result.status === "invalid_file") {
+      return reply.status(400).send({ success: false, error: result.error });
+    }
+
+    return reply.send({ success: true, data: result.contract });
+  } catch (error: unknown) {
+    if (isFileTooLarge(error)) {
+      return reply.status(400).send({ success: false, error: "File exceeds the 10MB limit." });
+    }
+    throw error;
   }
 }

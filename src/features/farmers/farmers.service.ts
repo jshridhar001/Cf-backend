@@ -260,6 +260,7 @@ export const farmersService = {
         date: data.date,
         acres: data.acres,
         ...(data.contractUrl !== undefined ? { contractUrl: data.contractUrl } : {}),
+        ...(data.hindiContractUrl !== undefined ? { hindiContractUrl: data.hindiContractUrl } : {}),
       })
       .returning();
     return contract;
@@ -273,6 +274,8 @@ export const farmersService = {
         ...(data.date !== undefined ? { date: data.date } : {}),
         ...(data.acres !== undefined ? { acres: data.acres } : {}),
         ...(data.contractUrl !== undefined ? { contractUrl: data.contractUrl } : {}),
+        ...(data.hindiContractUrl !== undefined ? { hindiContractUrl: data.hindiContractUrl } : {}),
+        ...(data.isNotarized !== undefined ? { isNotarized: data.isNotarized } : {}),
       })
       .where(and(eq(farmerContracts.id, contractId), eq(farmerContracts.farmerId, farmerId)))
       .returning();

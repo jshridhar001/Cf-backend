@@ -3,6 +3,7 @@ import { fromNodeHeaders } from "better-auth/node";
 import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import { seedRequisitionRoutes } from "@/features/seed-requisition/seed-requisition.routes.js";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { farmerRoutes } from "./features/farmers/farmers.routes.js";
 import { googleDriveOAuthRoutes } from "./features/farmers/google-drive/google-drive.routes.js";
@@ -68,6 +69,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
   await fastify.register(googleDriveOAuthRoutes, { prefix: "/api/v1/farmers/google-drive" });
   await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
+  await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
 
   fastify.get("/health", () => ({
     status: "ok",

@@ -15,13 +15,7 @@ import { varieties } from "@/db/schema/masters.js";
 // Import dispatches to link the relations later
 import { dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
 
-export const reqStatusEnum = pgEnum("req_status", [
-  "PENDING",
-  "APPROVED",
-  "REJECTED",
-  "FULFILLED",
-  "PARTIALLY_FULFILLED",
-]);
+export const reqStatusEnum = pgEnum("req_status", ["PENDING", "APPROVED", "REJECTED"]);
 
 export const seedRequisitions = pgTable(
   "seed_requisition",
@@ -36,17 +30,16 @@ export const seedRequisitions = pgTable(
 
     status: reqStatusEnum("status").default("PENDING").notNull(),
 
-    // Changed to Integer for bags
-    requestedBags: integer("requested_bags").notNull(),
-    requestedAcres: decimal("requested_acres", { precision: 10, scale: 2 }).notNull(),
+    // Exactly one of bags or acres is set (enforced in Zod)
+    requestedBags: integer("requested_bags"),
+    requestedAcres: decimal("requested_acres", { precision: 11, scale: 3 }),
 
     // Track fulfillment progress
     fulfilledBags: integer("fulfilled_bags").default(0).notNull(),
-    fulfilledAcres: decimal("fulfilled_acres", { precision: 10, scale: 2 }).default("0").notNull(),
+    fulfilledAcres: decimal("fulfilled_acres", { precision: 11, scale: 3 }).default("0").notNull(),
 
     requisitionDate: timestamp("requisition_date").notNull(),
     requestedDeliveryDate: timestamp("requested_delivery_date").notNull(),
-    approvedDeliveryDate: timestamp("approved_delivery_date"),
     remarks: text("remarks"),
     rejectionRemarks: text("rejection_remarks"),
 
@@ -64,7 +57,12 @@ export const seedRequisitions = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (t) => [index("seed_requisition_status_idx").on(t.status)],
+  (t) => [
+    index("seed_requisition_status_created_at_idx").on(t.status, t.createdAt),
+    index("seed_requisition_created_at_idx").on(t.createdAt),
+    index("seed_requisition_farmer_id_idx").on(t.farmerId),
+    index("seed_requisition_variety_id_idx").on(t.varietyId),
+  ],
 );
 
 export const seedRequisitionRelations = relations(seedRequisitions, ({ one, many }) => ({

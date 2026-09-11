@@ -20,6 +20,7 @@
     "db:seed": "tsx src/db/seed-users.ts",
     "db:seed:masters": "tsx src/db/seed-master.ts",
     "db:seed:farmers": "tsx src/db/seed-farmers.ts",
+    "db:seed:requisitions": "tsx src/db/seed-requisitions.ts",
     "google-drive:connect": "tsx src/features/farmers/google-drive/google-drive.connect.ts"
   },
   "lint-staged": {

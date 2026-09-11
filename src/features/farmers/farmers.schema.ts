@@ -76,7 +76,7 @@ export const farmerIdParamSchema = z.object({
   id: z.string().uuid("Invalid farmer ID"),
 });
 
-const acresSchema = z.string().regex(/^\d+(\.\d{1,2})?$/, "Must be a decimal with up to 2 places");
+const acresSchema = z.string().regex(/^\d+(\.\d{1,3})?$/, "Must be a decimal with up to 3 places");
 
 const contractDateSchema = z.iso.date("Must be a date in YYYY-MM-DD format");
 

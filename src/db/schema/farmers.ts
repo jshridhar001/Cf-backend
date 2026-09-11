@@ -84,7 +84,7 @@ export const farmerContracts = pgTable(
       .references(() => farmers.id, { onDelete: "cascade" }),
     variety: text("variety").notNull(),
     date: pgDate("date").notNull(),
-    acres: decimal("acres", { precision: 10, scale: 2 }).notNull(),
+    acres: decimal("acres", { precision: 10, scale: 3 }).notNull(),
     contractUrl: text("contract_url"),
     hindiContractUrl: text("hindi_contract_url"),
     isNotarized: boolean("is_notarized").default(false).notNull(),

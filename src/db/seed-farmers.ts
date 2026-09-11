@@ -68,6 +68,7 @@ export async function seedFarmers() {
           acres: "2.50",
           contractUrl: "https://example.com/contracts/ramesh-kufri-jyoti.pdf",
           hindiContractUrl: "https://example.com/contracts/ramesh-kufri-jyoti-hi.pdf",
+          isNotarized: true,
         },
         {
           variety: "Kufri Bahar",
@@ -75,6 +76,7 @@ export async function seedFarmers() {
           acres: "1.25",
           contractUrl: "https://example.com/contracts/ramesh-kufri-bahar.pdf",
           hindiContractUrl: "https://example.com/contracts/ramesh-kufri-bahar-hi.pdf",
+          isNotarized: false,
         },
       ],
     },
@@ -98,6 +100,7 @@ export async function seedFarmers() {
           acres: "4.00",
           contractUrl: "https://example.com/contracts/suresh-kufri-pukhraj.pdf",
           hindiContractUrl: "https://example.com/contracts/suresh-kufri-pukhraj-hi.pdf",
+          isNotarized: true,
         },
       ],
     },
@@ -121,6 +124,7 @@ export async function seedFarmers() {
           acres: "1.75",
           contractUrl: "https://example.com/contracts/anita-kufri-chipsona.pdf",
           hindiContractUrl: "https://example.com/contracts/anita-kufri-chipsona-hi.pdf",
+          isNotarized: false,
         },
       ],
     },
@@ -144,6 +148,7 @@ export async function seedFarmers() {
           acres: "3.00",
           contractUrl: "https://example.com/contracts/mohan-kufri-chandramukhi.pdf",
           hindiContractUrl: "https://example.com/contracts/mohan-kufri-chandramukhi-hi.pdf",
+          isNotarized: false,
         },
         {
           variety: "Kufri Jyoti",
@@ -151,6 +156,7 @@ export async function seedFarmers() {
           acres: "0.75",
           contractUrl: "https://example.com/contracts/mohan-kufri-jyoti.pdf",
           hindiContractUrl: "https://example.com/contracts/mohan-kufri-jyoti-hi.pdf",
+          isNotarized: true,
         },
       ],
     },
@@ -174,6 +180,7 @@ export async function seedFarmers() {
           acres: "5.50",
           contractUrl: "https://example.com/contracts/pritam-kufri-sindhuri.pdf",
           hindiContractUrl: "https://example.com/contracts/pritam-kufri-sindhuri-hi.pdf",
+          isNotarized: false,
         },
       ],
     },
@@ -207,6 +214,7 @@ export async function seedFarmers() {
         acres: contract.acres,
         contractUrl: contract.contractUrl,
         hindiContractUrl: contract.hindiContractUrl,
+        isNotarized: contract.isNotarized,
       })),
     );
 

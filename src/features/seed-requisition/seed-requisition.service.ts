@@ -16,6 +16,117 @@ const createdByUser = alias(user, "created_by_user");
 const approvedByUser = alias(user, "approved_by_user");
 const rejectedByUser = alias(user, "rejected_by_user");
 
+const requisitionDetailSelect = {
+  id: seedRequisitions.id,
+  farmerId: seedRequisitions.farmerId,
+  varietyId: seedRequisitions.varietyId,
+  status: seedRequisitions.status,
+  requestedBags: seedRequisitions.requestedBags,
+  requestedAcres: seedRequisitions.requestedAcres,
+  fulfilledBags: seedRequisitions.fulfilledBags,
+  fulfilledAcres: seedRequisitions.fulfilledAcres,
+  requisitionDate: seedRequisitions.requisitionDate,
+  requestedDeliveryDate: seedRequisitions.requestedDeliveryDate,
+  remarks: seedRequisitions.remarks,
+  rejectionRemarks: seedRequisitions.rejectionRemarks,
+  createdById: seedRequisitions.createdById,
+  approvedById: seedRequisitions.approvedById,
+  rejectedById: seedRequisitions.rejectedById,
+  approvedAt: seedRequisitions.approvedAt,
+  rejectedAt: seedRequisitions.rejectedAt,
+  createdAt: seedRequisitions.createdAt,
+  updatedAt: seedRequisitions.updatedAt,
+  farmerName: farmers.name,
+  farmerAccountNumber: farmers.accountNumber,
+  farmerMobileNumber: farmers.mobileNumber,
+  stationName: stations.name,
+  localityName: localities.name,
+  varietyName: varieties.name,
+  createdByName: createdByUser.name,
+  approvedByName: approvedByUser.name,
+  rejectedByName: rejectedByUser.name,
+};
+
+type RequisitionDetailRow = {
+  id: string;
+  farmerId: string;
+  varietyId: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  requestedBags: number | null;
+  requestedAcres: string | null;
+  fulfilledBags: number;
+  fulfilledAcres: string;
+  requisitionDate: Date;
+  requestedDeliveryDate: Date;
+  remarks: string | null;
+  rejectionRemarks: string | null;
+  createdById: string;
+  approvedById: string | null;
+  rejectedById: string | null;
+  approvedAt: Date | null;
+  rejectedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  farmerName: string;
+  farmerAccountNumber: string;
+  farmerMobileNumber: string;
+  stationName: string;
+  localityName: string;
+  varietyName: string;
+  createdByName: string | null;
+  approvedByName: string | null;
+  rejectedByName: string | null;
+};
+
+function requisitionDetailQuery() {
+  return db
+    .select(requisitionDetailSelect)
+    .from(seedRequisitions)
+    .innerJoin(farmers, eq(seedRequisitions.farmerId, farmers.id))
+    .innerJoin(stations, eq(farmers.stationId, stations.id))
+    .innerJoin(localities, eq(farmers.localityId, localities.id))
+    .innerJoin(varieties, eq(seedRequisitions.varietyId, varieties.id))
+    .leftJoin(createdByUser, eq(seedRequisitions.createdById, createdByUser.id))
+    .leftJoin(approvedByUser, eq(seedRequisitions.approvedById, approvedByUser.id))
+    .leftJoin(rejectedByUser, eq(seedRequisitions.rejectedById, rejectedByUser.id));
+}
+
+function mapRequisitionDetailRow(row: RequisitionDetailRow) {
+  return {
+    id: row.id,
+    farmerId: row.farmerId,
+    varietyId: row.varietyId,
+    status: row.status,
+    requestedBags: row.requestedBags,
+    requestedAcres: row.requestedAcres,
+    fulfilledBags: row.fulfilledBags,
+    fulfilledAcres: row.fulfilledAcres,
+    requisitionDate: row.requisitionDate,
+    requestedDeliveryDate: row.requestedDeliveryDate,
+    remarks: row.remarks,
+    rejectionRemarks: row.rejectionRemarks,
+    createdById: row.createdById,
+    approvedById: row.approvedById,
+    rejectedById: row.rejectedById,
+    approvedAt: row.approvedAt,
+    rejectedAt: row.rejectedAt,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    farmer: {
+      name: row.farmerName,
+      accountNumber: row.farmerAccountNumber,
+      mobileNumber: row.farmerMobileNumber,
+      station: { name: row.stationName },
+      locality: { name: row.localityName },
+    },
+    variety: { name: row.varietyName },
+    createdBy: row.createdByName ? { name: row.createdByName } : null,
+    approvedBy: row.approvedByName ? { name: row.approvedByName } : null,
+    rejectedBy: row.rejectedByName ? { name: row.rejectedByName } : null,
+    dispatchStops: [] as unknown[],
+  };
+}
+
 export async function createSeedRequisition(data: CreateSeedRequisitionBody, userId: string) {
   const [newReq] = await db
     .insert(seedRequisitions)
@@ -76,83 +187,14 @@ export async function getAllSeedRequisitions(query: ListSeedRequisitionsQuery) {
 }
 
 export async function getSeedRequisitionById(id: string) {
-  const [row] = await db
-    .select({
-      id: seedRequisitions.id,
-      farmerId: seedRequisitions.farmerId,
-      varietyId: seedRequisitions.varietyId,
-      status: seedRequisitions.status,
-      requestedBags: seedRequisitions.requestedBags,
-      requestedAcres: seedRequisitions.requestedAcres,
-      fulfilledBags: seedRequisitions.fulfilledBags,
-      fulfilledAcres: seedRequisitions.fulfilledAcres,
-      requisitionDate: seedRequisitions.requisitionDate,
-      requestedDeliveryDate: seedRequisitions.requestedDeliveryDate,
-      remarks: seedRequisitions.remarks,
-      rejectionRemarks: seedRequisitions.rejectionRemarks,
-      createdById: seedRequisitions.createdById,
-      approvedById: seedRequisitions.approvedById,
-      rejectedById: seedRequisitions.rejectedById,
-      approvedAt: seedRequisitions.approvedAt,
-      rejectedAt: seedRequisitions.rejectedAt,
-      createdAt: seedRequisitions.createdAt,
-      updatedAt: seedRequisitions.updatedAt,
-      farmerName: farmers.name,
-      farmerAccountNumber: farmers.accountNumber,
-      farmerMobileNumber: farmers.mobileNumber,
-      stationName: stations.name,
-      localityName: localities.name,
-      varietyName: varieties.name,
-      createdByName: createdByUser.name,
-      approvedByName: approvedByUser.name,
-      rejectedByName: rejectedByUser.name,
-    })
-    .from(seedRequisitions)
-    .innerJoin(farmers, eq(seedRequisitions.farmerId, farmers.id))
-    .innerJoin(stations, eq(farmers.stationId, stations.id))
-    .innerJoin(localities, eq(farmers.localityId, localities.id))
-    .innerJoin(varieties, eq(seedRequisitions.varietyId, varieties.id))
-    .leftJoin(createdByUser, eq(seedRequisitions.createdById, createdByUser.id))
-    .leftJoin(approvedByUser, eq(seedRequisitions.approvedById, approvedByUser.id))
-    .leftJoin(rejectedByUser, eq(seedRequisitions.rejectedById, rejectedByUser.id))
-    .where(eq(seedRequisitions.id, id))
-    .limit(1);
-
+  const [row] = await requisitionDetailQuery().where(eq(seedRequisitions.id, id)).limit(1);
   if (!row) return null;
+  return mapRequisitionDetailRow(row);
+}
 
-  return {
-    id: row.id,
-    farmerId: row.farmerId,
-    varietyId: row.varietyId,
-    status: row.status,
-    requestedBags: row.requestedBags,
-    requestedAcres: row.requestedAcres,
-    fulfilledBags: row.fulfilledBags,
-    fulfilledAcres: row.fulfilledAcres,
-    requisitionDate: row.requisitionDate,
-    requestedDeliveryDate: row.requestedDeliveryDate,
-    remarks: row.remarks,
-    rejectionRemarks: row.rejectionRemarks,
-    createdById: row.createdById,
-    approvedById: row.approvedById,
-    rejectedById: row.rejectedById,
-    approvedAt: row.approvedAt,
-    rejectedAt: row.rejectedAt,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    farmer: {
-      name: row.farmerName,
-      accountNumber: row.farmerAccountNumber,
-      mobileNumber: row.farmerMobileNumber,
-      station: { name: row.stationName },
-      locality: { name: row.localityName },
-    },
-    variety: { name: row.varietyName },
-    createdBy: row.createdByName ? { name: row.createdByName } : null,
-    approvedBy: row.approvedByName ? { name: row.approvedByName } : null,
-    rejectedBy: row.rejectedByName ? { name: row.rejectedByName } : null,
-    dispatchStops: [] as unknown[],
-  };
+export async function getSeedRequisitionReport() {
+  const rows = await requisitionDetailQuery().orderBy(desc(seedRequisitions.createdAt));
+  return rows.map(mapRequisitionDetailRow);
 }
 
 export async function updateSeedRequisition(id: string, data: UpdateSeedRequisitionBody) {

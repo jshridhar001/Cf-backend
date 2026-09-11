@@ -45,6 +45,16 @@ export async function getAllRequisitionsHandler(request: FastifyRequest, reply: 
   }
 }
 
+export async function getRequisitionReportHandler(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const data = await RequisitionService.getSeedRequisitionReport();
+    return reply.code(200).send({ success: true, data });
+  } catch (error) {
+    request.log.error(error);
+    return reply.code(500).send({ success: false, message: "Internal Server Error" });
+  }
+}
+
 export async function getRequisitionByIdHandler(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = requisitionIdParamSchema.parse(request.params);

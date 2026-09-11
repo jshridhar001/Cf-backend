@@ -5,6 +5,7 @@ import {
   deleteRequisitionHandler,
   getAllRequisitionsHandler,
   getRequisitionByIdHandler,
+  getRequisitionReportHandler,
   reviewRequisitionHandler,
   updateRequisitionHandler,
 } from "@/features/seed-requisition/seed-requisition.controller.js";
@@ -21,6 +22,7 @@ export async function seedRequisitionRoutes(fastify: FastifyInstance) {
     { schema: { querystring: listSeedRequisitionsQuerySchema } },
     getAllRequisitionsHandler,
   );
+  fastify.get("/report", getRequisitionReportHandler);
   fastify.get("/:id", getRequisitionByIdHandler);
   fastify.patch("/:id", updateRequisitionHandler);
 

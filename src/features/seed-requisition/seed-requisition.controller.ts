@@ -32,24 +32,14 @@ export async function createRequisitionHandler(request: FastifyRequest, reply: F
 export async function getAllRequisitionsHandler(request: FastifyRequest, reply: FastifyReply) {
   try {
     const query = listSeedRequisitionsQuerySchema.parse(request.query);
-    const { data, meta } = await RequisitionService.getAllSeedRequisitions(query);
-    return reply.code(200).send({ success: true, data, meta });
+    const data = await RequisitionService.getAllSeedRequisitions(query);
+    return reply.code(200).send({ success: true, data });
   } catch (error: unknown) {
     if (error && typeof error === "object" && "issues" in error) {
       return reply
         .code(400)
         .send({ success: false, errors: (error as { issues: unknown }).issues });
     }
-    request.log.error(error);
-    return reply.code(500).send({ success: false, message: "Internal Server Error" });
-  }
-}
-
-export async function getRequisitionReportHandler(request: FastifyRequest, reply: FastifyReply) {
-  try {
-    const data = await RequisitionService.getSeedRequisitionReport();
-    return reply.code(200).send({ success: true, data });
-  } catch (error) {
     request.log.error(error);
     return reply.code(500).send({ success: false, message: "Internal Server Error" });
   }

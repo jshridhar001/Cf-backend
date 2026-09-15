@@ -1,0 +1,1 @@
+ALTER TABLE "seed_requisition" ADD COLUMN "approved_delivery_date" timestamp;

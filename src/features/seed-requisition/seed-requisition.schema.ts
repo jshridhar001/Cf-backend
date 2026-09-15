@@ -7,8 +7,6 @@ export const requisitionIdParamSchema = z.object({
 });
 
 export const listSeedRequisitionsQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
   status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
   farmerId: z.string().uuid("Invalid Farmer ID").optional(),
   varietyId: z.string().uuid("Invalid Variety ID").optional(),
@@ -46,6 +44,7 @@ const createSeedRequisitionObjectSchema = z
     requestedAcres: acresDecimalSchema.optional(),
     requisitionDate: z.string().datetime(),
     requestedDeliveryDate: z.string().datetime(),
+    approvedDeliveryDate: z.string().datetime().optional(),
     remarks: z.string().optional(),
   })
   .refine(
@@ -65,6 +64,7 @@ const updateSeedRequisitionObjectSchema = z
     requestedAcres: acresDecimalSchema.optional(),
     requisitionDate: z.string().datetime().optional(),
     requestedDeliveryDate: z.string().datetime().optional(),
+    approvedDeliveryDate: z.string().datetime().optional(),
     remarks: z.string().optional(),
   })
   .refine(
@@ -92,6 +92,7 @@ export const updateSeedRequisitionSchema = z.preprocess(
 export const reviewRequisitionSchema = z.discriminatedUnion("status", [
   z.object({
     status: z.literal("APPROVED"),
+    approvedDeliveryDate: z.string().datetime().optional(),
   }),
   z.object({
     status: z.literal("REJECTED"),

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, lte, type SQL } from "drizzle-orm";
+import { and, desc, eq, gte, lte, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/db/index.js";
 import { user } from "@/db/schema/access-control.js";
@@ -27,6 +27,7 @@ const requisitionDetailSelect = {
   fulfilledAcres: seedRequisitions.fulfilledAcres,
   requisitionDate: seedRequisitions.requisitionDate,
   requestedDeliveryDate: seedRequisitions.requestedDeliveryDate,
+  approvedDeliveryDate: seedRequisitions.approvedDeliveryDate,
   remarks: seedRequisitions.remarks,
   rejectionRemarks: seedRequisitions.rejectionRemarks,
   createdById: seedRequisitions.createdById,
@@ -39,7 +40,9 @@ const requisitionDetailSelect = {
   farmerName: farmers.name,
   farmerAccountNumber: farmers.accountNumber,
   farmerMobileNumber: farmers.mobileNumber,
+  stationId: stations.id,
   stationName: stations.name,
+  localityId: localities.id,
   localityName: localities.name,
   varietyName: varieties.name,
   createdByName: createdByUser.name,
@@ -58,6 +61,7 @@ type RequisitionDetailRow = {
   fulfilledAcres: string;
   requisitionDate: Date;
   requestedDeliveryDate: Date;
+  approvedDeliveryDate: Date | null;
   remarks: string | null;
   rejectionRemarks: string | null;
   createdById: string;
@@ -70,7 +74,9 @@ type RequisitionDetailRow = {
   farmerName: string;
   farmerAccountNumber: string;
   farmerMobileNumber: string;
+  stationId: string;
   stationName: string;
+  localityId: string;
   localityName: string;
   varietyName: string;
   createdByName: string | null;
@@ -103,6 +109,7 @@ function mapRequisitionDetailRow(row: RequisitionDetailRow) {
     fulfilledAcres: row.fulfilledAcres,
     requisitionDate: row.requisitionDate,
     requestedDeliveryDate: row.requestedDeliveryDate,
+    approvedDeliveryDate: row.approvedDeliveryDate,
     remarks: row.remarks,
     rejectionRemarks: row.rejectionRemarks,
     createdById: row.createdById,
@@ -116,8 +123,8 @@ function mapRequisitionDetailRow(row: RequisitionDetailRow) {
       name: row.farmerName,
       accountNumber: row.farmerAccountNumber,
       mobileNumber: row.farmerMobileNumber,
-      station: { name: row.stationName },
-      locality: { name: row.localityName },
+      station: { id: row.stationId, name: row.stationName },
+      locality: { id: row.localityId, name: row.localityName },
     },
     variety: { name: row.varietyName },
     createdBy: row.createdByName ? { name: row.createdByName } : null,
@@ -137,6 +144,7 @@ export async function createSeedRequisition(data: CreateSeedRequisitionBody, use
       requestedAcres: data.requestedAcres ?? null,
       requisitionDate: new Date(data.requisitionDate),
       requestedDeliveryDate: new Date(data.requestedDeliveryDate),
+      approvedDeliveryDate: data.approvedDeliveryDate ? new Date(data.approvedDeliveryDate) : null,
       remarks: data.remarks,
       createdById: userId,
     })
@@ -145,8 +153,7 @@ export async function createSeedRequisition(data: CreateSeedRequisitionBody, use
 }
 
 export async function getAllSeedRequisitions(query: ListSeedRequisitionsQuery) {
-  const { page, pageSize, status, farmerId, varietyId, requisitionDateFrom, requisitionDateTo } =
-    query;
+  const { status, farmerId, varietyId, requisitionDateFrom, requisitionDateTo } = query;
 
   const filters: SQL[] = [];
   if (status) filters.push(eq(seedRequisitions.status, status));
@@ -160,30 +167,21 @@ export async function getAllSeedRequisitions(query: ListSeedRequisitionsQuery) {
   }
 
   const where = filters.length > 0 ? and(...filters) : undefined;
-  const offset = (page - 1) * pageSize;
 
-  const [data, countRows] = await Promise.all([
-    db.query.seedRequisitions.findMany({
-      where,
-      orderBy: [desc(seedRequisitions.createdAt)],
-      limit: pageSize,
-      offset,
-      with: {
-        farmer: { columns: { name: true, accountNumber: true } },
-        variety: { columns: { name: true } },
+  return db.query.seedRequisitions.findMany({
+    where,
+    orderBy: [desc(seedRequisitions.createdAt)],
+    with: {
+      farmer: {
+        columns: { name: true, accountNumber: true },
+        with: {
+          station: { columns: { id: true, name: true } },
+          locality: { columns: { id: true, name: true } },
+        },
       },
-    }),
-    db.select({ total: count() }).from(seedRequisitions).where(where),
-  ]);
-
-  return {
-    data,
-    meta: {
-      page,
-      pageSize,
-      total: Number(countRows[0]?.total ?? 0),
+      variety: { columns: { name: true } },
     },
-  };
+  });
 }
 
 export async function getSeedRequisitionById(id: string) {
@@ -192,16 +190,13 @@ export async function getSeedRequisitionById(id: string) {
   return mapRequisitionDetailRow(row);
 }
 
-export async function getSeedRequisitionReport() {
-  const rows = await requisitionDetailQuery().orderBy(desc(seedRequisitions.createdAt));
-  return rows.map(mapRequisitionDetailRow);
-}
-
 export async function updateSeedRequisition(id: string, data: UpdateSeedRequisitionBody) {
   const updateData: Record<string, unknown> = { ...data };
   if (data.requisitionDate) updateData.requisitionDate = new Date(data.requisitionDate);
   if (data.requestedDeliveryDate)
     updateData.requestedDeliveryDate = new Date(data.requestedDeliveryDate);
+  if (data.approvedDeliveryDate)
+    updateData.approvedDeliveryDate = new Date(data.approvedDeliveryDate);
 
   // Switching measure: set the provided one and clear the other
   if (data.requestedBags !== undefined) {
@@ -229,6 +224,7 @@ export async function reviewSeedRequisition(
     status: ReviewRequisitionBody["status"];
     approvedById?: string;
     approvedAt?: Date;
+    approvedDeliveryDate?: Date;
     rejectionRemarks?: string;
     rejectedById?: string;
     rejectedAt?: Date;
@@ -237,6 +233,9 @@ export async function reviewSeedRequisition(
   if (data.status === "APPROVED") {
     updatePayload.approvedById = userId;
     updatePayload.approvedAt = new Date();
+    if (data.approvedDeliveryDate) {
+      updatePayload.approvedDeliveryDate = new Date(data.approvedDeliveryDate);
+    }
   } else if (data.status === "REJECTED") {
     updatePayload.rejectionRemarks = data.rejectionRemarks;
     updatePayload.rejectedById = userId;

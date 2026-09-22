@@ -3,7 +3,15 @@ import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/db/index.js";
 import { user } from "@/db/schema/access-control.js";
 import { farmers } from "@/db/schema/farmers.js";
-import { localities, stations, varieties } from "@/db/schema/masters.js";
+import {
+  areas,
+  districts,
+  policeStations,
+  postOffices,
+  states,
+  varieties,
+  villages,
+} from "@/db/schema/masters.js";
 import { seedRequisitions } from "@/db/schema/seed-requisition.js";
 import type {
   CreateSeedRequisitionBody,
@@ -40,10 +48,19 @@ const requisitionDetailSelect = {
   farmerName: farmers.name,
   farmerAccountNumber: farmers.accountNumber,
   farmerMobileNumber: farmers.mobileNumber,
-  stationId: stations.id,
-  stationName: stations.name,
-  localityId: localities.id,
-  localityName: localities.name,
+  areaId: areas.id,
+  areaName: areas.name,
+  villageId: villages.id,
+  villageName: villages.name,
+  policeStationId: policeStations.id,
+  policeStationName: policeStations.name,
+  postOfficeId: postOffices.id,
+  postOfficeName: postOffices.name,
+  pincode: postOffices.pincode,
+  districtId: districts.id,
+  districtName: districts.name,
+  stateId: states.id,
+  stateName: states.name,
   varietyName: varieties.name,
   createdByName: createdByUser.name,
   approvedByName: approvedByUser.name,
@@ -74,10 +91,19 @@ type RequisitionDetailRow = {
   farmerName: string;
   farmerAccountNumber: string;
   farmerMobileNumber: string;
-  stationId: string;
-  stationName: string;
-  localityId: string;
-  localityName: string;
+  areaId: string;
+  areaName: string;
+  villageId: string;
+  villageName: string;
+  policeStationId: string;
+  policeStationName: string;
+  postOfficeId: string;
+  postOfficeName: string;
+  pincode: string;
+  districtId: string;
+  districtName: string;
+  stateId: string;
+  stateName: string;
   varietyName: string;
   createdByName: string | null;
   approvedByName: string | null;
@@ -89,8 +115,12 @@ function requisitionDetailQuery() {
     .select(requisitionDetailSelect)
     .from(seedRequisitions)
     .innerJoin(farmers, eq(seedRequisitions.farmerId, farmers.id))
-    .innerJoin(stations, eq(farmers.stationId, stations.id))
-    .innerJoin(localities, eq(farmers.localityId, localities.id))
+    .innerJoin(areas, eq(farmers.areaId, areas.id))
+    .innerJoin(villages, eq(areas.villageId, villages.id))
+    .innerJoin(policeStations, eq(villages.policeStationId, policeStations.id))
+    .innerJoin(postOffices, eq(policeStations.postOfficeId, postOffices.id))
+    .innerJoin(districts, eq(postOffices.districtId, districts.id))
+    .innerJoin(states, eq(districts.stateId, states.id))
     .innerJoin(varieties, eq(seedRequisitions.varietyId, varieties.id))
     .leftJoin(createdByUser, eq(seedRequisitions.createdById, createdByUser.id))
     .leftJoin(approvedByUser, eq(seedRequisitions.approvedById, approvedByUser.id))
@@ -123,8 +153,15 @@ function mapRequisitionDetailRow(row: RequisitionDetailRow) {
       name: row.farmerName,
       accountNumber: row.farmerAccountNumber,
       mobileNumber: row.farmerMobileNumber,
-      station: { id: row.stationId, name: row.stationName },
-      locality: { id: row.localityId, name: row.localityName },
+      area: {
+        id: row.areaId,
+        name: row.areaName,
+        village: { id: row.villageId, name: row.villageName },
+        policeStation: { id: row.policeStationId, name: row.policeStationName },
+        postOffice: { id: row.postOfficeId, name: row.postOfficeName, pincode: row.pincode },
+        district: { id: row.districtId, name: row.districtName },
+        state: { id: row.stateId, name: row.stateName },
+      },
     },
     variety: { name: row.varietyName },
     createdBy: row.createdByName ? { name: row.createdByName } : null,
@@ -175,8 +212,32 @@ export async function getAllSeedRequisitions(query: ListSeedRequisitionsQuery) {
       farmer: {
         columns: { name: true, accountNumber: true },
         with: {
-          station: { columns: { id: true, name: true } },
-          locality: { columns: { id: true, name: true } },
+          area: {
+            columns: { id: true, name: true },
+            with: {
+              village: {
+                columns: { id: true, name: true },
+                with: {
+                  policeStation: {
+                    columns: { id: true, name: true },
+                    with: {
+                      postOffice: {
+                        columns: { id: true, name: true, pincode: true },
+                        with: {
+                          district: {
+                            columns: { id: true, name: true },
+                            with: {
+                              state: { columns: { id: true, name: true } },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
       variety: { columns: { name: true } },

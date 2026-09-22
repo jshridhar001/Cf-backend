@@ -11,7 +11,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { localities, stations } from "@/db/schema/masters.js";
+import { areas } from "@/db/schema/masters.js";
 
 // --- Enums ---
 export const farmerAccountTypeEnum = pgEnum("farmer_account_type", [
@@ -27,12 +27,9 @@ export const farmerFamilies = pgTable("farmer_family", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   accountNumber: text("account_number").notNull().unique(),
-  stationId: uuid("station_id")
+  areaId: uuid("area_id")
     .notNull()
-    .references(() => stations.id),
-  localityId: uuid("locality_id")
-    .notNull()
-    .references(() => localities.id),
+    .references(() => areas.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -51,12 +48,9 @@ export const farmers = pgTable(
     panNumber: text("pan_number").unique(),
     accountType: farmerAccountTypeEnum("account_type").notNull().default("INDIVIDUAL"),
     status: farmerStatusEnum("status").notNull().default("ACTIVE"),
-    stationId: uuid("station_id")
+    areaId: uuid("area_id")
       .notNull()
-      .references(() => stations.id),
-    localityId: uuid("locality_id")
-      .notNull()
-      .references(() => localities.id),
+      .references(() => areas.id),
     familyId: uuid("family_id").references(() => farmerFamilies.id),
     bankName: text("bank_name"),
     ifscCode: text("ifsc_code"),
@@ -100,13 +94,9 @@ export const farmerContracts = pgTable(
 // --- Relations ---
 export const farmerFamiliesRelations = relations(farmerFamilies, ({ many, one }) => ({
   members: many(farmers),
-  station: one(stations, {
-    fields: [farmerFamilies.stationId],
-    references: [stations.id],
-  }),
-  locality: one(localities, {
-    fields: [farmerFamilies.localityId],
-    references: [localities.id],
+  area: one(areas, {
+    fields: [farmerFamilies.areaId],
+    references: [areas.id],
   }),
 }));
 
@@ -115,13 +105,9 @@ export const farmersRelations = relations(farmers, ({ many, one }) => ({
     fields: [farmers.familyId],
     references: [farmerFamilies.id],
   }),
-  station: one(stations, {
-    fields: [farmers.stationId],
-    references: [stations.id],
-  }),
-  locality: one(localities, {
-    fields: [farmers.localityId],
-    references: [localities.id],
+  area: one(areas, {
+    fields: [farmers.areaId],
+    references: [areas.id],
   }),
   contracts: many(farmerContracts),
 }));

@@ -1,0 +1,1261 @@
+{
+  "families": [],
+  "farmers": [
+    {
+      "name": "Angrez Singh S/O Kirpal Singh",
+      "accountNumber": "CF2026-001",
+      "mobileNumber": "9000000001",
+      "aadharNumber": "466906558296",
+      "panNumber": "ASYPS6023K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Axis Bank",
+      "ifscCode": "UTIB0001569",
+      "bankAccountNumber": "912010025736394",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Bareilly",
+        "postOffice": "Pachpera",
+        "pincode": "243201",
+        "policeStation": "Baheri Police Station",
+        "village": "Pateri Farm",
+        "area": "Pateri Farm"
+      }
+    },
+    {
+      "name": "Anshuman Singh S/O Ravi Kumar Singh",
+      "accountNumber": "CF2026-002",
+      "mobileNumber": "9000000002",
+      "aadharNumber": "328184997525",
+      "panNumber": "FYCPS4808B",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "IDBI Bank",
+      "ifscCode": "IBKL0000242",
+      "bankAccountNumber": "0242104000115544",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Kunda",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Kunda",
+        "area": "Kunda"
+      }
+    },
+    {
+      "name": "Dilbag Singh SherGill S/O Pargat Singh",
+      "accountNumber": "CF2026-003",
+      "mobileNumber": "9000000003",
+      "aadharNumber": "747448368712",
+      "panNumber": "BGJPS6631R",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "IDBI Bank",
+      "ifscCode": "IBKL0000242",
+      "bankAccountNumber": "0242104000065919",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Kunda",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Lalpur",
+        "area": "Lalpur"
+      }
+    },
+    {
+      "name": "Gulraj Singh S/O Jagir Singh (Kasipur/Ajitpur)",
+      "accountNumber": "CF2026-004",
+      "mobileNumber": "9000000004",
+      "aadharNumber": "293801690908",
+      "panNumber": "BGGPS6955K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "State Bank of India",
+      "ifscCode": "SBIN0007213",
+      "bankAccountNumber": "11207368843",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Maldhanchaur",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Dabhaura Mustakam",
+        "area": "Dabhaura Mustakam"
+      }
+    },
+    {
+      "name": "Gurinder Singh S/O Harpal Singh",
+      "accountNumber": "CF2026-005",
+      "mobileNumber": "9000000005",
+      "aadharNumber": "439628511334",
+      "panNumber": "CCUPB8450K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Kunda",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Missarwala",
+        "area": "Missarwala"
+      }
+    },
+    {
+      "name": "Gurvinder Singh S/O Manjeet Singh",
+      "accountNumber": "CF2026-006",
+      "mobileNumber": "9000000006",
+      "aadharNumber": "394121480570",
+      "panNumber": "CZYPS2227J",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0026200",
+      "bankAccountNumber": "0262000101286844",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Shivrajpur",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Shivrajpur",
+        "area": "Shivrajpur"
+      }
+    },
+    {
+      "name": "Iqbal Singh Sahota S/O Ratan Singh Sahota",
+      "accountNumber": "CF2026-007",
+      "mobileNumber": "9000000007",
+      "aadharNumber": "761917523589",
+      "panNumber": "APXPS1068J",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "ICICI Bank",
+      "ifscCode": "ICIC0001601",
+      "bankAccountNumber": "160101501831",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Pratappur",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Jaitpur Ghosi",
+        "area": "Jaitpur Ghosi"
+      }
+    },
+    {
+      "name": "Navneet Kumar S/O Balveer Singh",
+      "accountNumber": "CF2026-008",
+      "mobileNumber": "9000000008",
+      "aadharNumber": "678952647698",
+      "panNumber": "CQMPK0918H",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Dharampur",
+        "pincode": "244712",
+        "policeStation": "Jaspur Police Station",
+        "village": "Angadpur",
+        "area": "Angadpur"
+      }
+    },
+    {
+      "name": "Paramjeet Singh S/O Sadhu Singh Bains & Simranjeet",
+      "accountNumber": "CF2026-009",
+      "mobileNumber": "9000000009",
+      "aadharNumber": "865580338425",
+      "panNumber": "AWYPS8895F",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Kunda",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Baintwala",
+        "area": "Baintwala"
+      }
+    },
+    {
+      "name": "Satvinder Singh S/O Harbhajan Singh",
+      "accountNumber": "CF2026-010",
+      "mobileNumber": "9000000010",
+      "aadharNumber": "301088587252",
+      "panNumber": "ERFPS0783C",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Axis Bank",
+      "ifscCode": "UTIB0000406",
+      "bankAccountNumber": "917010051639709",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Mahuwakhera",
+        "pincode": "244713",
+        "policeStation": "Kichha Police Station",
+        "village": "Dheemarkhera",
+        "area": "Dheemarkhera"
+      }
+    },
+    {
+      "name": "Tejender Singh S/O Chain Singh",
+      "accountNumber": "CF2026-011",
+      "mobileNumber": "9000000011",
+      "aadharNumber": "376551030301",
+      "panNumber": "CQFPS6051L",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0007434",
+      "bankAccountNumber": "50200112225351",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Shivrajpur",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Kashipur",
+        "area": "Kashipur"
+      }
+    },
+    {
+      "name": "Ajit Singh Punia S/O Harkewal Singh",
+      "accountNumber": "CF2026-012",
+      "mobileNumber": "9000000012",
+      "aadharNumber": "411429932657",
+      "panNumber": "BVXPS8588N",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0070010",
+      "bankAccountNumber": "4430008800006517",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Jogipura",
+        "pincode": "262401",
+        "policeStation": "Bazpur Police Station",
+        "village": "Rajpur No 1",
+        "area": "Rajpur No 1"
+      }
+    },
+    {
+      "name": "Amarjit Singh S/O Harpal Singh +1",
+      "accountNumber": "CF2026-013",
+      "mobileNumber": "9000000013",
+      "aadharNumber": "430295849608",
+      "panNumber": "EKEPS6225R",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004720",
+      "bankAccountNumber": "50100434883490",
+      "address": {
+        "state": "Chandigarh",
+        "district": "Chandigarh",
+        "postOffice": "Sector 44 (Chandigarh)",
+        "pincode": "160047",
+        "policeStation": "Bazpur",
+        "village": "Sector-44 B",
+        "area": "Sector-44 B"
+      }
+    },
+    {
+      "name": "Dilmohan Singh S/O Bakshish Singh",
+      "accountNumber": "CF2026-014",
+      "mobileNumber": "9000000014",
+      "aadharNumber": "762776335607",
+      "panNumber": "AMAPS1682E",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Axis Bank",
+      "ifscCode": "UTIB0000053",
+      "bankAccountNumber": "911010017403618",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Lucknow",
+        "postOffice": "Secretariat (Lucknow)",
+        "pincode": "226001",
+        "policeStation": "Bazpur",
+        "village": "4004 Haritage Appartment 5 Park Road",
+        "area": "4004 Haritage Appartment 5 Park Road"
+      }
+    },
+    {
+      "name": "Harcharan Singh Sandhu & Surender Singh S/O CHARAN SINGH SANDHU",
+      "accountNumber": "CF2026-015",
+      "mobileNumber": "9000000015",
+      "aadharNumber": "889991887141",
+      "panNumber": "CHTPS0424G",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004720",
+      "bankAccountNumber": "50100242978828",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Bazpur",
+        "pincode": "262401",
+        "policeStation": "Bazpur Police Station",
+        "village": "Banna Khera",
+        "area": "Banna Khera"
+      }
+    },
+    {
+      "name": "Jasjeet Singh S/O Surjeet Singh",
+      "accountNumber": "CF2026-016",
+      "mobileNumber": "9000000016",
+      "aadharNumber": "955105653984",
+      "panNumber": "HXZPS7041J",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Rampur",
+        "postOffice": "Nanka Rani",
+        "pincode": "244924",
+        "policeStation": "Swaar Police Station",
+        "village": "Nayagaon",
+        "area": "Nayagaon"
+      }
+    },
+    {
+      "name": "Jobandeep Singh S/O Narender Singh & Narender S/O Jagir Singh",
+      "accountNumber": "CF2026-017",
+      "mobileNumber": "9000000017",
+      "aadharNumber": "708319465887",
+      "panNumber": null,
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": "NTBL0BAZ136",
+      "bankAccountNumber": "1362002000005654",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Bazpur",
+        "pincode": "262401",
+        "policeStation": "Bazpur Police Station",
+        "village": "Keshowala",
+        "area": "Keshowala"
+      }
+    },
+    {
+      "name": "Manmohan Singh Sandhu S/O Kuldeep Singh",
+      "accountNumber": "CF2026-018",
+      "mobileNumber": "9000000018",
+      "aadharNumber": "917378561189",
+      "panNumber": "ECYPS1978H",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Rampur",
+        "postOffice": "Manpur",
+        "pincode": "244924",
+        "policeStation": "Swaar Police Station",
+        "village": "Dharampur Uttri",
+        "area": "Dharampur Uttri"
+      }
+    },
+    {
+      "name": "Mohinder Singh S/O Prem Singh",
+      "accountNumber": "CF2026-019",
+      "mobileNumber": "9000000019",
+      "aadharNumber": "626499024995",
+      "panNumber": "AXXPS9823M",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Bank of Baroda",
+      "ifscCode": "BARB0SULNAI",
+      "bankAccountNumber": "06560100003962",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Karanpur",
+        "pincode": "244713",
+        "policeStation": "Kashipur Police Station",
+        "village": "Sarkara",
+        "area": "Sarkara"
+      }
+    },
+    {
+      "name": "Ranjeet Singh Brah S/O Chanan Singh",
+      "accountNumber": "CF2026-020",
+      "mobileNumber": "9000000020",
+      "aadharNumber": "422369692288",
+      "panNumber": "EGIPS5354D",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Udham Singh Nagar",
+        "postOffice": "Bazpur",
+        "pincode": "262401",
+        "policeStation": "Bazpur Police Station",
+        "village": "Beria",
+        "area": "Beria"
+      }
+    },
+    {
+      "name": "Sartaj Singh Sidhu S/O Hardev Singh Sidhu",
+      "accountNumber": "CF2026-021",
+      "mobileNumber": "9000000021",
+      "aadharNumber": "741779948278",
+      "panNumber": "HNFPS2943B",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0070010",
+      "bankAccountNumber": "07002191005980",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Rampur",
+        "postOffice": "Suar",
+        "pincode": "244924",
+        "policeStation": "Swaar Police Station",
+        "village": "Arsal Parsal",
+        "area": "Arsal Parsal"
+      }
+    },
+    {
+      "name": "Vineeta Singh W/O Prabhakar Vardhan Singh",
+      "accountNumber": "CF2026-022",
+      "mobileNumber": "9000000022",
+      "aadharNumber": "944248322211",
+      "panNumber": "ASYPS5989C",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Lucknow",
+        "postOffice": "Mahanagar",
+        "pincode": "226006",
+        "policeStation": "Bazpur",
+        "village": "B-149",
+        "area": "B-149"
+      }
+    },
+    {
+      "name": "Tejinder Singh Sandhu S/O Charan Singh Sandhu",
+      "accountNumber": "CF2026-023",
+      "mobileNumber": "9000000023",
+      "aadharNumber": "413877686149",
+      "panNumber": "CGIPS4651K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0106400",
+      "bankAccountNumber": "1064000101207303",
+      "address": {
+        "state": "Uttarakhand",
+        "district": "Haridwar",
+        "postOffice": "Haridwar",
+        "pincode": "249401",
+        "policeStation": "Shyampur Police Station (best match — verify)",
+        "village": "Samaspur Katebar Laldang Haridwar",
+        "area": "Samaspur Katebar Laldang Haridwar"
+      }
+    },
+    {
+      "name": "Amandeep Singh S/O Jaspal Singh",
+      "accountNumber": "CF2026-024",
+      "mobileNumber": "9000000024",
+      "aadharNumber": "576177829835",
+      "panNumber": "FOKPS5842K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004846",
+      "bankAccountNumber": "50100154605215",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Banda (Shahjahanpur)",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Banda",
+        "area": "Banda"
+      }
+    },
+    {
+      "name": "Balveer Kaur W/O Manpreet Singh",
+      "accountNumber": "CF2026-025",
+      "mobileNumber": "9000000025",
+      "aadharNumber": "391330120640",
+      "panNumber": "GKHPK2970L",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "State Bank of India",
+      "ifscCode": "SBIN0001113",
+      "bankAccountNumber": "34645569437",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Dudwa (best match — verify)",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Jamunia",
+        "area": "Jamunia"
+      }
+    },
+    {
+      "name": "Deepak Kumar S/O Tirath Ram Sharma",
+      "accountNumber": "CF2026-026",
+      "mobileNumber": "9000000026",
+      "aadharNumber": "452991707301",
+      "panNumber": "FBYPK7537N",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": "UPCB00SJDCB",
+      "bankAccountNumber": "000613000001487",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Mohiuddinpur",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Dadiuri",
+        "area": "Dadiuri"
+      }
+    },
+    {
+      "name": "Gagandeep Singh S/O Gurudip Singh",
+      "accountNumber": "CF2026-027",
+      "mobileNumber": "9000000027",
+      "aadharNumber": "538595363337",
+      "panNumber": "FDTPS5882K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0162210",
+      "bankAccountNumber": "16222191020327",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Azmatpur",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Umrapur M",
+        "area": "Umrapur M"
+      }
+    },
+    {
+      "name": "Gurdev Singh S/O Jeet Singh",
+      "accountNumber": "CF2026-028",
+      "mobileNumber": "9000000028",
+      "aadharNumber": "905605102389",
+      "panNumber": "BCYPS2871J",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004846",
+      "bankAccountNumber": "50200102739542",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "D Ghanshyam",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Kundra",
+        "area": "Kundra"
+      }
+    },
+    {
+      "name": "Inderjeet Singh S/O Fakir Singh",
+      "accountNumber": "CF2026-029",
+      "mobileNumber": "9000000029",
+      "aadharNumber": "514934392502",
+      "panNumber": "FYLPS1570R",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "ICICI Bank",
+      "ifscCode": "ICIC0003213",
+      "bankAccountNumber": "321351000330",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Azmatpur",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Koora",
+        "area": "Koora"
+      }
+    },
+    {
+      "name": "Jaspal Singh S/O Baldev Singh",
+      "accountNumber": "CF2026-030",
+      "mobileNumber": "9000000030",
+      "aadharNumber": "948407274666",
+      "panNumber": "BUJPJ4458F",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004846",
+      "bankAccountNumber": "50100792037930",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Banda (Shahjahanpur)",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Padriya Dalelpur",
+        "area": "Padriya Dalelpur"
+      }
+    },
+    {
+      "name": "Kalvinder Singh S/O Gurmel Singh",
+      "accountNumber": "CF2026-031",
+      "mobileNumber": "9000000031",
+      "aadharNumber": "319998625688",
+      "panNumber": "GRSPS1697Q",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab & Sind Bank",
+      "ifscCode": "PSIB0000494",
+      "bankAccountNumber": "04941000004049",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Azmatpur",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Dhimarpur",
+        "area": "Dhimarpur"
+      }
+    },
+    {
+      "name": "Kamaldeep Singh S/O Jasveer Singh",
+      "accountNumber": "CF2026-032",
+      "mobileNumber": "9000000032",
+      "aadharNumber": "228303683288",
+      "panNumber": "FYQPS1178N",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "State Bank of India",
+      "ifscCode": "SBIN0001668",
+      "bankAccountNumber": "34911196586",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Powayan",
+        "pincode": "242401",
+        "policeStation": "Powayan Police Station",
+        "village": "Miyanpur",
+        "area": "Miyanpur"
+      }
+    },
+    {
+      "name": "Kamaljeet Singh S/O Shiv Raj Singh",
+      "accountNumber": "CF2026-033",
+      "mobileNumber": "9000000033",
+      "aadharNumber": "664716098206",
+      "panNumber": "BVXPS5644B",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Bank of Baroda",
+      "ifscCode": "BARB0BANDAX",
+      "bankAccountNumber": "08290100001933",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Banda (Shahjahanpur)",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Powayan Road",
+        "area": "Powayan Road"
+      }
+    },
+    {
+      "name": "Kuldeep Singh S/O Laxman Singh",
+      "accountNumber": "CF2026-034",
+      "mobileNumber": "9000000034",
+      "aadharNumber": "398020087988",
+      "panNumber": "FECPS5131F",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004846",
+      "bankAccountNumber": "50100415532372",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Mohiuddinpur",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Indlapur",
+        "area": "Indlapur"
+      }
+    },
+    {
+      "name": "Lakhvinder Singh S/O Gurumukh Singh",
+      "accountNumber": "CF2026-035",
+      "mobileNumber": "9000000035",
+      "aadharNumber": "983986695188",
+      "panNumber": "GXCPS1661G",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "HDFC Bank",
+      "ifscCode": "HDFC0004846",
+      "bankAccountNumber": "50100475135565",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Bilsanda",
+        "pincode": "262202",
+        "policeStation": "Bisalpur Police Station",
+        "village": "Ghanshyampur",
+        "area": "Ghanshyampur"
+      }
+    },
+    {
+      "name": "Manjeet Singh S/O Harjindar Singh",
+      "accountNumber": "CF2026-036",
+      "mobileNumber": "9000000036",
+      "aadharNumber": "906176404118",
+      "panNumber": "FDYPS3087K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Behtasambad",
+        "pincode": "242401",
+        "policeStation": "Powayan Police Station",
+        "village": "Miyanpur",
+        "area": "Miyanpur"
+      }
+    },
+    {
+      "name": "Paramjeet Singh S/O Malkeet Singh",
+      "accountNumber": "CF2026-037",
+      "mobileNumber": "9000000037",
+      "aadharNumber": "855295744034",
+      "panNumber": "FZPPS9633N",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Axis Bank",
+      "ifscCode": "UTIB0000823",
+      "bankAccountNumber": "915030030682263",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Dudwa",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Kundra",
+        "area": "Kundra"
+      }
+    },
+    {
+      "name": "Sukhjit Singh S/O Mahanga Singh",
+      "accountNumber": "CF2026-038",
+      "mobileNumber": "9000000038",
+      "aadharNumber": "540506116466",
+      "panNumber": "GCUPS3304H",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab & Sind Bank",
+      "ifscCode": "PSIB0000494",
+      "bankAccountNumber": "04941000014660",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Banda (Shahjahanpur)",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Bhauar Khera Khurd",
+        "area": "Bhauar Khera Khurd"
+      }
+    },
+    {
+      "name": "Vishal Sharma S/O Tirath Ram Sharma",
+      "accountNumber": "CF2026-039",
+      "mobileNumber": "9000000039",
+      "aadharNumber": "926476048130",
+      "panNumber": "BEMPV2361C",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": "UPCB00SJDCB",
+      "bankAccountNumber": "000613000016326",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Shahjahanpur",
+        "postOffice": "Mohiuddinpur",
+        "pincode": "242042",
+        "policeStation": "Powayan Police Station",
+        "village": "Dadiuri",
+        "area": "Dadiuri"
+      }
+    },
+    {
+      "name": "Sukhdev Singh S/o Arjun Singh",
+      "accountNumber": "CF2026-040",
+      "mobileNumber": "9000000040",
+      "aadharNumber": "290115904002",
+      "panNumber": null,
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0145210",
+      "bankAccountNumber": "14522191006775",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Bhagwantapur",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Bakhtapur",
+        "area": "Bakhtapur"
+      }
+    },
+    {
+      "name": "Amandeep Singh S/O Kashmir Singh",
+      "accountNumber": "CF2026-041",
+      "mobileNumber": "9000000041",
+      "aadharNumber": "444082597139",
+      "panNumber": "CANPS7825J",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "State Bank of India",
+      "ifscCode": "SBIN0017186",
+      "bankAccountNumber": "11598742100",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Lakhimpur Kheri",
+        "postOffice": "Mailani",
+        "pincode": "262803",
+        "policeStation": "Gola Police Station",
+        "village": "Lochanpur",
+        "area": "Lochanpur"
+      }
+    },
+    {
+      "name": "Avtar Singh S/O Arjun Singh",
+      "accountNumber": "CF2026-042",
+      "mobileNumber": "9000000042",
+      "aadharNumber": "720336733906",
+      "panNumber": "DADPS4663D",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Axis Bank",
+      "ifscCode": "UTIB0001848",
+      "bankAccountNumber": "922010016862955",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Rampura Fakire",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Gurunanak Farm",
+        "area": "Gurunanak Farm"
+      }
+    },
+    {
+      "name": "Goldanjeet Singh S/O Nahar Singh",
+      "accountNumber": "CF2026-043",
+      "mobileNumber": "9000000043",
+      "aadharNumber": "855101434538",
+      "panNumber": "IKRPS1833L",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab & Sind Bank",
+      "ifscCode": "PSIB0021107",
+      "bankAccountNumber": "11071600000524",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Gulabtanda",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Banjarganj",
+        "area": "Banjarganj"
+      }
+    },
+    {
+      "name": "Hardeep Singh S/O Mukhtiar Singh",
+      "accountNumber": "CF2026-044",
+      "mobileNumber": "9000000044",
+      "aadharNumber": "445807304861",
+      "panNumber": "HEDPS7478C",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": "CBIN0285024",
+      "bankAccountNumber": "3551430025",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Rampura Fakire",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Gurunanak Farm",
+        "area": "Gurunanak Farm"
+      }
+    },
+    {
+      "name": "Pavan Kumar S/O Dharam Singh",
+      "accountNumber": "CF2026-045",
+      "mobileNumber": "9000000045",
+      "aadharNumber": "903162711763",
+      "panNumber": "EVEPS8812M",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Sabalpur",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Bakhtapur",
+        "area": "Bakhtapur"
+      }
+    },
+    {
+      "name": "Jagtar Singh S/O Shri Pal Singh",
+      "accountNumber": "CF2026-046",
+      "mobileNumber": "9000000046",
+      "aadharNumber": "442765739661",
+      "panNumber": "BPZPS3128A",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Bank of Baroda",
+      "ifscCode": "BARB0MOHLAK",
+      "bankAccountNumber": "45030100002013",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Lakhimpur Kheri",
+        "postOffice": "Saraunia",
+        "pincode": "261505",
+        "policeStation": "Mohammadi Police Station",
+        "village": "Gram",
+        "area": "Gram"
+      }
+    },
+    {
+      "name": "Jaspal Singh S/O Amar Singh",
+      "accountNumber": "CF2026-047",
+      "mobileNumber": "9000000047",
+      "aadharNumber": "989147984948",
+      "panNumber": "IFZPS2192B",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": null,
+      "ifscCode": null,
+      "bankAccountNumber": null,
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Naujalia Nakatia",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Nauranabad",
+        "area": "Nauranabad"
+      }
+    },
+    {
+      "name": "Jasvinder Singh S/O Mohan Singh",
+      "accountNumber": "CF2026-048",
+      "mobileNumber": "9000000048",
+      "aadharNumber": "650187418091",
+      "panNumber": "FJMPS7230C",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Bank of Baroda",
+      "ifscCode": "BARB0PURANP",
+      "bankAccountNumber": "06970100008148",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Sabalpur",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Muradpur",
+        "area": "Muradpur"
+      }
+    },
+    {
+      "name": "Ompal S/O Raghuraj Singh",
+      "accountNumber": "CF2026-049",
+      "mobileNumber": "9000000049",
+      "aadharNumber": "403409453622",
+      "panNumber": null,
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Bank of Baroda",
+      "ifscCode": "BARB0PURANP",
+      "bankAccountNumber": "06970100023956",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Sabalpur",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Sabalpur Khas",
+        "area": "Sabalpur Khas"
+      }
+    },
+    {
+      "name": "Parjeet Kaur D/O Gurdeep Singh",
+      "accountNumber": "CF2026-050",
+      "mobileNumber": "9000000050",
+      "aadharNumber": "809881441702",
+      "panNumber": "BUSPK9254R",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Bank of India",
+      "ifscCode": "BKID0006843",
+      "bankAccountNumber": "684310110015588",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Udaikaranpur",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Pachpeda Prahladpur",
+        "area": "Pachpeda Prahladpur"
+      }
+    },
+    {
+      "name": "Saravjeet Singh S/O Baljeet Singh",
+      "accountNumber": "CF2026-051",
+      "mobileNumber": "9000000051",
+      "aadharNumber": "385984472143",
+      "panNumber": "EIRPS5431J",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Punjab National Bank",
+      "ifscCode": "PUNB0145210",
+      "bankAccountNumber": "14522191021419",
+      "address": {
+        "state": "Uttar Pradesh",
+        "district": "Pilibhit",
+        "postOffice": "Rudrapur",
+        "pincode": "262122",
+        "policeStation": "Puranpur Police Station",
+        "village": "Sundarpur",
+        "area": "Sundarpur"
+      }
+    },
+    {
+      "name": "Paramjeet Singh S/O Naseeb Singh",
+      "accountNumber": "CF2026-052",
+      "mobileNumber": "9000000052",
+      "aadharNumber": "268766431328",
+      "panNumber": "BPHPS1703K",
+      "accountType": "INDIVIDUAL",
+      "status": "ACTIVE",
+      "familyAccountNumber": null,
+      "bankName": "Axis Bank",
+      "ifscCode": "UTIB0001675",
+      "bankAccountNumber": "913010044954406",
+      "address": {
+        "state": "Punjab",
+        "district": "S.A.S. Nagar (Mohali)",
+        "postOffice": "Chandigarh Sector 55",
+        "pincode": "160055",
+        "policeStation": "Bilaspur",
+        "village": "Sector 90-91 Mohali",
+        "area": "Sector 90-91 Mohali"
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "row": 4,
+      "name": "Udayvir Singh +1 (30+10 beegha)",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 5,
+      "name": "Navdeep Singh Gill S/o",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 6,
+      "name": "Tarsem Singh S/o",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 13,
+      "name": "Jora Singh S/O Surjan Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 16,
+      "name": "Samar Pal Singh Grewal S/O Inderjeet Singh Grewal",
+      "reason": "missing village, district, state, pincode"
+    },
+    {
+      "row": 17,
+      "name": "Sanjot Kaur W/O Bhupinder Singh (Kalagarh/Kashipur)",
+      "reason": "missing Aadhaar, pincode"
+    },
+    {
+      "row": 21,
+      "name": "Karnaveer Singh S/o Omprakash Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 22,
+      "name": "Bhupinder Singh (Banna Kheda)",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 24,
+      "name": "Choudhary Rampal (Persad Khera)",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 25,
+      "name": "Digvijay Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 27,
+      "name": "Gurpal Singh S/O Satnam Singh & Satnam Singh S/O Jagir Singh",
+      "reason": "missing village"
+    },
+    {
+      "row": 28,
+      "name": "Jagjeet Singh S/O Satnam Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 30,
+      "name": "Hardeep Singh S/O Nouniha Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 31,
+      "name": "Harinder Singh Hooda S/O Inder Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 36,
+      "name": "Prabjot Singh S/O Jasveer Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 38,
+      "name": "Ranjit Singh Gill S/O Gyan Singh Gill",
+      "reason": "missing state, pincode"
+    },
+    {
+      "row": 40,
+      "name": "Habibjaan",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 41,
+      "name": "Shalini Gupta W/O Vishal Goyal",
+      "reason": "missing state, pincode"
+    },
+    {
+      "row": 43,
+      "name": "Ravi Singh",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 44,
+      "name": "Sunil Dogra",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    },
+    {
+      "row": 62,
+      "name": "Abhi Singh S/O Om Pal Singh",
+      "reason": "missing village"
+    },
+    {
+      "row": 76,
+      "name": "Gagandeep Singh S/O Bhajan Lal",
+      "reason": "missing Aadhaar, village, district, state, pincode"
+    }
+  ]
+}

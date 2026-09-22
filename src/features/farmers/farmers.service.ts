@@ -8,15 +8,33 @@ import type {
   UpdateFarmerContractBody,
 } from "@/features/farmers/farmers.schema.js";
 
+const areaWithHierarchy = {
+  with: {
+    village: {
+      with: {
+        policeStation: {
+          with: {
+            postOffice: {
+              with: {
+                district: {
+                  with: { state: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+} as const;
+
 const farmerDetailRelations = {
   family: {
     with: {
-      station: true,
-      locality: true,
+      area: areaWithHierarchy,
     },
   },
-  station: true,
-  locality: true,
+  area: areaWithHierarchy,
   contracts: true,
 } as const;
 
@@ -24,14 +42,14 @@ export const farmersService = {
   // --- Families (read-only for picker) ---
   async getFamilies() {
     return await db.query.farmerFamilies.findMany({
-      with: { members: true },
+      with: { members: true, area: areaWithHierarchy },
     });
   },
 
   async getFamilyById(id: string) {
     return await db.query.farmerFamilies.findFirst({
       where: eq(farmerFamilies.id, id),
-      with: { members: true },
+      with: { members: true, area: areaWithHierarchy },
     });
   },
 
@@ -49,8 +67,7 @@ export const farmersService = {
             panNumber: data.panNumber,
             accountType: data.accountType,
             status: data.status,
-            stationId: data.stationId,
-            localityId: data.localityId,
+            areaId: data.areaId,
             bankName: data.bankName,
             ifscCode: data.ifscCode,
             bankAccountNumber: data.bankAccountNumber,
@@ -66,8 +83,7 @@ export const farmersService = {
           .values({
             name: data.familyName,
             accountNumber: data.familyAccountNumber,
-            stationId: data.stationId,
-            localityId: data.localityId,
+            areaId: data.areaId,
           })
           .returning();
 
@@ -81,8 +97,7 @@ export const farmersService = {
             panNumber: data.panNumber,
             accountType: data.accountType,
             status: data.status,
-            stationId: data.stationId,
-            localityId: data.localityId,
+            areaId: data.areaId,
             bankName: data.bankName,
             ifscCode: data.ifscCode,
             bankAccountNumber: data.bankAccountNumber,
@@ -98,10 +113,8 @@ export const farmersService = {
       });
       if (!family) throw new Error("Linked Family not found");
 
-      if (family.stationId !== data.stationId || family.localityId !== data.localityId) {
-        throw new Error(
-          "Farmer's station and locality must match the parent family's station and locality",
-        );
+      if (family.areaId !== data.areaId) {
+        throw new Error("Farmer's area must match the parent family's area");
       }
 
       const [farmer] = await tx
@@ -114,8 +127,7 @@ export const farmersService = {
           panNumber: data.panNumber,
           accountType: data.accountType,
           status: data.status,
-          stationId: data.stationId,
-          localityId: data.localityId,
+          areaId: data.areaId,
           bankName: data.bankName,
           ifscCode: data.ifscCode,
           bankAccountNumber: data.bankAccountNumber,
@@ -150,8 +162,7 @@ export const farmersService = {
       const { familyName, familyAccountNumber, ...farmerFields } = data;
 
       const merged = {
-        stationId: farmerFields.stationId ?? existing.stationId,
-        localityId: farmerFields.localityId ?? existing.localityId,
+        areaId: farmerFields.areaId ?? existing.areaId,
         familyId: farmerFields.familyId === undefined ? existing.familyId : farmerFields.familyId,
         accountType: farmerFields.accountType ?? existing.accountType,
       };
@@ -166,16 +177,14 @@ export const farmersService = {
         });
         if (!family) throw new Error("Linked Family not found");
 
-        if (family.stationId !== merged.stationId || family.localityId !== merged.localityId) {
+        if (family.areaId !== merged.areaId) {
           const willSyncFamily =
             existing.accountType === "FAMILY_PRIMARY" &&
             existing.familyId === merged.familyId &&
-            (farmerFields.stationId !== undefined || farmerFields.localityId !== undefined);
+            farmerFields.areaId !== undefined;
 
           if (!willSyncFamily) {
-            throw new Error(
-              "Farmer's station and locality must match the parent family's station and locality",
-            );
+            throw new Error("Farmer's area must match the parent family's area");
           }
         }
       }
@@ -190,18 +199,14 @@ export const farmersService = {
         existing.familyId &&
         (familyName !== undefined ||
           familyAccountNumber !== undefined ||
-          farmerFields.stationId !== undefined ||
-          farmerFields.localityId !== undefined)
+          farmerFields.areaId !== undefined)
       ) {
         await tx
           .update(farmerFamilies)
           .set({
             ...(familyName !== undefined ? { name: familyName } : {}),
             ...(familyAccountNumber !== undefined ? { accountNumber: familyAccountNumber } : {}),
-            ...(farmerFields.stationId !== undefined ? { stationId: farmerFields.stationId } : {}),
-            ...(farmerFields.localityId !== undefined
-              ? { localityId: farmerFields.localityId }
-              : {}),
+            ...(farmerFields.areaId !== undefined ? { areaId: farmerFields.areaId } : {}),
           })
           .where(eq(farmerFamilies.id, existing.familyId));
       }

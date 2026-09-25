@@ -1,18 +1,15 @@
 import { defineConfig } from "drizzle-kit";
 import { config } from "dotenv";
+import { resolveDatabaseUrl } from "./src/db/resolve-database-url.ts";
 
 config();
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required.");
-}
 
 export default defineConfig({
   schema: "./src/db/schema/index.ts",
   out: "./src/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: resolveDatabaseUrl(),
   },
   verbose: true,
   strict: true,

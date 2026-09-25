@@ -5,6 +5,7 @@ import type {
   UpdateStationBody,
 } from "@/features/master/stations/stations.schema.js";
 import { stationsService } from "@/features/master/stations/stations.service.js";
+import { isUniqueViolation } from "@/lib/postgres-errors.js";
 
 // --- READ ---
 export async function getAllStations(_request: FastifyRequest, reply: FastifyReply) {
@@ -12,24 +13,22 @@ export async function getAllStations(_request: FastifyRequest, reply: FastifyRep
   return reply.send({ success: true, data });
 }
 
-export async function getStationById(
-  request: FastifyRequest<{ Params: StationIdParam }>,
-  reply: FastifyReply,
-) {
-  const station = await stationsService.getStationById(request.params.id);
-  if (!station) {
-    return reply.status(404).send({ success: false, error: "Station not found." });
-  }
-  return reply.send({ success: true, data: station });
-}
-
 // --- CREATE ---
 export async function createStation(
   request: FastifyRequest<{ Body: CreateStationBody }>,
   reply: FastifyReply,
 ) {
-  const newStation = await stationsService.createStation(request.body);
-  return reply.status(201).send({ success: true, data: newStation });
+  try {
+    const newStation = await stationsService.createStation(request.body.name);
+    return reply.status(201).send({ success: true, data: newStation });
+  } catch (error) {
+    if (isUniqueViolation(error)) {
+      return reply
+        .status(409)
+        .send({ success: false, error: "A station with this name already exists." });
+    }
+    throw error;
+  }
 }
 
 // --- UPDATE ---
@@ -37,13 +36,23 @@ export async function updateStation(
   request: FastifyRequest<{ Params: StationIdParam; Body: UpdateStationBody }>,
   reply: FastifyReply,
 ) {
-  const updatedStation = await stationsService.updateStation(request.params.id, request.body);
+  try {
+    const updatedStation = await stationsService.updateStation(
+      request.params.id,
+      request.body.name,
+    );
 
-  if (!updatedStation) {
-    return reply.status(404).send({ success: false, error: "Station not found." });
+    if (!updatedStation) {
+      return reply.status(404).send({ success: false, error: "Station not found." });
+    }
+
+    return reply.send({ success: true, data: updatedStation });
+  } catch (error) {
+    if (isUniqueViolation(error)) {
+      return reply.status(409).send({ success: false, error: "Station name already taken." });
+    }
+    throw error;
   }
-
-  return reply.send({ success: true, data: updatedStation });
 }
 
 // --- DELETE SINGLE ---
@@ -57,10 +66,7 @@ export async function deleteStation(
     return reply.status(404).send({ success: false, error: "Station not found." });
   }
 
-  return reply.send({
-    success: true,
-    message: "Station (and all its localities) deleted successfully.",
-  });
+  return reply.send({ success: true, message: "Station deleted successfully." });
 }
 
 // --- DELETE ALL ---

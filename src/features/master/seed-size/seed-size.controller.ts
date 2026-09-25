@@ -5,15 +5,7 @@ import type {
   UpdateSeedSizeBody,
 } from "@/features/master/seed-size/seed-size.schema.js";
 import { seedSizesService } from "@/features/master/seed-size/seed-size.service.js";
-
-function isUniqueViolation(error: unknown): error is { code: string } {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (error as { code: unknown }).code === "23505"
-  );
-}
+import { isUniqueViolation } from "@/lib/postgres-errors.js";
 
 // --- READ ---
 export async function getAllSeedSizes(_request: FastifyRequest, reply: FastifyReply) {

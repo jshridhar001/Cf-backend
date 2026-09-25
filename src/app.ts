@@ -4,8 +4,6 @@ import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
-import { farmerRoutes } from "./features/farmers/farmers.routes.js";
-import { googleDriveOAuthRoutes } from "./features/farmers/google-drive/google-drive.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
@@ -66,8 +64,6 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
   await fastify.register(adminRoutes, { prefix: "/api/v1/access-control" });
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
-  await fastify.register(googleDriveOAuthRoutes, { prefix: "/api/v1/farmers/google-drive" });
-  await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
 
   fastify.get("/health", () => ({
     status: "ok",

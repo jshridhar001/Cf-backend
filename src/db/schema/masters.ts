@@ -1,5 +1,4 @@
-import { relations } from "drizzle-orm";
-import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 // --- Enums ---
 // Mirrors facilityUsageZodEnum (Zod is the source of truth)
@@ -10,40 +9,6 @@ export const facilityUsageEnum = pgEnum("facility_usage", [
 ]);
 
 // --- Tables ---
-
-export const stations = pgTable("station", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name").notNull(),
-  city: text("city"),
-  state: text("state"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
-
-export const localities = pgTable(
-  "locality",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    name: text("name").notNull(),
-    stationId: uuid("station_id")
-      .notNull()
-      .references(() => stations.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => {
-    // CRITICAL: Index the foreign key to prevent full table scans during joins
-    return {
-      stationIdIdx: index("locality_station_id_idx").on(table.stationId),
-    };
-  },
-);
 
 export const varieties = pgTable("variety", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -102,15 +67,72 @@ export const tuberSizes = pgTable("tuber_size", {
     .notNull(),
 });
 
-// --- Relations ---
+export const stations = pgTable("station", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
 
-export const stationRelations = relations(stations, ({ many }) => ({
-  localities: many(localities),
-}));
+export const villages = pgTable("village", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
 
-export const localityRelations = relations(localities, ({ one }) => ({
-  station: one(stations, {
-    fields: [localities.stationId],
-    references: [stations.id],
-  }),
-}));
+export const postOffices = pgTable("post_office", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const policeStations = pgTable("police_station", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const districts = pgTable("district", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const states = pgTable("state", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const pincodes = pgTable("pincode", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});

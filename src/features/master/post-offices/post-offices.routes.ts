@@ -1,0 +1,47 @@
+import type { FastifyInstance } from "fastify";
+import * as postOfficesController from "@/features/master/post-offices/post-offices.controller.js";
+import {
+  createPostOfficeBodySchema,
+  postOfficeIdParamSchema,
+  updatePostOfficeBodySchema,
+} from "@/features/master/post-offices/post-offices.schema.js";
+import { requireHeadOffice } from "@/middleware/require-head-office.js";
+
+export async function postOfficeRoutes(fastify: FastifyInstance) {
+  // 🛡️ Apply Head Office protection to ALL routes in this plugin
+  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
+  fastify.addHook("preHandler", requireHeadOffice);
+
+  // --- READ ---
+  fastify.get("/", postOfficesController.getAllPostOffices);
+
+  // --- CREATE ---
+  fastify.post(
+    "/",
+    {
+      schema: { body: createPostOfficeBodySchema },
+    },
+    postOfficesController.createPostOffice,
+  );
+
+  // --- UPDATE ---
+  fastify.put(
+    "/:id",
+    {
+      schema: { params: postOfficeIdParamSchema, body: updatePostOfficeBodySchema },
+    },
+    postOfficesController.updatePostOffice,
+  );
+
+  // --- DELETE SINGLE ---
+  fastify.delete(
+    "/:id",
+    {
+      schema: { params: postOfficeIdParamSchema },
+    },
+    postOfficesController.deletePostOffice,
+  );
+
+  // --- DELETE ALL (DANGER ⚠️) ---
+  fastify.delete("/all", postOfficesController.deleteAllPostOffices);
+}

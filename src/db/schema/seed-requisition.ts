@@ -10,7 +10,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
-import { farmers } from "@/db/schema/farmers.js";
 import { varieties } from "@/db/schema/masters.js";
 // Import dispatches to link the relations later
 import { dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
@@ -27,9 +26,8 @@ export const seedRequisitions = pgTable(
   "seed_requisition",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    farmerId: uuid("farmer_id")
-      .notNull()
-      .references(() => farmers.id),
+    // Plain UUID until farmers module returns
+    farmerId: uuid("farmer_id").notNull(),
     varietyId: uuid("variety_id")
       .notNull()
       .references(() => varieties.id),
@@ -68,10 +66,6 @@ export const seedRequisitions = pgTable(
 );
 
 export const seedRequisitionRelations = relations(seedRequisitions, ({ one, many }) => ({
-  farmer: one(farmers, {
-    fields: [seedRequisitions.farmerId],
-    references: [farmers.id],
-  }),
   variety: one(varieties, {
     fields: [seedRequisitions.varietyId],
     references: [varieties.id],

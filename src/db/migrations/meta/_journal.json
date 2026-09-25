@@ -36,6 +36,20 @@
       "when": 1788761312213,
       "tag": "0004_nappy_sue_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790142689617,
+      "tag": "0005_fixed_living_lightning",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790148724785,
+      "tag": "0006_sour_frog_thor",
+      "breakpoints": true
     }
   ]
 }

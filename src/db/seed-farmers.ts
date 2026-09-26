@@ -17,6 +17,9 @@ const SEED_FARMERS = [
   {
     name: "Ramesh Kumar",
     accountNumber: "CF-FARMER-001",
+    bankName: "State Bank of India",
+    bankAccountNumber: "100000000001",
+    ifscCode: "SBIN0001442",
     mobileNumber: "9000000001",
     aadharNumber: "100000000001",
     state: "Punjab",
@@ -30,6 +33,9 @@ const SEED_FARMERS = [
   {
     name: "Suresh Patel",
     accountNumber: "CF-FARMER-002",
+    bankName: "Punjab National Bank",
+    bankAccountNumber: "200000000002",
+    ifscCode: "PUNB0144100",
     mobileNumber: "9000000002",
     aadharNumber: "100000000002",
     state: "Punjab",
@@ -43,6 +49,9 @@ const SEED_FARMERS = [
   {
     name: "Lakshmi Devi",
     accountNumber: "CF-FARMER-003",
+    bankName: "State Bank of India",
+    bankAccountNumber: "300000000003",
+    ifscCode: "SBIN0004527",
     mobileNumber: "9000000003",
     aadharNumber: "100000000003",
     state: "Punjab",
@@ -56,6 +65,9 @@ const SEED_FARMERS = [
   {
     name: "Harpreet Singh",
     accountNumber: "CF-FARMER-004",
+    bankName: "Punjab National Bank",
+    bankAccountNumber: "400000000004",
+    ifscCode: "PUNB0144620",
     mobileNumber: "9000000004",
     aadharNumber: "100000000004",
     state: "Punjab",
@@ -69,6 +81,9 @@ const SEED_FARMERS = [
   {
     name: "Anita Sharma",
     accountNumber: "CF-FARMER-005",
+    bankName: "State Bank of India",
+    bankAccountNumber: "500000000005",
+    ifscCode: "SBIN0014115",
     mobileNumber: "9000000005",
     aadharNumber: "100000000005",
     state: "Punjab",
@@ -132,6 +147,9 @@ export async function seedFarmers() {
       SEED_FARMERS.map((farmer) => ({
         name: farmer.name,
         accountNumber: farmer.accountNumber,
+        bankName: farmer.bankName,
+        bankAccountNumber: farmer.bankAccountNumber,
+        ifscCode: farmer.ifscCode,
         mobileNumber: farmer.mobileNumber,
         aadharNumber: farmer.aadharNumber,
         stateId: addressIds.get(`state:${farmer.state}`),

@@ -3,6 +3,9 @@ import { z } from "zod";
 export const createFarmerBodySchema = z.object({
   name: z.string().min(1, "Name must be provided"),
   accountNumber: z.string().min(1, "Account number must be provided"),
+  bankName: z.string().min(1, "Bank name must be provided"),
+  bankAccountNumber: z.string().min(1, "Bank account number must be provided"),
+  ifscCode: z.string().min(1, "IFSC code must be provided"),
   mobileNumber: z.string().min(1, "Mobile number must be provided"),
   aadharNumber: z.string().min(1, "Aadhaar number must be provided"),
   stationId: z.string().uuid("Invalid station ID"),

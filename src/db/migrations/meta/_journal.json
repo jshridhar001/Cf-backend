@@ -57,6 +57,13 @@
       "when": 1790328385010,
       "tag": "0007_aberrant_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790441441175,
+      "tag": "0008_abnormal_paladin",
+      "breakpoints": true
     }
   ]
 }

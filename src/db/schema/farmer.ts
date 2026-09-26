@@ -45,6 +45,9 @@ export const farmers = pgTable(
     mobileNumber: text("mobile_number").notNull(),
     aadharNumber: text("aadhar_number").notNull().unique(),
     panNumber: text("pan_number").unique(),
+    bankName: text("bank_name").notNull(),
+    bankAccountNumber: text("bank_account_number").notNull(),
+    ifscCode: text("ifsc_code").notNull(),
     accountType: farmerAccountTypeEnum("account_type").notNull().default("INDIVIDUAL"),
     status: farmerStatusEnum("status").notNull().default("ACTIVE"),
 

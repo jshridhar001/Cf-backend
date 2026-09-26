@@ -10,6 +10,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
+import { farmers } from "@/db/schema/farmer.js";
 import { varieties } from "@/db/schema/masters.js";
 // Import dispatches to link the relations later
 import { dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
@@ -26,8 +27,9 @@ export const seedRequisitions = pgTable(
   "seed_requisition",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    // Plain UUID until farmers module returns
-    farmerId: uuid("farmer_id").notNull(),
+    farmerId: uuid("farmer_id")
+      .notNull()
+      .references(() => farmers.id, { onDelete: "restrict" }),
     varietyId: uuid("variety_id")
       .notNull()
       .references(() => varieties.id),
@@ -43,6 +45,7 @@ export const seedRequisitions = pgTable(
     fulfilledAcres: decimal("fulfilled_acres", { precision: 10, scale: 2 }).default("0").notNull(),
 
     requisitionDate: timestamp("requisition_date").notNull(),
+    contractDate: timestamp("contract_date").notNull(),
     requestedDeliveryDate: timestamp("requested_delivery_date").notNull(),
     approvedDeliveryDate: timestamp("approved_delivery_date"),
     remarks: text("remarks"),
@@ -62,10 +65,17 @@ export const seedRequisitions = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (t) => [index("seed_requisition_status_idx").on(t.status)],
+  (t) => [
+    index("seed_requisition_status_idx").on(t.status),
+    index("seed_requisition_farmer_id_idx").on(t.farmerId),
+  ],
 );
 
 export const seedRequisitionRelations = relations(seedRequisitions, ({ one, many }) => ({
+  farmer: one(farmers, {
+    fields: [seedRequisitions.farmerId],
+    references: [farmers.id],
+  }),
   variety: one(varieties, {
     fields: [seedRequisitions.varietyId],
     references: [varieties.id],

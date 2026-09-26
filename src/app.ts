@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
+import { farmerRoutes } from "./features/farmers/farmer.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
@@ -63,6 +64,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   });
 
   await fastify.register(adminRoutes, { prefix: "/api/v1/access-control" });
+  await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
 
   fastify.get("/health", () => ({

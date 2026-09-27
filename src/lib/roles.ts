@@ -62,3 +62,16 @@ export type HeadOfficeRoleValue = (typeof HEAD_OFFICE_ROLES)[number];
 export function isHeadOfficeRole(role: string | null | undefined) {
   return HEAD_OFFICE_ROLES.includes(role as HeadOfficeRoleValue);
 }
+
+export const SEED_REQUISITION_DECISION_ROLES = [
+  SUPER_DEVELOPER_ROLE,
+  "MANAGING_DIRECTOR",
+  "PROGRAMME_MANAGER",
+  "ACCOUNTS_SEEDS_SUPPLY_MANAGER",
+] as const;
+
+export type SeedRequisitionDecisionRoleValue = (typeof SEED_REQUISITION_DECISION_ROLES)[number];
+
+export function isSeedRequisitionDecisionRole(role: string | null | undefined) {
+  return SEED_REQUISITION_DECISION_ROLES.includes(role as SeedRequisitionDecisionRoleValue);
+}

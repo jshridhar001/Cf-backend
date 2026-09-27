@@ -64,6 +64,20 @@
       "when": 1790441441175,
       "tag": "0008_abnormal_paladin",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790444335040,
+      "tag": "0009_flowery_timeslip",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790455614535,
+      "tag": "0010_optional_seed_requisition_dates",
+      "breakpoints": true
     }
   ]
 }

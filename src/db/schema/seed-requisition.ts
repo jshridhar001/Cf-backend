@@ -15,13 +15,7 @@ import { varieties } from "@/db/schema/masters.js";
 // Import dispatches to link the relations later
 import { dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
 
-export const reqStatusEnum = pgEnum("req_status", [
-  "PENDING",
-  "APPROVED",
-  "REJECTED",
-  "FULFILLED",
-  "PARTIALLY_FULFILLED",
-]);
+export const reqStatusEnum = pgEnum("req_status", ["PENDING", "APPROVED", "REJECTED"]);
 
 export const seedRequisitions = pgTable(
   "seed_requisition",
@@ -44,9 +38,9 @@ export const seedRequisitions = pgTable(
     fulfilledBags: integer("fulfilled_bags").default(0).notNull(),
     fulfilledAcres: decimal("fulfilled_acres", { precision: 10, scale: 2 }).default("0").notNull(),
 
-    requisitionDate: timestamp("requisition_date").notNull(),
+    requisitionDate: timestamp("requisition_date"),
     contractDate: timestamp("contract_date").notNull(),
-    requestedDeliveryDate: timestamp("requested_delivery_date").notNull(),
+    requestedDeliveryDate: timestamp("requested_delivery_date"),
     approvedDeliveryDate: timestamp("approved_delivery_date"),
     remarks: text("remarks"),
     rejectionRemarks: text("rejection_remarks"),

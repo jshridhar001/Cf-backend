@@ -7,14 +7,15 @@ import { farmers } from "@/db/schema/farmer.js";
 import { varieties } from "@/db/schema/masters.js";
 import { seedRequisitions } from "@/db/schema/seed-requisition.js";
 
-const VARIETY_NAME = "Kufri Jyoti";
+const VARIETY_NAME = "Himalini";
+const FARMERS_WITH_REQUISITIONS = 4;
 
 const REQUESTS = [
-  { bags: 20, acres: "2.50" },
-  { bags: 40, acres: "5.00" },
-  { bags: 30, acres: "3.75" },
-  { bags: 25, acres: "3.00" },
-  { bags: 50, acres: "6.25" },
+  { bags: 20 },
+  { acres: "5.00" },
+  { bags: 30 },
+  { acres: "3.00" },
+  { bags: 50 },
 ] as const;
 
 export async function seedRequisitionsData() {
@@ -49,6 +50,15 @@ export async function seedRequisitionsData() {
     throw new Error("No users found. Run pnpm db:seed first.");
   }
 
+  const farmersToSeed = existingFarmers.slice(0, FARMERS_WITH_REQUISITIONS);
+  const skippedFarmers = existingFarmers.slice(FARMERS_WITH_REQUISITIONS);
+
+  if (farmersToSeed.length < FARMERS_WITH_REQUISITIONS) {
+    throw new Error(
+      `Expected at least ${FARMERS_WITH_REQUISITIONS} farmers, found ${existingFarmers.length}.`,
+    );
+  }
+
   await db.delete(seedRequisitions);
 
   const contractDate = new Date("2026-09-01T00:00:00.000Z");
@@ -56,13 +66,13 @@ export async function seedRequisitionsData() {
   const inserted = await db
     .insert(seedRequisitions)
     .values(
-      existingFarmers.map((farmer, index) => {
+      farmersToSeed.map((farmer, index) => {
         const request = REQUESTS[index % REQUESTS.length];
         return {
           farmerId: farmer.id,
           varietyId,
-          requestedBags: request.bags,
-          requestedAcres: request.acres,
+          requestedBags: "bags" in request ? request.bags : null,
+          requestedAcres: "acres" in request ? request.acres : null,
           contractDate,
           createdById: existingUser.id,
         };
@@ -71,11 +81,17 @@ export async function seedRequisitionsData() {
     .returning({ id: seedRequisitions.id, farmerId: seedRequisitions.farmerId });
 
   for (const requisition of inserted) {
-    const farmer = existingFarmers.find((row) => row.id === requisition.farmerId);
+    const farmer = farmersToSeed.find((row) => row.id === requisition.farmerId);
     console.log(`Created requisition for ${farmer?.accountNumber} ${farmer?.name}`);
   }
 
-  console.log(`Seeded ${inserted.length} seed requisitions`);
+  for (const farmer of skippedFarmers) {
+    console.log(`Left without requisition: ${farmer.accountNumber} ${farmer.name}`);
+  }
+
+  console.log(
+    `Seeded ${inserted.length} ${VARIETY_NAME} requisitions, left ${skippedFarmers.length} farmer(s) without one`,
+  );
 }
 
 const isDirectRun =

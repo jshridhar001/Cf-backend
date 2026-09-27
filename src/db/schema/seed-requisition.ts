@@ -30,9 +30,9 @@ export const seedRequisitions = pgTable(
 
     status: reqStatusEnum("status").default("PENDING").notNull(),
 
-    // Changed to Integer for bags
-    requestedBags: integer("requested_bags").notNull(),
-    requestedAcres: decimal("requested_acres", { precision: 10, scale: 2 }).notNull(),
+    // Exactly one of these is set. The other stays null.
+    requestedBags: integer("requested_bags"),
+    requestedAcres: decimal("requested_acres", { precision: 10, scale: 2 }),
 
     // Track fulfillment progress
     fulfilledBags: integer("fulfilled_bags").default(0).notNull(),

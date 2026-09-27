@@ -1,0 +1,1 @@
+ALTER TABLE "farmer" DROP COLUMN "contract_url";

@@ -25,6 +25,17 @@ export const seedRequisitionRoutes: FastifyPluginAsyncZod = async (fastify) => {
     seedRequisitionsController.createSeedRequisition,
   );
 
+  fastify.put(
+    "/:id",
+    {
+      schema: {
+        params: seedRequisitionIdParamSchema,
+        body: createSeedRequisitionBodySchema,
+      },
+    },
+    seedRequisitionsController.updateSeedRequisition,
+  );
+
   fastify.patch(
     "/:id/decision",
     {
@@ -35,5 +46,13 @@ export const seedRequisitionRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     seedRequisitionsController.decideSeedRequisition,
+  );
+
+  fastify.delete("/all", seedRequisitionsController.deleteAllSeedRequisitions);
+
+  fastify.delete(
+    "/:id",
+    { schema: { params: seedRequisitionIdParamSchema } },
+    seedRequisitionsController.deleteSeedRequisition,
   );
 };

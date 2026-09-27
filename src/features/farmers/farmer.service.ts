@@ -26,7 +26,15 @@ export const farmersService = {
   async getAllFarmers() {
     return await db.query.farmers.findMany({
       orderBy: [desc(farmers.createdAt)],
-      with: farmerAddressWith,
+      with: {
+        ...farmerAddressWith,
+        seedRequisitions: {
+          orderBy: (seedRequisitions, { desc }) => [desc(seedRequisitions.createdAt)],
+          with: {
+            variety: true,
+          },
+        },
+      },
     });
   },
 

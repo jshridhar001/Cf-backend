@@ -11,10 +11,7 @@ function readPostgresError(error: unknown): PostgresErrorInfo | undefined {
   const code = "code" in error ? error.code : undefined;
   if (typeof code === "string" && /^\d{5}$/.test(code)) {
     const constraint = "constraint_name" in error ? error.constraint_name : undefined;
-    return {
-      code,
-      constraint: typeof constraint === "string" ? constraint : undefined,
-    };
+    return typeof constraint === "string" ? { code, constraint } : { code };
   }
 
   if ("cause" in error) {

@@ -19,7 +19,6 @@ export const createFarmerBodySchema = z.object({
   stateId: z.string().uuid("Invalid state ID").optional(),
   pincodeId: z.string().uuid("Invalid pincode ID").optional(),
   familyId: z.string().uuid("Invalid family ID").optional(),
-  contractUrl: z.string().min(1).optional(),
 });
 
 export type CreateFarmerBody = z.infer<typeof createFarmerBodySchema>;

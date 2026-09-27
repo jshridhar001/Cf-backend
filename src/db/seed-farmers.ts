@@ -141,6 +141,14 @@ export async function seedFarmers() {
     }
   }
 
+  const addressId = (key: string) => {
+    const id = addressIds.get(key);
+    if (!id) {
+      throw new Error(`Missing address id for ${key}`);
+    }
+    return id;
+  };
+
   const inserted = await db
     .insert(farmers)
     .values(
@@ -152,13 +160,13 @@ export async function seedFarmers() {
         ifscCode: farmer.ifscCode,
         mobileNumber: farmer.mobileNumber,
         aadharNumber: farmer.aadharNumber,
-        stateId: addressIds.get(`state:${farmer.state}`),
-        districtId: addressIds.get(`district:${farmer.district}`),
-        stationId: addressIds.get(`station:${farmer.station}`),
-        policeStationId: addressIds.get(`policeStation:${farmer.policeStation}`),
-        pincodeId: addressIds.get(`pincode:${farmer.pincode}`),
-        postOfficeId: addressIds.get(`postOffice:${farmer.postOffice}`),
-        villageId: addressIds.get(`village:${farmer.village}`),
+        stateId: addressId(`state:${farmer.state}`),
+        districtId: addressId(`district:${farmer.district}`),
+        stationId: addressId(`station:${farmer.station}`),
+        policeStationId: addressId(`policeStation:${farmer.policeStation}`),
+        pincodeId: addressId(`pincode:${farmer.pincode}`),
+        postOfficeId: addressId(`postOffice:${farmer.postOffice}`),
+        villageId: addressId(`village:${farmer.village}`),
       })),
     )
     .returning({ id: farmers.id, name: farmers.name, accountNumber: farmers.accountNumber });

@@ -42,8 +42,8 @@ export const seedRequisitionsService = {
       .values({
         farmerId: data.farmerId,
         varietyId: data.varietyId,
-        requestedBags: data.requestedBags,
-        requestedAcres: data.requestedAcres,
+        requestedBags: data.requestedBags ?? null,
+        requestedAcres: data.requestedAcres ?? null,
         contractDate: data.contractDate,
         requisitionDate: data.requisitionDate,
         requestedDeliveryDate: data.requestedDeliveryDate,
@@ -54,6 +54,32 @@ export const seedRequisitionsService = {
 
     return await db.query.seedRequisitions.findFirst({
       where: eq(seedRequisitions.id, created.id),
+      with: seedRequisitionWith,
+    });
+  },
+
+  async updateSeedRequisition(id: string, data: CreateSeedRequisitionBody) {
+    const [updated] = await db
+      .update(seedRequisitions)
+      .set({
+        farmerId: data.farmerId,
+        varietyId: data.varietyId,
+        requestedBags: data.requestedBags ?? null,
+        requestedAcres: data.requestedAcres ?? null,
+        contractDate: data.contractDate,
+        requisitionDate: data.requisitionDate ?? null,
+        requestedDeliveryDate: data.requestedDeliveryDate ?? null,
+        remarks: data.remarks ?? null,
+      })
+      .where(eq(seedRequisitions.id, id))
+      .returning({ id: seedRequisitions.id });
+
+    if (!updated) {
+      return undefined;
+    }
+
+    return await db.query.seedRequisitions.findFirst({
+      where: eq(seedRequisitions.id, updated.id),
       with: seedRequisitionWith,
     });
   },
@@ -99,5 +125,18 @@ export const seedRequisitionsService = {
     });
 
     return { error: null, data };
+  },
+
+  async deleteSeedRequisition(id: string) {
+    const [deleted] = await db
+      .delete(seedRequisitions)
+      .where(eq(seedRequisitions.id, id))
+      .returning({ id: seedRequisitions.id });
+
+    return deleted;
+  },
+
+  async deleteAllSeedRequisitions() {
+    return await db.delete(seedRequisitions).returning({ id: seedRequisitions.id });
   },
 };

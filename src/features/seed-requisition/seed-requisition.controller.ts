@@ -54,6 +54,35 @@ export async function createSeedRequisition(
   }
 }
 
+export async function updateSeedRequisition(
+  request: FastifyRequest<{ Params: SeedRequisitionIdParam; Body: CreateSeedRequisitionBody }>,
+  reply: FastifyReply,
+) {
+  try {
+    const data = await seedRequisitionsService.updateSeedRequisition(
+      request.params.id,
+      request.body,
+    );
+
+    if (!data) {
+      return reply.code(404).send({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Seed requisition not found" },
+      });
+    }
+
+    return reply.send({ success: true, data });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return reply.code(400).send({
+        success: false,
+        error: { code: "BAD_REQUEST", message: "Invalid farmer or variety" },
+      });
+    }
+    throw error;
+  }
+}
+
 export async function decideSeedRequisition(
   request: FastifyRequest<{ Params: SeedRequisitionIdParam; Body: DecideSeedRequisitionBody }>,
   reply: FastifyReply,
@@ -90,4 +119,51 @@ export async function decideSeedRequisition(
   }
 
   return reply.send({ success: true, data: result.data });
+}
+
+export async function deleteSeedRequisition(
+  request: FastifyRequest<{ Params: SeedRequisitionIdParam }>,
+  reply: FastifyReply,
+) {
+  try {
+    const deleted = await seedRequisitionsService.deleteSeedRequisition(request.params.id);
+
+    if (!deleted) {
+      return reply.code(404).send({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Seed requisition not found" },
+      });
+    }
+
+    return reply.send({ success: true, message: "Seed requisition deleted successfully." });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return reply.code(409).send({
+        success: false,
+        error: {
+          code: "CONFLICT",
+          message: "Seed requisition is linked to a dispatch and cannot be deleted",
+        },
+      });
+    }
+    throw error;
+  }
+}
+
+export async function deleteAllSeedRequisitions(_request: FastifyRequest, reply: FastifyReply) {
+  try {
+    await seedRequisitionsService.deleteAllSeedRequisitions();
+    return reply.send({ success: true, message: "All seed requisitions deleted permanently." });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return reply.code(409).send({
+        success: false,
+        error: {
+          code: "CONFLICT",
+          message: "A seed requisition is linked to a dispatch and cannot be deleted",
+        },
+      });
+    }
+    throw error;
+  }
 }

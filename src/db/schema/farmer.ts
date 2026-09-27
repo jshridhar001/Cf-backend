@@ -65,7 +65,6 @@ export const farmers = pgTable(
     pincodeId: uuid("pincode_id").references(() => pincodes.id, { onDelete: "restrict" }),
 
     familyId: uuid("family_id").references(() => farmerFamilies.id),
-    contractUrl: text("contract_url"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

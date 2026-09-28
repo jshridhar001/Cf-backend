@@ -1,4 +1,5 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { googleDriveRoutes } from "@/features/seed-requisition/google-drive/google-drive.routes.js";
 import * as seedRequisitionsController from "@/features/seed-requisition/seed-requisition.controller.js";
 import {
   createSeedRequisitionBodySchema,
@@ -10,6 +11,8 @@ import { requireSeedRequisitionDecision } from "@/middleware/require-seed-requis
 
 export const seedRequisitionRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.addHook("preHandler", requireAuth);
+
+  await fastify.register(googleDriveRoutes);
 
   fastify.get("/", seedRequisitionsController.getAllSeedRequisitions);
 

@@ -1,4 +1,4 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { farmers } from "@/db/schema/farmer.js";
 import {
@@ -25,7 +25,7 @@ const farmerAddressWith = {
 export const farmersService = {
   async getAllFarmers() {
     return await db.query.farmers.findMany({
-      orderBy: [desc(farmers.createdAt)],
+      orderBy: [asc(farmers.name)],
       with: {
         ...farmerAddressWith,
         seedRequisitions: {

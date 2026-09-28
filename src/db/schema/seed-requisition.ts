@@ -40,6 +40,8 @@ export const seedRequisitions = pgTable(
 
     requisitionDate: timestamp("requisition_date"),
     contractDate: timestamp("contract_date").notNull(),
+    engContractUrl: text("eng_contract_url"),
+    hindiContractUrl: text("hindi_contract_url"),
     requestedDeliveryDate: timestamp("requested_delivery_date"),
     approvedDeliveryDate: timestamp("approved_delivery_date"),
     remarks: text("remarks"),

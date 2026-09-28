@@ -36,6 +36,23 @@ export const seedRequisitionsService = {
     });
   },
 
+  async updateContractUrl(id: string, field: "engContractUrl" | "hindiContractUrl", url: string) {
+    const [updated] = await db
+      .update(seedRequisitions)
+      .set({ [field]: url })
+      .where(eq(seedRequisitions.id, id))
+      .returning({ id: seedRequisitions.id });
+
+    if (!updated) {
+      return undefined;
+    }
+
+    return await db.query.seedRequisitions.findFirst({
+      where: eq(seedRequisitions.id, updated.id),
+      with: seedRequisitionWith,
+    });
+  },
+
   async createSeedRequisition(data: CreateSeedRequisitionBody, createdById: string) {
     const [created] = await db
       .insert(seedRequisitions)

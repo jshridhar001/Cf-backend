@@ -6,6 +6,7 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { farmerRoutes } from "./features/farmers/farmer.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
+import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { googleDriveOAuthRoutes } from "./features/seed-requisition/google-drive/google-drive.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
 import { auth } from "./lib/auth.js";
@@ -72,6 +73,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     prefix: "/api/v1/seed-requisitions/google-drive",
   });
   await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
+  await fastify.register(seedDispatchRoutes, { prefix: "/api/v1/seed-dispatches" });
 
   fastify.get("/health", () => ({
     status: "ok",

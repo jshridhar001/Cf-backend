@@ -21,6 +21,7 @@
     "db:seed:farmers": "tsx src/db/seed-farmers.ts",
     "db:seed:farmers:2026": "tsx src/db/main_seed_scripts/seed-registered-farmers-2026.ts",
     "db:seed:requisitions": "tsx src/db/seed-script-requisitions.ts",
+    "db:seed:dispatches": "tsx src/db/seed-script-dispatches.ts",
     "db:seed:masters": "tsx src/db/seed-master.ts"
   },
   "lint-staged": {

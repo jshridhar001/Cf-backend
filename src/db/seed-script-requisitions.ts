@@ -5,17 +5,21 @@ import { db } from "@/db/index.js";
 import { user } from "@/db/schema/access-control.js";
 import { farmers } from "@/db/schema/farmer.js";
 import { varieties } from "@/db/schema/masters.js";
+import {
+  dispatches,
+  dispatchRequisitionSizeLines,
+  dispatchRequisitions,
+} from "@/db/schema/seed-dispatch.js";
 import { seedRequisitions } from "@/db/schema/seed-requisition.js";
 
 const VARIETY_NAME = "Himalini";
 const FARMERS_WITH_REQUISITIONS = 4;
 
 const REQUESTS = [
-  { bags: 20 },
-  { acres: "5.00" },
-  { bags: 30 },
-  { acres: "3.00" },
-  { bags: 50 },
+  { bags: 20, status: "PENDING" },
+  { acres: "5.00", status: "APPROVED" },
+  { bags: 30, status: "APPROVED" },
+  { acres: "3.00", status: "REJECTED" },
 ] as const;
 
 export async function seedRequisitionsData() {
@@ -59,30 +63,75 @@ export async function seedRequisitionsData() {
     );
   }
 
+  await db.delete(dispatchRequisitionSizeLines);
+  await db.delete(dispatchRequisitions);
+  await db.delete(dispatches);
   await db.delete(seedRequisitions);
 
   const contractDate = new Date("2026-09-01T00:00:00.000Z");
+  const approvedAt = new Date("2026-09-10T00:00:00.000Z");
+  const approvedDeliveryDate = new Date("2026-10-15T00:00:00.000Z");
+  const rejectedAt = new Date("2026-09-12T00:00:00.000Z");
 
   const inserted = await db
     .insert(seedRequisitions)
     .values(
       farmersToSeed.map((farmer, index) => {
         const request = REQUESTS[index % REQUESTS.length];
+        const quantity = {
+          requestedBags: "bags" in request ? request.bags : null,
+          requestedAcres: "acres" in request ? request.acres : null,
+        };
+
+        if (request.status === "APPROVED") {
+          return {
+            farmerId: farmer.id,
+            varietyId,
+            ...quantity,
+            status: "APPROVED" as const,
+            contractDate,
+            approvedDeliveryDate,
+            approvedById: existingUser.id,
+            approvedAt,
+            createdById: existingUser.id,
+          };
+        }
+
+        if (request.status === "REJECTED") {
+          return {
+            farmerId: farmer.id,
+            varietyId,
+            ...quantity,
+            status: "REJECTED" as const,
+            contractDate,
+            rejectionRemarks: "Requested quantity is not available for this season",
+            rejectedById: existingUser.id,
+            rejectedAt,
+            createdById: existingUser.id,
+          };
+        }
+
         return {
           farmerId: farmer.id,
           varietyId,
-          requestedBags: "bags" in request ? request.bags : null,
-          requestedAcres: "acres" in request ? request.acres : null,
+          ...quantity,
+          status: "PENDING" as const,
           contractDate,
           createdById: existingUser.id,
         };
       }),
     )
-    .returning({ id: seedRequisitions.id, farmerId: seedRequisitions.farmerId });
+    .returning({
+      id: seedRequisitions.id,
+      farmerId: seedRequisitions.farmerId,
+      status: seedRequisitions.status,
+    });
 
   for (const requisition of inserted) {
     const farmer = farmersToSeed.find((row) => row.id === requisition.farmerId);
-    console.log(`Created requisition for ${farmer?.accountNumber} ${farmer?.name}`);
+    console.log(
+      `Created ${requisition.status} requisition for ${farmer?.accountNumber} ${farmer?.name}`,
+    );
   }
 
   for (const farmer of skippedFarmers) {

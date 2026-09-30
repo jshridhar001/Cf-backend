@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   decimal,
   index,
@@ -13,8 +14,11 @@ import { user } from "@/db/schema/access-control.js";
 import { facilities, generations, seedSizes } from "@/db/schema/masters.js";
 import { seedRequisitions } from "@/db/schema/seed-requisition.js";
 
-export const dispatchStatusEnum = pgEnum("dispatch_status", ["LOADING", "IN_TRANSIT", "COMPLETED"]);
-export const stopStatusEnum = pgEnum("stop_status", ["PENDING", "RECEIVED", "REJECTED"]);
+export const dispatchStatusEnum = pgEnum("dispatch_status", ["IN_TRANSIT", "DELIVERED", "NULL"]);
+
+export const lotStatusEnum = pgEnum("lot_status", ["PENDING", "RECEIVED"]);
+
+export const stockTransferStatusEnum = pgEnum("stock_transfer_status", ["PENDING", "RECEIVED"]);
 
 // --- 1. Dispatches (The Physical Truck) ---
 export const dispatches = pgTable(
@@ -22,7 +26,7 @@ export const dispatches = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     toLocation: text("to_location").notNull(),
-    status: dispatchStatusEnum("status").default("LOADING").notNull(),
+    status: dispatchStatusEnum("status").default("NULL").notNull(),
 
     dispatchDate: timestamp("dispatch_date"),
     truckNumber: text("truck_number").notNull(),
@@ -46,7 +50,6 @@ export const dispatches = pgTable(
 );
 
 // --- 2. Dispatch Requisitions (The "Stops" + Merged Lot Details) ---
-// Merging dispatchLots into this table simplifies the OTP flow.
 export const dispatchRequisitions = pgTable(
   "dispatch_requisition",
   {
@@ -58,10 +61,8 @@ export const dispatchRequisitions = pgTable(
       .notNull()
       .references(() => seedRequisitions.id, { onDelete: "restrict" }),
 
-    // Status of this specific delivery stop
-    status: stopStatusEnum("status").default("PENDING").notNull(),
+    status: lotStatusEnum("status").default("PENDING").notNull(),
 
-    // OTP and Receiving Data (Migrated from dispatchLots)
     otpSentAt: timestamp("otp_sent_at"),
     otpVerifiedAt: timestamp("otp_verified_at"),
     receivedAt: timestamp("received_at"),
@@ -91,7 +92,6 @@ export const dispatchRequisitionSizeLines = pgTable(
       .notNull()
       .references(() => generations.id),
 
-    // Changed to integer because these are bags
     bagQuantity: integer("bag_quantity").notNull(),
   },
   (t) => [
@@ -104,4 +104,41 @@ export const dispatchRequisitionSizeLines = pgTable(
   ],
 );
 
-// ... Add Relations block matching the new unified IDs ...
+// --- Relations ---
+export const dispatchesRelations = relations(dispatches, ({ many }) => ({
+  dispatchRequisitions: many(dispatchRequisitions),
+}));
+
+export const dispatchRequisitionsRelations = relations(dispatchRequisitions, ({ one, many }) => ({
+  dispatch: one(dispatches, {
+    fields: [dispatchRequisitions.dispatchId],
+    references: [dispatches.id],
+  }),
+  requisition: one(seedRequisitions, {
+    fields: [dispatchRequisitions.requisitionId],
+    references: [seedRequisitions.id],
+  }),
+  sizeLines: many(dispatchRequisitionSizeLines),
+}));
+
+export const dispatchRequisitionSizeLinesRelations = relations(
+  dispatchRequisitionSizeLines,
+  ({ one }) => ({
+    dispatchRequisition: one(dispatchRequisitions, {
+      fields: [dispatchRequisitionSizeLines.dispatchRequisitionId],
+      references: [dispatchRequisitions.id],
+    }),
+    facility: one(facilities, {
+      fields: [dispatchRequisitionSizeLines.facilityId],
+      references: [facilities.id],
+    }),
+    size: one(seedSizes, {
+      fields: [dispatchRequisitionSizeLines.sizeId],
+      references: [seedSizes.id],
+    }),
+    generation: one(generations, {
+      fields: [dispatchRequisitionSizeLines.generationId],
+      references: [generations.id],
+    }),
+  }),
+);

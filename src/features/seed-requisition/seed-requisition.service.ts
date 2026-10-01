@@ -65,6 +65,8 @@ export const seedRequisitionsService = {
         requisitionDate: data.requisitionDate,
         requestedDeliveryDate: data.requestedDeliveryDate,
         remarks: data.remarks,
+        ...(data.engContractUrl !== undefined ? { engContractUrl: data.engContractUrl } : {}),
+        ...(data.hindiContractUrl !== undefined ? { hindiContractUrl: data.hindiContractUrl } : {}),
         createdById,
       })
       .returning({ id: seedRequisitions.id });
@@ -87,6 +89,8 @@ export const seedRequisitionsService = {
         requisitionDate: data.requisitionDate ?? null,
         requestedDeliveryDate: data.requestedDeliveryDate ?? null,
         remarks: data.remarks ?? null,
+        ...(data.engContractUrl !== undefined ? { engContractUrl: data.engContractUrl } : {}),
+        ...(data.hindiContractUrl !== undefined ? { hindiContractUrl: data.hindiContractUrl } : {}),
       })
       .where(eq(seedRequisitions.id, id))
       .returning({ id: seedRequisitions.id });

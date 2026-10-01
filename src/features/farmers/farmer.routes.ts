@@ -8,6 +8,7 @@ export async function farmerRoutes(fastify: FastifyInstance) {
 
   fastify.get("/", farmersController.getAllFarmers);
   fastify.get("/address-options", farmersController.getAddressOptions);
+  fastify.get("/families", farmersController.getFamilies);
 
   fastify.post("/", { schema: { body: createFarmerBodySchema } }, farmersController.createFarmer);
 

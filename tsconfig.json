@@ -25,7 +25,7 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/features/seed-dispatch-2"],
   "tsc-alias": {
     "resolveFullPaths": true,
     "resolveFullExtension": ".js"

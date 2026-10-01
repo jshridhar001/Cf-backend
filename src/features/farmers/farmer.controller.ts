@@ -20,6 +20,9 @@ function duplicateFarmerMessage(constraint: string | undefined) {
   if (constraint === "unique_family_primary") {
     return "This family already has a primary account.";
   }
+  if (constraint === "farmer_family_account_number_unique") {
+    return "A family with this account number already exists.";
+  }
   return "A farmer with these details already exists.";
 }
 
@@ -30,6 +33,11 @@ export async function getAllFarmers(_request: FastifyRequest, reply: FastifyRepl
 
 export async function getAddressOptions(_request: FastifyRequest, reply: FastifyReply) {
   const data = await farmersService.getAddressOptions();
+  return reply.send({ success: true, data });
+}
+
+export async function getFamilies(_request: FastifyRequest, reply: FastifyReply) {
+  const data = await farmersService.getFamilies();
   return reply.send({ success: true, data });
 }
 

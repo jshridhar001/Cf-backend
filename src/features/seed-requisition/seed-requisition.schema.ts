@@ -2,6 +2,26 @@ import { z } from "zod";
 
 const optionalDate = z.coerce.date().optional();
 
+function optionalContractUrl() {
+  return z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((value) => {
+      if (value == null) return value;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : null;
+    })
+    .refine((value) => {
+      if (value == null) return true;
+      try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "Enter a valid contract URL.");
+}
+
 const requestedBagsSchema = z.number().int().positive("Requested bags must be greater than 0");
 
 const requestedAcresSchema = z.coerce
@@ -19,6 +39,8 @@ export const createSeedRequisitionBodySchema = z
     requisitionDate: optionalDate,
     requestedDeliveryDate: optionalDate,
     remarks: z.string().trim().min(1).optional(),
+    engContractUrl: optionalContractUrl(),
+    hindiContractUrl: optionalContractUrl(),
   })
   .refine(
     (data) => (data.requestedBags !== undefined) !== (data.requestedAcres !== undefined),

@@ -5,13 +5,8 @@ import {
   districtIdParamSchema,
   updateDistrictBodySchema,
 } from "@/features/master/districts/districts.schema.js";
-import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function districtRoutes(fastify: FastifyInstance) {
-  // 🛡️ Apply Head Office protection to ALL routes in this plugin
-  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
-  fastify.addHook("preHandler", requireHeadOffice);
-
   // --- READ ---
   fastify.get("/", districtsController.getAllDistricts);
 

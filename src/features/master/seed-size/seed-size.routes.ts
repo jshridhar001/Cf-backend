@@ -5,12 +5,8 @@ import {
   seedSizeIdParamSchema,
   updateSeedSizeBodySchema,
 } from "@/features/master/seed-size/seed-size.schema.js";
-import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function seedSizeRoutes(fastify: FastifyInstance) {
-  // 🛡️ Apply Head Office protection to ALL routes in this plugin
-  fastify.addHook("preHandler", requireHeadOffice);
-
   fastify.get("/", seedSizesController.getAllSeedSizes);
 
   fastify.post(

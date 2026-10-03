@@ -5,13 +5,8 @@ import {
   stationIdParamSchema,
   updateStationBodySchema,
 } from "@/features/master/stations/stations.schema.js";
-import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function stationRoutes(fastify: FastifyInstance) {
-  // 🛡️ Apply Head Office protection to ALL routes in this plugin
-  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
-  fastify.addHook("preHandler", requireHeadOffice);
-
   // --- READ ---
   fastify.get("/", stationsController.getAllStations);
 

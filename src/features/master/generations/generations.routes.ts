@@ -5,13 +5,8 @@ import {
   generationIdParamSchema,
   updateGenerationBodySchema,
 } from "@/features/master/generations/generations.schema.js";
-import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function generationRoutes(fastify: FastifyInstance) {
-  // 🛡️ Apply Head Office protection to ALL routes in this plugin
-  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
-  fastify.addHook("preHandler", requireHeadOffice);
-
   // --- READ ---
   fastify.get("/", generationsController.getAllGenerations);
 

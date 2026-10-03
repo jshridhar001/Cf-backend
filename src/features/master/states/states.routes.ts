@@ -5,13 +5,8 @@ import {
   stateIdParamSchema,
   updateStateBodySchema,
 } from "@/features/master/states/states.schema.js";
-import { requireHeadOffice } from "@/middleware/require-head-office.js";
 
 export async function stateRoutes(fastify: FastifyInstance) {
-  // 🛡️ Apply Head Office protection to ALL routes in this plugin
-  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
-  fastify.addHook("preHandler", requireHeadOffice);
-
   // --- READ ---
   fastify.get("/", statesController.getAllStates);
 

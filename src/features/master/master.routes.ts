@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { requireHeadOffice } from "@/middleware/require-head-office.js";
 import { districtRoutes } from "./districts/districts.routes.js";
 import { facilityRoutes } from "./facilities/facilities.routes.js";
 import { generationRoutes } from "./generations/generations.routes.js";
@@ -13,6 +14,9 @@ import { varietyRoutes } from "./varieties/varieties.routes.js";
 import { villageRoutes } from "./villages/villages.routes.js";
 
 export async function masterRoutes(fastify: FastifyInstance) {
+  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
+  fastify.addHook("preHandler", requireHeadOffice);
+
   await fastify.register(varietyRoutes, { prefix: "/varieties" });
   await fastify.register(generationRoutes, { prefix: "/generations" });
   await fastify.register(seedSizeRoutes, { prefix: "/seed-sizes" });

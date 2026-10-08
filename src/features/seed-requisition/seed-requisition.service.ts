@@ -4,11 +4,13 @@ import { seedRequisitions } from "@/db/schema/seed-requisition.js";
 import type {
   CreateSeedRequisitionBody,
   DecideSeedRequisitionBody,
+  UpdateSeedRequisitionBody,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
 
 const seedRequisitionWith = {
   farmer: {
     with: {
+      family: true,
       state: true,
       district: true,
       station: true,
@@ -77,7 +79,7 @@ export const seedRequisitionsService = {
     });
   },
 
-  async updateSeedRequisition(id: string, data: CreateSeedRequisitionBody) {
+  async updateSeedRequisition(id: string, data: UpdateSeedRequisitionBody) {
     const [updated] = await db
       .update(seedRequisitions)
       .set({

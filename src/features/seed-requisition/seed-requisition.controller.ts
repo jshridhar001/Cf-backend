@@ -3,6 +3,7 @@ import type {
   CreateSeedRequisitionBody,
   DecideSeedRequisitionBody,
   SeedRequisitionIdParam,
+  UpdateSeedRequisitionBody,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
 import { seedRequisitionsService } from "@/features/seed-requisition/seed-requisition.service.js";
 import { isForeignKeyViolation } from "@/lib/postgres-errors.js";
@@ -55,7 +56,7 @@ export async function createSeedRequisition(
 }
 
 export async function updateSeedRequisition(
-  request: FastifyRequest<{ Params: SeedRequisitionIdParam; Body: CreateSeedRequisitionBody }>,
+  request: FastifyRequest<{ Params: SeedRequisitionIdParam; Body: UpdateSeedRequisitionBody }>,
   reply: FastifyReply,
 ) {
   try {

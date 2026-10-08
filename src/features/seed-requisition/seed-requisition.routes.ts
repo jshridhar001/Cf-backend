@@ -5,6 +5,7 @@ import {
   createSeedRequisitionBodySchema,
   decideSeedRequisitionBodySchema,
   seedRequisitionIdParamSchema,
+  updateSeedRequisitionBodySchema,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
 import { requireAuth } from "@/middleware/require-auth.js";
 import { requireSeedRequisitionDecision } from "@/middleware/require-seed-requisition-decision.js";
@@ -33,7 +34,7 @@ export const seedRequisitionRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       schema: {
         params: seedRequisitionIdParamSchema,
-        body: createSeedRequisitionBodySchema,
+        body: updateSeedRequisitionBodySchema,
       },
     },
     seedRequisitionsController.updateSeedRequisition,

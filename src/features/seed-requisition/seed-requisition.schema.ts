@@ -29,23 +29,48 @@ const requestedAcresSchema = z.coerce
   .positive("Requested acres must be greater than 0")
   .transform((value) => value.toFixed(2));
 
-export const createSeedRequisitionBodySchema = z
-  .object({
-    farmerId: z.string().uuid("Invalid farmer ID"),
-    varietyId: z.string().uuid("Invalid variety ID"),
-    requestedBags: requestedBagsSchema.optional(),
-    requestedAcres: requestedAcresSchema.optional(),
-    contractDate: z.coerce.date(),
-    requisitionDate: optionalDate,
-    requestedDeliveryDate: optionalDate,
-    remarks: z.string().trim().min(1).optional(),
-    engContractUrl: optionalContractUrl(),
-    hindiContractUrl: optionalContractUrl(),
-  })
-  .refine(
-    (data) => (data.requestedBags !== undefined) !== (data.requestedAcres !== undefined),
-    "Send exactly one of requestedBags or requestedAcres",
-  );
+const updateRequestedBagsSchema = z
+  .number()
+  .int()
+  .nonnegative("Requested bags must be 0 or greater");
+
+const updateRequestedAcresSchema = z.coerce
+  .number()
+  .nonnegative("Requested acres must be 0 or greater")
+  .transform((value) => value.toFixed(2));
+
+function seedRequisitionBodySchema(
+  requestedBags: z.ZodType<number | undefined>,
+  requestedAcres: z.ZodType<string | undefined>,
+) {
+  return z
+    .object({
+      farmerId: z.string().uuid("Invalid farmer ID"),
+      varietyId: z.string().uuid("Invalid variety ID"),
+      requestedBags,
+      requestedAcres,
+      contractDate: z.coerce.date(),
+      requisitionDate: optionalDate,
+      requestedDeliveryDate: optionalDate,
+      remarks: z.string().trim().min(1).optional(),
+      engContractUrl: optionalContractUrl(),
+      hindiContractUrl: optionalContractUrl(),
+    })
+    .refine(
+      (data) => (data.requestedBags !== undefined) !== (data.requestedAcres !== undefined),
+      "Send exactly one of requestedBags or requestedAcres",
+    );
+}
+
+export const createSeedRequisitionBodySchema = seedRequisitionBodySchema(
+  requestedBagsSchema.optional(),
+  requestedAcresSchema.optional(),
+);
+
+export const updateSeedRequisitionBodySchema = seedRequisitionBodySchema(
+  updateRequestedBagsSchema.optional(),
+  updateRequestedAcresSchema.optional(),
+);
 
 export const seedRequisitionIdParamSchema = z.object({
   id: z.string().uuid("Invalid seed requisition ID"),
@@ -63,5 +88,6 @@ export const decideSeedRequisitionBodySchema = z.discriminatedUnion("decision", 
 ]);
 
 export type CreateSeedRequisitionBody = z.infer<typeof createSeedRequisitionBodySchema>;
+export type UpdateSeedRequisitionBody = z.infer<typeof updateSeedRequisitionBodySchema>;
 export type SeedRequisitionIdParam = z.infer<typeof seedRequisitionIdParamSchema>;
 export type DecideSeedRequisitionBody = z.infer<typeof decideSeedRequisitionBodySchema>;

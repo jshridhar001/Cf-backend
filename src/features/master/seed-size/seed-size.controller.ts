@@ -1,15 +1,19 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
   CreateSeedSizeBody,
+  ListSeedSizeQuery,
   SeedSizeIdParam,
   UpdateSeedSizeBody,
 } from "@/features/master/seed-size/seed-size.schema.js";
 import { seedSizesService } from "@/features/master/seed-size/seed-size.service.js";
-import { isUniqueViolation } from "@/lib/postgres-errors.js";
+import { isForeignKeyViolation, isUniqueViolation } from "@/lib/postgres-errors.js";
 
 // --- READ ---
-export async function getAllSeedSizes(_request: FastifyRequest, reply: FastifyReply) {
-  const data = await seedSizesService.getAllSeedSizes();
+export async function getAllSeedSizes(
+  request: FastifyRequest<{ Querystring: ListSeedSizeQuery }>,
+  reply: FastifyReply,
+) {
+  const data = await seedSizesService.getAllSeedSizes(request.query.varietyId);
   return reply.send({ success: true, data });
 }
 
@@ -25,7 +29,10 @@ export async function createSeedSize(
     if (isUniqueViolation(error)) {
       return reply
         .status(409)
-        .send({ success: false, error: "A seed size with this name already exists." });
+        .send({ success: false, error: "This size already exists for this variety." });
+    }
+    if (isForeignKeyViolation(error)) {
+      return reply.status(400).send({ success: false, error: "Variety not found." });
     }
     throw error;
   }
@@ -46,7 +53,12 @@ export async function updateSeedSize(
     return reply.send({ success: true, data: updatedSize });
   } catch (error) {
     if (isUniqueViolation(error)) {
-      return reply.status(409).send({ success: false, error: "Seed size name already taken." });
+      return reply
+        .status(409)
+        .send({ success: false, error: "This size already exists for this variety." });
+    }
+    if (isForeignKeyViolation(error)) {
+      return reply.status(400).send({ success: false, error: "Variety not found." });
     }
     throw error;
   }

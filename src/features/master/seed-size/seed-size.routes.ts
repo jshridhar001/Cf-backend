@@ -2,12 +2,17 @@ import type { FastifyInstance } from "fastify";
 import * as seedSizesController from "@/features/master/seed-size/seed-size.controller.js";
 import {
   createSeedSizeBodySchema,
+  listSeedSizeQuerySchema,
   seedSizeIdParamSchema,
   updateSeedSizeBodySchema,
 } from "@/features/master/seed-size/seed-size.schema.js";
 
 export async function seedSizeRoutes(fastify: FastifyInstance) {
-  fastify.get("/", seedSizesController.getAllSeedSizes);
+  fastify.get(
+    "/",
+    { schema: { querystring: listSeedSizeQuerySchema } },
+    seedSizesController.getAllSeedSizes,
+  );
 
   fastify.post(
     "/",

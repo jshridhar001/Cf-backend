@@ -1,4 +1,5 @@
-import { integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { integer, pgEnum, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 // --- Enums ---
 // Mirrors facilityUsageZodEnum (Zod is the source of truth)
@@ -36,16 +37,28 @@ export const facilities = pgTable("facility", {
     .notNull(),
 });
 
-export const seedSizes = pgTable("seed_size", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name").notNull().unique(),
-  seedBagsPerAcre: integer("seed_bags_per_acre"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
+export const seedSizes = pgTable(
+  "seed_size",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    varietyId: uuid("variety_id").references(() => varieties.id),
+    seedBagsPerAcre: integer("seed_bags_per_acre"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [unique("seed_size_variety_name_key").on(t.varietyId, t.name)],
+);
+
+export const seedSizesRelations = relations(seedSizes, ({ one }) => ({
+  variety: one(varieties, {
+    fields: [seedSizes.varietyId],
+    references: [varieties.id],
+  }),
+}));
 
 export const generations = pgTable("generation", {
   id: uuid("id").defaultRandom().primaryKey(),

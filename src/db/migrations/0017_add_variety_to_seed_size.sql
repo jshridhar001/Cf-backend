@@ -1,0 +1,2 @@
+ALTER TABLE "seed_size" ADD COLUMN "variety_id" uuid;--> statement-breakpoint
+ALTER TABLE "seed_size" ADD CONSTRAINT "seed_size_variety_id_variety_id_fk" FOREIGN KEY ("variety_id") REFERENCES "public"."variety"("id") ON DELETE no action ON UPDATE no action;

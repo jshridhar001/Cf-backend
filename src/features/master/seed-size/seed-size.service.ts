@@ -6,22 +6,36 @@ import type {
   UpdateSeedSizeBody,
 } from "@/features/master/seed-size/seed-size.schema.js";
 
+const seedSizeWith = {
+  variety: true,
+} as const;
+
+async function findSeedSizeWithVariety(id: string) {
+  return await db.query.seedSizes.findFirst({
+    where: eq(seedSizes.id, id),
+    with: seedSizeWith,
+  });
+}
+
 export const seedSizesService = {
-  async getAllSeedSizes() {
+  async getAllSeedSizes(varietyId?: string) {
     return await db.query.seedSizes.findMany({
+      where: varietyId ? eq(seedSizes.varietyId, varietyId) : undefined,
       orderBy: [desc(seedSizes.createdAt)],
+      with: seedSizeWith,
     });
   },
 
   async getSeedSizeById(id: string) {
-    return await db.query.seedSizes.findFirst({
-      where: eq(seedSizes.id, id),
-    });
+    return await findSeedSizeWithVariety(id);
   },
 
   async createSeedSize(data: CreateSeedSizeBody) {
-    const [newSize] = await db.insert(seedSizes).values(data).returning();
-    return newSize;
+    const [newSize] = await db.insert(seedSizes).values(data).returning({ id: seedSizes.id });
+    if (!newSize) {
+      return undefined;
+    }
+    return await findSeedSizeWithVariety(newSize.id);
   },
 
   async updateSeedSize(id: string, data: UpdateSeedSizeBody) {
@@ -29,8 +43,11 @@ export const seedSizesService = {
       .update(seedSizes)
       .set(data)
       .where(eq(seedSizes.id, id))
-      .returning();
-    return updatedSize;
+      .returning({ id: seedSizes.id });
+    if (!updatedSize) {
+      return undefined;
+    }
+    return await findSeedSizeWithVariety(updatedSize.id);
   },
 
   async deleteSeedSize(id: string) {

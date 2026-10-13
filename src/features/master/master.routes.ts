@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { requireHeadOffice } from "@/middleware/require-head-office.js";
 import { districtRoutes } from "./districts/districts.routes.js";
 import { facilityRoutes } from "./facilities/facilities.routes.js";
+import { facilityStockRoutes } from "./facility-stock/facility-stock.routes.js";
 import { generationRoutes } from "./generations/generations.routes.js";
 import { pincodeRoutes } from "./pincodes/pincodes.routes.js";
 import { policeStationRoutes } from "./police-stations/police-stations.routes.js";
@@ -21,6 +22,7 @@ export async function masterRoutes(fastify: FastifyInstance) {
   await fastify.register(generationRoutes, { prefix: "/generations" });
   await fastify.register(seedSizeRoutes, { prefix: "/seed-sizes" });
   await fastify.register(facilityRoutes, { prefix: "/facilities" });
+  await fastify.register(facilityStockRoutes, { prefix: "/facility-stock" });
   await fastify.register(tuberSizeRoutes, { prefix: "/tuber-sizes" });
   await fastify.register(stationRoutes, { prefix: "/stations" });
   await fastify.register(villageRoutes, { prefix: "/villages" });

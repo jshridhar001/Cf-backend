@@ -5,6 +5,10 @@ import type {
   UpdateFacilityBody,
 } from "@/features/master/facilities/facilites.schema.js";
 import { facilitiesService } from "@/features/master/facilities/facilities.service.js";
+import { isForeignKeyViolation } from "@/lib/postgres-errors.js";
+
+const facilityInUseMessage =
+  "This facility is still used by dispatch records and cannot be deleted.";
 
 // --- READ ---
 export async function getAllFacilities(_request: FastifyRequest, reply: FastifyReply) {
@@ -56,17 +60,31 @@ export async function deleteFacility(
   request: FastifyRequest<{ Params: FacilityIdParam }>,
   reply: FastifyReply,
 ) {
-  const deleted = await facilitiesService.deleteFacility(request.params.id);
+  try {
+    const deleted = await facilitiesService.deleteFacility(request.params.id);
 
-  if (!deleted) {
-    return reply.status(404).send({ success: false, error: "Facility not found." });
+    if (!deleted) {
+      return reply.status(404).send({ success: false, error: "Facility not found." });
+    }
+
+    return reply.send({ success: true, message: "Facility deleted successfully." });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return reply.status(409).send({ success: false, error: facilityInUseMessage });
+    }
+    throw error;
   }
-
-  return reply.send({ success: true, message: "Facility deleted successfully." });
 }
 
 // --- DELETE ALL ---
 export async function deleteAllFacilities(_request: FastifyRequest, reply: FastifyReply) {
-  await facilitiesService.deleteAllFacilities();
-  return reply.send({ success: true, message: "All facilities deleted permanently." });
+  try {
+    await facilitiesService.deleteAllFacilities();
+    return reply.send({ success: true, message: "All facilities deleted permanently." });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return reply.status(409).send({ success: false, error: facilityInUseMessage });
+    }
+    throw error;
+  }
 }

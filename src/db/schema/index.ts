@@ -5,3 +5,4 @@ export * from "@/db/schema/farmer-stock.js";
 export * from "@/db/schema/masters.js";
 export * from "@/db/schema/seed-dispatch.js";
 export * from "@/db/schema/seed-requisition.js";
+export * from "@/db/schema/stock-transfer.js";

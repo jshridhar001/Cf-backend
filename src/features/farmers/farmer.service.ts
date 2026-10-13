@@ -1,13 +1,17 @@
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { farmerFamilies, farmers } from "@/db/schema/farmer.js";
+import { farmerStockBalances } from "@/db/schema/farmer-stock.js";
 import {
   districts,
+  generations,
   pincodes,
   policeStations,
   postOffices,
+  seedSizes,
   states,
   stations,
+  varieties,
   villages,
 } from "@/db/schema/masters.js";
 import type { CreateFarmerBody } from "@/features/farmers/farmer.schema.js";
@@ -90,6 +94,47 @@ export const farmersService = {
         },
       },
     });
+  },
+
+  async getFarmerStock(farmerId: string) {
+    const [farmer] = await db
+      .select({ id: farmers.id })
+      .from(farmers)
+      .where(eq(farmers.id, farmerId))
+      .limit(1);
+
+    if (!farmer) return null;
+
+    return await db
+      .select({
+        id: farmerStockBalances.id,
+        farmerId: farmerStockBalances.farmerId,
+        varietyId: farmerStockBalances.varietyId,
+        sizeId: farmerStockBalances.sizeId,
+        generationId: farmerStockBalances.generationId,
+        balance: farmerStockBalances.balance,
+        createdAt: farmerStockBalances.createdAt,
+        updatedAt: farmerStockBalances.updatedAt,
+        variety: {
+          id: varieties.id,
+          name: varieties.name,
+        },
+        size: {
+          id: seedSizes.id,
+          name: seedSizes.name,
+          seedBagsPerAcre: seedSizes.seedBagsPerAcre,
+        },
+        generation: {
+          id: generations.id,
+          name: generations.name,
+        },
+      })
+      .from(farmerStockBalances)
+      .innerJoin(varieties, eq(varieties.id, farmerStockBalances.varietyId))
+      .innerJoin(seedSizes, eq(seedSizes.id, farmerStockBalances.sizeId))
+      .innerJoin(generations, eq(generations.id, farmerStockBalances.generationId))
+      .where(eq(farmerStockBalances.farmerId, farmerId))
+      .orderBy(asc(varieties.name), asc(seedSizes.name), asc(generations.name));
   },
 
   async getFamilies() {

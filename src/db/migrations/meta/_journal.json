@@ -134,6 +134,13 @@
       "when": 1791903883144,
       "tag": "0018_seed_size_unique_by_variety",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791911057207,
+      "tag": "0019_stock_transfer",
+      "breakpoints": true
     }
   ]
 }

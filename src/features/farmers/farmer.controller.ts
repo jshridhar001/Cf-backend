@@ -36,6 +36,19 @@ export async function getAddressOptions(_request: FastifyRequest, reply: Fastify
   return reply.send({ success: true, data });
 }
 
+export async function getFarmerStock(
+  request: FastifyRequest<{ Params: FarmerIdParam }>,
+  reply: FastifyReply,
+) {
+  const data = await farmersService.getFarmerStock(request.params.id);
+
+  if (!data) {
+    return reply.status(404).send({ success: false, error: "Farmer not found." });
+  }
+
+  return reply.send({ success: true, data });
+}
+
 export async function getFamilies(_request: FastifyRequest, reply: FastifyReply) {
   const data = await farmersService.getFamilies();
   return reply.send({ success: true, data });

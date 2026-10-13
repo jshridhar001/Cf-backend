@@ -9,6 +9,7 @@ import { masterRoutes } from "./features/master/master.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { googleDriveOAuthRoutes } from "./features/seed-requisition/google-drive/google-drive.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
+import { stockTransferRoutes } from "./features/stock-transfer/stock-transfer.routes.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
 
@@ -74,6 +75,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   });
   await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
   await fastify.register(seedDispatchRoutes, { prefix: "/api/v1/seed-dispatches" });
+  await fastify.register(stockTransferRoutes, { prefix: "/api/v1/stock-transfers" });
 
   fastify.get("/health", () => ({
     status: "ok",

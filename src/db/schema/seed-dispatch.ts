@@ -18,7 +18,11 @@ export const dispatchStatusEnum = pgEnum("dispatch_status", ["IN_TRANSIT", "DELI
 
 export const lotStatusEnum = pgEnum("lot_status", ["PENDING", "RECEIVED"]);
 
-export const stockTransferStatusEnum = pgEnum("stock_transfer_status", ["PENDING", "RECEIVED"]);
+export const stockTransferStatusEnum = pgEnum("stock_transfer_status", [
+  "PENDING",
+  "RECEIVED",
+  "NULL",
+]);
 
 // --- 1. Dispatches (The Physical Truck) ---
 export const dispatches = pgTable(

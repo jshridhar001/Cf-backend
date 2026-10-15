@@ -1,4 +1,4 @@
-import { desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { facilities, generations, seedSizes } from "@/db/schema/masters.js";
 import {
@@ -6,7 +6,7 @@ import {
   dispatchRequisitionSizeLines,
   dispatchRequisitions,
 } from "@/db/schema/seed-dispatch.js";
-import { seedRequisitions } from "@/db/schema/seed-requisition.js";
+import { seedRequisitionDeliveries, seedRequisitions } from "@/db/schema/seed-requisition.js";
 import {
   assertAcresLinesWithinMaxBags,
   formatDecimal,
@@ -151,11 +151,18 @@ export const seedDispatchesService = {
           throw new DispatchFlowError("invalid_requisition", "Invalid seed requisition");
         }
 
-        if (requisitionRows.some((requisition) => requisition.status !== "APPROVED")) {
-          throw new DispatchFlowError(
-            "not_approved",
-            "Only approved seed requisitions can be dispatched",
+        const approvedLines = await tx
+          .select({ requisitionId: seedRequisitionDeliveries.requisitionId })
+          .from(seedRequisitionDeliveries)
+          .where(
+            and(
+              inArray(seedRequisitionDeliveries.requisitionId, requisitionIds),
+              eq(seedRequisitionDeliveries.status, "APPROVED"),
+            ),
           );
+        const approvedRequisitionIds = new Set(approvedLines.map((line) => line.requisitionId));
+        if (requisitionIds.some((id) => !approvedRequisitionIds.has(id))) {
+          throw new DispatchFlowError("not_approved", "Only approved deliveries can be dispatched");
         }
 
         const sizeRows =

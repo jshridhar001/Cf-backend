@@ -90,6 +90,9 @@ export const farmersService = {
           orderBy: (seedRequisitions, { desc }) => [desc(seedRequisitions.createdAt)],
           with: {
             variety: true,
+            deliveries: {
+              orderBy: (deliveries, { asc }) => [asc(deliveries.deliveryDate)],
+            },
           },
         },
       },

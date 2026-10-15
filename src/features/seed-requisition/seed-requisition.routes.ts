@@ -3,7 +3,8 @@ import { googleDriveRoutes } from "@/features/seed-requisition/google-drive/goog
 import * as seedRequisitionsController from "@/features/seed-requisition/seed-requisition.controller.js";
 import {
   createSeedRequisitionBodySchema,
-  decideSeedRequisitionBodySchema,
+  decideDeliveryBodySchema,
+  deliveryDecisionParamSchema,
   seedRequisitionIdParamSchema,
   updateSeedRequisitionBodySchema,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
@@ -41,15 +42,15 @@ export const seedRequisitionRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 
   fastify.patch(
-    "/:id/decision",
+    "/:id/deliveries/:deliveryId/decision",
     {
       preHandler: requireSeedRequisitionDecision,
       schema: {
-        params: seedRequisitionIdParamSchema,
-        body: decideSeedRequisitionBodySchema,
+        params: deliveryDecisionParamSchema,
+        body: decideDeliveryBodySchema,
       },
     },
-    seedRequisitionsController.decideSeedRequisition,
+    seedRequisitionsController.decideDelivery,
   );
 
   fastify.delete("/all", seedRequisitionsController.deleteAllSeedRequisitions);

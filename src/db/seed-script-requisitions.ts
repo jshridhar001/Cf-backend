@@ -10,7 +10,7 @@ import {
   dispatchRequisitionSizeLines,
   dispatchRequisitions,
 } from "@/db/schema/seed-dispatch.js";
-import { seedRequisitions } from "@/db/schema/seed-requisition.js";
+import { seedRequisitionDeliveries, seedRequisitions } from "@/db/schema/seed-requisition.js";
 
 const VARIETY_NAME = "Himalini";
 const FARMERS_WITH_REQUISITIONS = 4;
@@ -70,7 +70,6 @@ export async function seedRequisitionsData() {
 
   const contractDate = new Date("2026-09-01T00:00:00.000Z");
   const approvedAt = new Date("2026-09-10T00:00:00.000Z");
-  const approvedDeliveryDate = new Date("2026-10-15T00:00:00.000Z");
   const rejectedAt = new Date("2026-09-12T00:00:00.000Z");
 
   const inserted = await db
@@ -90,9 +89,6 @@ export async function seedRequisitionsData() {
             ...quantity,
             status: "APPROVED" as const,
             contractDate,
-            approvedDeliveryDate,
-            approvedById: existingUser.id,
-            approvedAt,
             createdById: existingUser.id,
           };
         }
@@ -104,9 +100,6 @@ export async function seedRequisitionsData() {
             ...quantity,
             status: "REJECTED" as const,
             contractDate,
-            rejectionRemarks: "Requested quantity is not available for this season",
-            rejectedById: existingUser.id,
-            rejectedAt,
             createdById: existingUser.id,
           };
         }
@@ -125,7 +118,99 @@ export async function seedRequisitionsData() {
       id: seedRequisitions.id,
       farmerId: seedRequisitions.farmerId,
       status: seedRequisitions.status,
+      requestedBags: seedRequisitions.requestedBags,
+      requestedAcres: seedRequisitions.requestedAcres,
     });
+
+  const firstDeliveryDate = new Date("2026-10-01T00:00:00.000Z");
+  const secondDeliveryDate = new Date("2026-10-15T00:00:00.000Z");
+
+  await db.insert(seedRequisitionDeliveries).values(
+    inserted.flatMap(
+      (
+        requisition,
+      ): Array<{
+        requisitionId: string;
+        deliveryDate: Date;
+        bags: number | null;
+        acres: string | null;
+        status: "PENDING" | "APPROVED" | "REJECTED";
+        approvedById: string | null;
+        approvedAt: Date | null;
+        rejectedById: string | null;
+        rejectedAt: Date | null;
+        rejectionRemarks: string | null;
+      }> => {
+        const decision =
+          requisition.status === "APPROVED"
+            ? {
+                status: "APPROVED" as const,
+                approvedById: existingUser.id,
+                approvedAt,
+                rejectedById: null,
+                rejectedAt: null,
+                rejectionRemarks: null,
+              }
+            : requisition.status === "REJECTED"
+              ? {
+                  status: "REJECTED" as const,
+                  approvedById: null,
+                  approvedAt: null,
+                  rejectedById: existingUser.id,
+                  rejectedAt,
+                  rejectionRemarks: "Requested quantity is not available for this season",
+                }
+              : {
+                  status: "PENDING" as const,
+                  approvedById: null,
+                  approvedAt: null,
+                  rejectedById: null,
+                  rejectedAt: null,
+                  rejectionRemarks: null,
+                };
+
+        if (requisition.requestedBags != null) {
+          const firstBags = requisition.requestedBags >= 20 ? 5 : 1;
+          const secondBags = requisition.requestedBags >= 30 ? 8 : 4;
+          return [
+            {
+              requisitionId: requisition.id,
+              deliveryDate: firstDeliveryDate,
+              bags: firstBags,
+              acres: null,
+              ...decision,
+            },
+            {
+              requisitionId: requisition.id,
+              deliveryDate: secondDeliveryDate,
+              bags: secondBags,
+              acres: null,
+              ...decision,
+            },
+          ];
+        }
+
+        const acres = requisition.requestedAcres ?? "0.00";
+        const [firstAcres, secondAcres] = acres === "3.00" ? ["1.00", "1.00"] : ["2.00", "1.50"];
+        return [
+          {
+            requisitionId: requisition.id,
+            deliveryDate: firstDeliveryDate,
+            bags: null,
+            acres: firstAcres,
+            ...decision,
+          },
+          {
+            requisitionId: requisition.id,
+            deliveryDate: secondDeliveryDate,
+            bags: null,
+            acres: secondAcres,
+            ...decision,
+          },
+        ];
+      },
+    ),
+  );
 
   for (const requisition of inserted) {
     const farmer = farmersToSeed.find((row) => row.id === requisition.farmerId);

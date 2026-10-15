@@ -141,6 +141,20 @@
       "when": 1791911057207,
       "tag": "0019_stock_transfer",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791998975090,
+      "tag": "0020_thick_hellfire_club",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792037018995,
+      "tag": "0021_per_line_delivery_approval",
+      "breakpoints": true
     }
   ]
 }

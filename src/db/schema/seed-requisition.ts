@@ -1,5 +1,6 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
+  check,
   decimal,
   index,
   integer,
@@ -7,6 +8,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
@@ -42,19 +44,12 @@ export const seedRequisitions = pgTable(
     contractDate: timestamp("contract_date").notNull(),
     engContractUrl: text("eng_contract_url"),
     hindiContractUrl: text("hindi_contract_url"),
-    requestedDeliveryDate: timestamp("requested_delivery_date"),
-    approvedDeliveryDate: timestamp("approved_delivery_date"),
     remarks: text("remarks"),
-    rejectionRemarks: text("rejection_remarks"),
 
     createdById: text("created_by_id")
       .notNull()
       .references(() => user.id),
-    approvedById: text("approved_by_id").references(() => user.id),
-    rejectedById: text("rejected_by_id").references(() => user.id),
 
-    approvedAt: timestamp("approved_at"),
-    rejectedAt: timestamp("rejected_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -67,6 +62,36 @@ export const seedRequisitions = pgTable(
   ],
 );
 
+export const seedRequisitionDeliveries = pgTable(
+  "seed_requisition_delivery",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    requisitionId: uuid("requisition_id")
+      .notNull()
+      .references(() => seedRequisitions.id, { onDelete: "cascade" }),
+    deliveryDate: timestamp("delivery_date").notNull(),
+    acres: decimal("acres", { precision: 10, scale: 2 }),
+    bags: integer("bags"),
+    status: reqStatusEnum("status").default("PENDING").notNull(),
+    approvedById: text("approved_by_id").references(() => user.id),
+    rejectedById: text("rejected_by_id").references(() => user.id),
+    rejectionRemarks: text("rejection_remarks"),
+    approvedAt: timestamp("approved_at"),
+    rejectedAt: timestamp("rejected_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    unique("seed_requisition_delivery_req_date").on(t.requisitionId, t.deliveryDate),
+    index("seed_requisition_delivery_date_idx").on(t.deliveryDate),
+    check(
+      "seed_requisition_delivery_one_quantity",
+      sql`(${t.acres} IS NOT NULL AND ${t.bags} IS NULL) OR (${t.acres} IS NULL AND ${t.bags} IS NOT NULL)`,
+    ),
+    check("seed_requisition_delivery_acres_positive", sql`${t.acres} IS NULL OR ${t.acres} > 0`),
+    check("seed_requisition_delivery_bags_positive", sql`${t.bags} IS NULL OR ${t.bags} > 0`),
+  ],
+);
+
 export const seedRequisitionRelations = relations(seedRequisitions, ({ one, many }) => ({
   farmer: one(farmers, {
     fields: [seedRequisitions.farmerId],
@@ -76,5 +101,16 @@ export const seedRequisitionRelations = relations(seedRequisitions, ({ one, many
     fields: [seedRequisitions.varietyId],
     references: [varieties.id],
   }),
+  deliveries: many(seedRequisitionDeliveries),
   dispatchStops: many(dispatchRequisitions), // Linked from the other file
 }));
+
+export const seedRequisitionDeliveriesRelations = relations(
+  seedRequisitionDeliveries,
+  ({ one }) => ({
+    requisition: one(seedRequisitions, {
+      fields: [seedRequisitionDeliveries.requisitionId],
+      references: [seedRequisitions.id],
+    }),
+  }),
+);

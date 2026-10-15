@@ -1,7 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
   CreateSeedRequisitionBody,
-  DecideSeedRequisitionBody,
+  DecideDeliveryBody,
+  DeliveryDecisionParam,
   SeedRequisitionIdParam,
   UpdateSeedRequisitionBody,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
@@ -84,8 +85,8 @@ export async function updateSeedRequisition(
   }
 }
 
-export async function decideSeedRequisition(
-  request: FastifyRequest<{ Params: SeedRequisitionIdParam; Body: DecideSeedRequisitionBody }>,
+export async function decideDelivery(
+  request: FastifyRequest<{ Params: DeliveryDecisionParam; Body: DecideDeliveryBody }>,
   reply: FastifyReply,
 ) {
   const decidedById = request.user?.id;
@@ -96,8 +97,9 @@ export async function decideSeedRequisition(
     });
   }
 
-  const result = await seedRequisitionsService.decideSeedRequisition(
+  const result = await seedRequisitionsService.decideDelivery(
     request.params.id,
+    request.params.deliveryId,
     request.body,
     decidedById,
   );
@@ -109,12 +111,29 @@ export async function decideSeedRequisition(
     });
   }
 
+  if (result.error === "delivery_not_found") {
+    return reply.code(404).send({
+      success: false,
+      error: { code: "NOT_FOUND", message: "Delivery line not found" },
+    });
+  }
+
   if (result.error === "not_pending") {
     return reply.code(409).send({
       success: false,
       error: {
         code: "CONFLICT",
-        message: "Only pending seed requisitions can be approved or rejected",
+        message: "Only a pending delivery can be approved or rejected",
+      },
+    });
+  }
+
+  if (result.error === "date_taken") {
+    return reply.code(409).send({
+      success: false,
+      error: {
+        code: "CONFLICT",
+        message: "Another delivery is already scheduled on that date",
       },
     });
   }

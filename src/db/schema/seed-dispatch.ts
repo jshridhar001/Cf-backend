@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
 import { facilities, generations, seedSizes } from "@/db/schema/masters.js";
-import { seedRequisitions } from "@/db/schema/seed-requisition.js";
+import { seedRequisitionDeliveries, seedRequisitions } from "@/db/schema/seed-requisition.js";
 
 export const dispatchStatusEnum = pgEnum("dispatch_status", ["IN_TRANSIT", "DELIVERED", "NULL"]);
 
@@ -64,6 +64,9 @@ export const dispatchRequisitions = pgTable(
     requisitionId: uuid("requisition_id")
       .notNull()
       .references(() => seedRequisitions.id, { onDelete: "restrict" }),
+    deliveryId: uuid("delivery_id").references(() => seedRequisitionDeliveries.id, {
+      onDelete: "restrict",
+    }),
 
     status: lotStatusEnum("status").default("PENDING").notNull(),
 
@@ -73,8 +76,9 @@ export const dispatchRequisitions = pgTable(
     receivedById: text("received_by_id").references(() => user.id, { onDelete: "set null" }),
   },
   (t) => [
-    unique("unique_dispatch_requisition").on(t.dispatchId, t.requisitionId),
+    unique("unique_dispatch_delivery").on(t.dispatchId, t.deliveryId),
     index("dispatch_requisition_req_id_idx").on(t.requisitionId),
+    index("dispatch_requisition_delivery_id_idx").on(t.deliveryId),
   ],
 );
 
@@ -121,6 +125,10 @@ export const dispatchRequisitionsRelations = relations(dispatchRequisitions, ({ 
   requisition: one(seedRequisitions, {
     fields: [dispatchRequisitions.requisitionId],
     references: [seedRequisitions.id],
+  }),
+  delivery: one(seedRequisitionDeliveries, {
+    fields: [dispatchRequisitions.deliveryId],
+    references: [seedRequisitionDeliveries.id],
   }),
   sizeLines: many(dispatchRequisitionSizeLines),
 }));

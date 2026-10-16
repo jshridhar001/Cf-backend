@@ -16,6 +16,7 @@ const sizeLineSchema = z.object({
 
 const dispatchStopSchema = z.object({
   requisitionId: z.string().uuid("Invalid seed requisition ID"),
+  deliveryId: z.string().uuid("Invalid delivery ID"),
   sizeLines: z.array(sizeLineSchema).min(1, "Each stop needs at least one size line"),
 });
 
@@ -34,17 +35,17 @@ export const createDispatchBodySchema = z
     requisitions: z.array(dispatchStopSchema).min(1, "Add at least one requisition stop"),
   })
   .superRefine((data, ctx) => {
-    const requisitionIds = new Set<string>();
+    const deliveryIds = new Set<string>();
 
     data.requisitions.forEach((stop, stopIndex) => {
-      if (requisitionIds.has(stop.requisitionId)) {
+      if (deliveryIds.has(stop.deliveryId)) {
         ctx.addIssue({
           code: "custom",
-          message: "Each requisition can appear only once on a dispatch",
-          path: ["requisitions", stopIndex, "requisitionId"],
+          message: "Each approved delivery can appear only once on a dispatch",
+          path: ["requisitions", stopIndex, "deliveryId"],
         });
       }
-      requisitionIds.add(stop.requisitionId);
+      deliveryIds.add(stop.deliveryId);
 
       const lineKeys = new Set<string>();
       stop.sizeLines.forEach((line, lineIndex) => {

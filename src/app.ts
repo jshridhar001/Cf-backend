@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
+import { coldStorageGatePassRoutes } from "./features/cold-storage-gate-pass/cold-storage-gate-pass.routes.js";
 import { farmerRoutes } from "./features/farmers/farmer.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
@@ -75,6 +76,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   });
   await fastify.register(seedRequisitionRoutes, { prefix: "/api/v1/seed-requisitions" });
   await fastify.register(seedDispatchRoutes, { prefix: "/api/v1/seed-dispatches" });
+  await fastify.register(coldStorageGatePassRoutes, {
+    prefix: "/api/v1/cold-storage-gate-passes",
+  });
   await fastify.register(stockTransferRoutes, { prefix: "/api/v1/stock-transfers" });
 
   fastify.get("/health", () => ({

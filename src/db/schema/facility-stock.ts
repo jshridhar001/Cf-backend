@@ -18,7 +18,8 @@ export const facilityStocks = pgTable(
     generationId: uuid("generation_id")
       .notNull()
       .references(() => generations.id),
-    quantity: integer("quantity").notNull(),
+    initialQuantity: integer("initial_quantity").notNull(),
+    currentQuantity: integer("current_quantity").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -27,7 +28,8 @@ export const facilityStocks = pgTable(
   },
   (t) => [
     unique("facility_stock_key").on(t.facilityId, t.varietyId, t.sizeId, t.generationId),
-    check("facility_stock_quantity_nonnegative", sql`${t.quantity} >= 0`),
+    check("facility_stock_initial_quantity_nonnegative", sql`${t.initialQuantity} >= 0`),
+    check("facility_stock_current_quantity_nonnegative", sql`${t.currentQuantity} >= 0`),
   ],
 );
 

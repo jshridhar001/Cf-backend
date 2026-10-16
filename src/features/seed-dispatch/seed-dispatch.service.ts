@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { facilities, generations, seedSizes } from "@/db/schema/masters.js";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@/db/schema/seed-dispatch.js";
 import { seedRequisitionDeliveries, seedRequisitions } from "@/db/schema/seed-requisition.js";
 import {
+  acresFromBags,
   assertAcresLinesWithinMaxBags,
   formatDecimal,
   getRemainingAcres,
@@ -79,6 +80,12 @@ function quantityRow(requisition: {
   };
 }
 
+type DeliveryUsage = { bags: number; acres: number };
+
+function emptyUsage(): DeliveryUsage {
+  return { bags: 0, acres: 0 };
+}
+
 function asQuantityError(error: unknown): DispatchFlowError | null {
   if (!(error instanceof Error)) return null;
   if (error.message.includes("bags-per-acre")) {
@@ -124,7 +131,8 @@ export const seedDispatchesService = {
   async createDispatch(data: CreateDispatchBody, createdById: string) {
     return await runDispatchFlow(async () => {
       const createdId = await db.transaction(async (tx) => {
-        const requisitionIds = data.requisitions.map((stop) => stop.requisitionId);
+        const requisitionIds = [...new Set(data.requisitions.map((stop) => stop.requisitionId))];
+        const deliveryIds = data.requisitions.map((stop) => stop.deliveryId);
         const sizeIds = [
           ...new Set(
             data.requisitions.flatMap((stop) => stop.sizeLines.map((line) => line.sizeId)),
@@ -151,18 +159,13 @@ export const seedDispatchesService = {
           throw new DispatchFlowError("invalid_requisition", "Invalid seed requisition");
         }
 
-        const approvedLines = await tx
-          .select({ requisitionId: seedRequisitionDeliveries.requisitionId })
+        const deliveryRows = await tx
+          .select()
           .from(seedRequisitionDeliveries)
-          .where(
-            and(
-              inArray(seedRequisitionDeliveries.requisitionId, requisitionIds),
-              eq(seedRequisitionDeliveries.status, "APPROVED"),
-            ),
-          );
-        const approvedRequisitionIds = new Set(approvedLines.map((line) => line.requisitionId));
-        if (requisitionIds.some((id) => !approvedRequisitionIds.has(id))) {
-          throw new DispatchFlowError("not_approved", "Only approved deliveries can be dispatched");
+          .where(inArray(seedRequisitionDeliveries.id, deliveryIds))
+          .for("update");
+        if (deliveryRows.length !== deliveryIds.length) {
+          throw new DispatchFlowError("invalid_requisition", "Invalid approved delivery");
         }
 
         const sizeRows =
@@ -204,37 +207,93 @@ export const seedDispatchesService = {
           );
         }
 
+        const priorUsageRows = await tx
+          .select({
+            deliveryId: dispatchRequisitions.deliveryId,
+            bagQuantity: dispatchRequisitionSizeLines.bagQuantity,
+            bagsPerAcre: seedSizes.seedBagsPerAcre,
+          })
+          .from(dispatchRequisitionSizeLines)
+          .innerJoin(
+            dispatchRequisitions,
+            eq(dispatchRequisitionSizeLines.dispatchRequisitionId, dispatchRequisitions.id),
+          )
+          .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
+          .innerJoin(seedSizes, eq(dispatchRequisitionSizeLines.sizeId, seedSizes.id))
+          .where(
+            and(
+              inArray(dispatchRequisitions.deliveryId, deliveryIds),
+              ne(dispatches.status, "NULL"),
+            ),
+          );
+
+        const usageByDelivery = new Map<string, DeliveryUsage>();
+        for (const row of priorUsageRows) {
+          if (!row.deliveryId) continue;
+          const current = usageByDelivery.get(row.deliveryId) ?? emptyUsage();
+          current.bags += row.bagQuantity;
+          current.acres = roundDecimal(
+            current.acres + acresFromBags(row.bagQuantity, row.bagsPerAcre ?? 0),
+          );
+          usageByDelivery.set(row.deliveryId, current);
+        }
+
         const sizeById = new Map(sizeRows.map((row) => [row.id, row]));
         const requisitionById = new Map(requisitionRows.map((row) => [row.id, row]));
+        const deliveryById = new Map(deliveryRows.map((row) => [row.id, row]));
         const facilityBagTotals = new Map<string, number>();
 
         for (const stop of data.requisitions) {
           const requisition = requisitionById.get(stop.requisitionId);
-          if (!requisition) {
-            throw new DispatchFlowError("invalid_requisition", "Invalid seed requisition");
+          const delivery = deliveryById.get(stop.deliveryId);
+          if (!requisition || !delivery || delivery.requisitionId !== stop.requisitionId) {
+            throw new DispatchFlowError("invalid_requisition", "Invalid approved delivery");
+          }
+          if (delivery.status !== "APPROVED") {
+            throw new DispatchFlowError(
+              "not_approved",
+              "Only approved deliveries can be dispatched",
+            );
           }
 
           const row = quantityRow(requisition);
+          const acresBased = isAcresBasedRequisition(row);
+          const usage = usageByDelivery.get(stop.deliveryId) ?? emptyUsage();
+          const bagLines = stop.sizeLines.map((line) => ({
+            quantity: line.bagQuantity,
+            bagsPerAcre: sizeById.get(line.sizeId)?.seedBagsPerAcre ?? 0,
+          }));
           const bagTotal = stop.sizeLines.reduce((sum, line) => sum + line.bagQuantity, 0);
+          const lotRemaining = acresBased
+            ? Math.max(0, roundDecimal(parseDecimal(delivery.acres) - usage.acres))
+            : Math.max(0, (delivery.bags ?? 0) - usage.bags);
+          const requisitionRemaining = acresBased ? getRemainingAcres(row) : getRemainingBags(row);
+          const cap = Math.min(lotRemaining, requisitionRemaining);
 
-          if (isAcresBasedRequisition(row)) {
+          if (acresBased) {
             try {
-              assertAcresLinesWithinMaxBags(
-                stop.sizeLines.map((line) => ({
-                  quantity: line.bagQuantity,
-                  bagsPerAcre: sizeById.get(line.sizeId)?.seedBagsPerAcre ?? 0,
-                })),
-                getRemainingAcres(row),
-              );
+              assertAcresLinesWithinMaxBags(bagLines, cap);
             } catch (error) {
               const mapped = asQuantityError(error);
               if (mapped) throw mapped;
               throw error;
             }
-          } else if (bagTotal > getRemainingBags(row)) {
+          } else if (bagTotal > cap) {
             throw new DispatchFlowError(
               "quantity_exceeded",
-              "Dispatch quantity exceeds remaining seed bags for a selected requisition.",
+              "Dispatch quantity exceeds the remaining quantity for this approved delivery.",
+            );
+          }
+
+          const consumedAcres = acresBased ? sumAcresFromBagLines(bagLines) : 0;
+          usageByDelivery.set(stop.deliveryId, {
+            bags: usage.bags + bagTotal,
+            acres: roundDecimal(usage.acres + consumedAcres),
+          });
+          requisition.fulfilledBags = (requisition.fulfilledBags ?? 0) + bagTotal;
+          if (acresBased) {
+            requisition.fulfilledAcres = formatDecimal(
+              parseDecimal(requisition.fulfilledAcres) + consumedAcres,
             );
           }
 
@@ -270,12 +329,12 @@ export const seedDispatchesService = {
             throw new DispatchFlowError("invalid_requisition", "Invalid seed requisition");
           }
 
-          const bagTotal = stop.sizeLines.reduce((sum, line) => sum + line.bagQuantity, 0);
           const [insertedStop] = await tx
             .insert(dispatchRequisitions)
             .values({
               dispatchId: created.id,
               requisitionId: stop.requisitionId,
+              deliveryId: stop.deliveryId,
               status: "PENDING",
             })
             .returning({ id: dispatchRequisitions.id });
@@ -289,34 +348,16 @@ export const seedDispatchesService = {
               bagQuantity: line.bagQuantity,
             })),
           );
+        }
 
-          const row = quantityRow(requisition);
-          const nextFulfilledBags = (requisition.fulfilledBags ?? 0) + bagTotal;
-
-          if (isAcresBasedRequisition(row)) {
-            const consumedAcres = sumAcresFromBagLines(
-              stop.sizeLines.map((line) => ({
-                quantity: line.bagQuantity,
-                bagsPerAcre: sizeById.get(line.sizeId)?.seedBagsPerAcre ?? 0,
-              })),
-            );
-            const nextFulfilledAcres = roundDecimal(
-              parseDecimal(requisition.fulfilledAcres) + consumedAcres,
-            );
-
-            await tx
-              .update(seedRequisitions)
-              .set({
-                fulfilledBags: nextFulfilledBags,
-                fulfilledAcres: formatDecimal(nextFulfilledAcres),
-              })
-              .where(eq(seedRequisitions.id, stop.requisitionId));
-          } else {
-            await tx
-              .update(seedRequisitions)
-              .set({ fulfilledBags: nextFulfilledBags })
-              .where(eq(seedRequisitions.id, stop.requisitionId));
-          }
+        for (const requisition of requisitionById.values()) {
+          await tx
+            .update(seedRequisitions)
+            .set({
+              fulfilledBags: requisition.fulfilledBags ?? 0,
+              fulfilledAcres: requisition.fulfilledAcres ?? "0",
+            })
+            .where(eq(seedRequisitions.id, requisition.id));
         }
 
         for (const [facilityId, bags] of facilityBagTotals) {
@@ -378,6 +419,7 @@ export const seedDispatchesService = {
             ? await tx.select().from(seedSizes).where(inArray(seedSizes.id, sizeIds))
             : [];
         const sizeById = new Map(sizeRows.map((row) => [row.id, row]));
+        const fulfilledByRequisition = new Map<string, { bags: number; acres: number }>();
 
         for (const stop of dispatch.dispatchRequisitions) {
           const requisition = stop.requisition;
@@ -399,34 +441,40 @@ export const seedDispatchesService = {
           }
 
           const bagTotal = stop.sizeLines.reduce((sum, line) => sum + line.bagQuantity, 0);
-          const nextFulfilledBags = Math.max(0, (requisition.fulfilledBags ?? 0) - bagTotal);
+          const running = fulfilledByRequisition.get(requisition.id) ?? {
+            bags: requisition.fulfilledBags ?? 0,
+            acres: parseDecimal(requisition.fulfilledAcres),
+          };
+          const nextFulfilledBags = Math.max(0, running.bags - bagTotal);
           const row = quantityRow(requisition);
+          const nextFulfilledAcres = isAcresBasedRequisition(row)
+            ? Math.max(
+                0,
+                roundDecimal(
+                  running.acres -
+                    sumAcresFromBagLines(
+                      stop.sizeLines.map((line) => ({
+                        quantity: line.bagQuantity,
+                        bagsPerAcre: sizeById.get(line.sizeId)?.seedBagsPerAcre ?? 0,
+                      })),
+                    ),
+                ),
+              )
+            : running.acres;
+          fulfilledByRequisition.set(requisition.id, {
+            bags: nextFulfilledBags,
+            acres: nextFulfilledAcres,
+          });
 
-          if (isAcresBasedRequisition(row)) {
-            const consumedAcres = sumAcresFromBagLines(
-              stop.sizeLines.map((line) => ({
-                quantity: line.bagQuantity,
-                bagsPerAcre: sizeById.get(line.sizeId)?.seedBagsPerAcre ?? 0,
-              })),
-            );
-            const nextFulfilledAcres = Math.max(
-              0,
-              roundDecimal(parseDecimal(requisition.fulfilledAcres) - consumedAcres),
-            );
-
-            await tx
-              .update(seedRequisitions)
-              .set({
-                fulfilledBags: nextFulfilledBags,
-                fulfilledAcres: formatDecimal(nextFulfilledAcres),
-              })
-              .where(eq(seedRequisitions.id, requisition.id));
-          } else {
-            await tx
-              .update(seedRequisitions)
-              .set({ fulfilledBags: nextFulfilledBags })
-              .where(eq(seedRequisitions.id, requisition.id));
-          }
+          await tx
+            .update(seedRequisitions)
+            .set({
+              fulfilledBags: nextFulfilledBags,
+              ...(isAcresBasedRequisition(row)
+                ? { fulfilledAcres: formatDecimal(nextFulfilledAcres) }
+                : {}),
+            })
+            .where(eq(seedRequisitions.id, requisition.id));
 
           for (const line of stop.sizeLines) {
             await tx

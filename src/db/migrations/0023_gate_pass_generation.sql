@@ -1,0 +1,2 @@
+ALTER TABLE "cold_storage_gate_pass" ADD COLUMN "generation_id" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "cold_storage_gate_pass" ADD CONSTRAINT "cold_storage_gate_pass_generation_id_generation_id_fk" FOREIGN KEY ("generation_id") REFERENCES "public"."generation"("id") ON DELETE no action ON UPDATE no action;

@@ -7,7 +7,8 @@ export const createFacilityStockBodySchema = z.object({
   varietyId: z.string().uuid("Invalid variety ID"),
   sizeId: z.string().uuid("Invalid seed size ID"),
   generationId: z.string().uuid("Invalid generation ID"),
-  quantity: quantitySchema,
+  initialQuantity: quantitySchema,
+  currentQuantity: quantitySchema.optional(),
 });
 
 export const updateFacilityStockBodySchema = z.object({
@@ -15,7 +16,8 @@ export const updateFacilityStockBodySchema = z.object({
   varietyId: z.string().uuid("Invalid variety ID").optional(),
   sizeId: z.string().uuid("Invalid seed size ID").optional(),
   generationId: z.string().uuid("Invalid generation ID").optional(),
-  quantity: quantitySchema.optional(),
+  initialQuantity: quantitySchema.optional(),
+  currentQuantity: quantitySchema.optional(),
 });
 
 export const facilityStockIdParamSchema = z.object({

@@ -155,6 +155,34 @@
       "when": 1792037018995,
       "tag": "0021_per_line_delivery_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792053871755,
+      "tag": "0022_cold_storage_gate_pass_and_stock_quantities",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792055200255,
+      "tag": "0023_gate_pass_generation",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792056267278,
+      "tag": "0024_gate_pass_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792081433996,
+      "tag": "0025_dispatch_delivery_lot",
+      "breakpoints": true
     }
   ]
 }

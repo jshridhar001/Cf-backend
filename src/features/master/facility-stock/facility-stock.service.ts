@@ -78,7 +78,13 @@ export const facilityStockService = {
     await assertIdExists(data.sizeId, findSeedSize, 400, "Seed size not found.");
     await assertIdExists(data.generationId, findGeneration, 400, "Generation not found.");
 
-    const [created] = await db.insert(facilityStocks).values(data).returning();
+    const [created] = await db
+      .insert(facilityStocks)
+      .values({
+        ...data,
+        currentQuantity: data.currentQuantity ?? data.initialQuantity,
+      })
+      .returning();
     return created;
   },
 

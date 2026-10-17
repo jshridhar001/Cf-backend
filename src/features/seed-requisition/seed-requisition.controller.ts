@@ -6,7 +6,10 @@ import type {
   SeedRequisitionIdParam,
   UpdateSeedRequisitionBody,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
-import { seedRequisitionsService } from "@/features/seed-requisition/seed-requisition.service.js";
+import {
+  ActiveDispatchError,
+  seedRequisitionsService,
+} from "@/features/seed-requisition/seed-requisition.service.js";
 import { isForeignKeyViolation } from "@/lib/postgres-errors.js";
 
 export async function getAllSeedRequisitions(_request: FastifyRequest, reply: FastifyReply) {
@@ -75,6 +78,12 @@ export async function updateSeedRequisition(
 
     return reply.send({ success: true, data });
   } catch (error) {
+    if (error instanceof ActiveDispatchError) {
+      return reply.code(409).send({
+        success: false,
+        error: { code: "CONFLICT", message: error.message },
+      });
+    }
     if (isForeignKeyViolation(error)) {
       return reply.code(400).send({
         success: false,

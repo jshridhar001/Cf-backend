@@ -1,5 +1,6 @@
 import { and, type asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
+import { dispatches, dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
 import { seedRequisitionDeliveries, seedRequisitions } from "@/db/schema/seed-requisition.js";
 import type {
   CreateSeedRequisitionBody,
@@ -7,6 +8,13 @@ import type {
   UpdateSeedRequisitionBody,
 } from "@/features/seed-requisition/seed-requisition.schema.js";
 import { isUniqueViolation } from "@/lib/postgres-errors.js";
+
+export class ActiveDispatchError extends Error {
+  constructor() {
+    super("This requisition has an active dispatch and cannot be edited.");
+    this.name = "ActiveDispatchError";
+  }
+}
 
 type RequestedDelivery = NonNullable<CreateSeedRequisitionBody["requestedDeliveries"]>[number];
 type DeliveryStatus = "PENDING" | "APPROVED" | "REJECTED";
@@ -177,6 +185,23 @@ export const seedRequisitionsService = {
 
       if (!updated) {
         return undefined;
+      }
+
+      const linkedDispatches = await tx
+        .select({ status: dispatches.status })
+        .from(dispatchRequisitions)
+        .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
+        .where(eq(dispatchRequisitions.requisitionId, updated.id));
+
+      if (linkedDispatches.some((row) => row.status !== "NULL")) {
+        throw new ActiveDispatchError();
+      }
+
+      if (linkedDispatches.length > 0) {
+        await tx
+          .update(dispatchRequisitions)
+          .set({ deliveryId: null })
+          .where(eq(dispatchRequisitions.requisitionId, updated.id));
       }
 
       const existingLines = await tx

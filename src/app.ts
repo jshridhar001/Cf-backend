@@ -6,6 +6,7 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { coldStorageGatePassRoutes } from "./features/cold-storage-gate-pass/cold-storage-gate-pass.routes.js";
 import { farmerRoutes } from "./features/farmers/farmer.routes.js";
+import { fieldRoutes } from "./features/fields/fields.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { googleDriveOAuthRoutes } from "./features/seed-requisition/google-drive/google-drive.routes.js";
@@ -70,6 +71,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
   await fastify.register(adminRoutes, { prefix: "/api/v1/access-control" });
   await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
+  await fastify.register(fieldRoutes, { prefix: "/api/v1/fields" });
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
   await fastify.register(googleDriveOAuthRoutes, {
     prefix: "/api/v1/seed-requisitions/google-drive",

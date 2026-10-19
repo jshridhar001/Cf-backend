@@ -183,6 +183,13 @@
       "when": 1792081433996,
       "tag": "0025_dispatch_delivery_lot",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792414265641,
+      "tag": "0026_farmer_field",
+      "breakpoints": true
     }
   ]
 }

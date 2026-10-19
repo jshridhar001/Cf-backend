@@ -3,6 +3,7 @@ export * from "@/db/schema/cold-storage-gate-pass.js";
 export * from "@/db/schema/facility-stock.js";
 export * from "@/db/schema/farmer.js";
 export * from "@/db/schema/farmer-stock.js";
+export * from "@/db/schema/fields.js";
 export * from "@/db/schema/masters.js";
 export * from "@/db/schema/seed-dispatch.js";
 export * from "@/db/schema/seed-requisition.js";

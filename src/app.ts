@@ -3,15 +3,18 @@ import { fromNodeHeaders } from "better-auth/node";
 import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import { createRouteHandler } from "uploadthing/fastify";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { coldStorageGatePassRoutes } from "./features/cold-storage-gate-pass/cold-storage-gate-pass.routes.js";
 import { farmerRoutes } from "./features/farmers/farmer.routes.js";
 import { fieldRoutes } from "./features/fields/fields.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
+import { plantationRoutes } from "./features/plantation/plantation.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { googleDriveOAuthRoutes } from "./features/seed-requisition/google-drive/google-drive.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
 import { stockTransferRoutes } from "./features/stock-transfer/stock-transfer.routes.js";
+import { uploadRouter } from "./features/uploads/upload.router.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
 
@@ -47,7 +50,15 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     origin: process.env.CORS_ORIGIN || clientOrigin,
     credentials: false,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "x-uploadthing-package",
+      "x-uploadthing-version",
+      "b3",
+      "traceparent",
+    ],
     exposedHeaders: ["set-auth-token"],
     maxAge: 86400,
   });
@@ -72,6 +83,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(adminRoutes, { prefix: "/api/v1/access-control" });
   await fastify.register(farmerRoutes, { prefix: "/api/v1/farmers" });
   await fastify.register(fieldRoutes, { prefix: "/api/v1/fields" });
+  await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
   await fastify.register(googleDriveOAuthRoutes, {
     prefix: "/api/v1/seed-requisitions/google-drive",
@@ -82,6 +94,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     prefix: "/api/v1/cold-storage-gate-passes",
   });
   await fastify.register(stockTransferRoutes, { prefix: "/api/v1/stock-transfers" });
+  await fastify.register(createRouteHandler, {
+    router: uploadRouter,
+  });
 
   fastify.get("/health", () => ({
     status: "ok",

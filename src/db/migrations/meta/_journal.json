@@ -190,6 +190,20 @@
       "when": 1792414265641,
       "tag": "0026_farmer_field",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792436421994,
+      "tag": "0027_field_plantation",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792438111891,
+      "tag": "0028_plantation_media_remarks",
+      "breakpoints": true
     }
   ]
 }

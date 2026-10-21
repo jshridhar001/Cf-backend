@@ -1,9 +1,25 @@
+import type { IncomingHttpHeaders } from "node:http";
 import { fromNodeHeaders } from "better-auth/node";
 import { createUploadthing, type FileRouter } from "uploadthing/fastify";
 import { UploadThingError } from "uploadthing/server";
 import { auth } from "@/lib/auth.js";
 
 const f = createUploadthing();
+
+async function requireUploadSession(headers: IncomingHttpHeaders) {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(headers),
+  });
+
+  if (!session) {
+    throw new UploadThingError({
+      code: "FORBIDDEN",
+      message: "Authentication required",
+    });
+  }
+
+  return { userId: session.user.id };
+}
 
 export const uploadRouter = {
   plantationImage: f({
@@ -12,22 +28,19 @@ export const uploadRouter = {
       maxFileCount: 8,
     },
   })
-    .middleware(async ({ req }) => {
-      const session = await auth.api.getSession({
-        headers: fromNodeHeaders(req.headers),
-      });
-
-      if (!session) {
-        throw new UploadThingError({
-          code: "FORBIDDEN",
-          message: "Authentication required",
-        });
-      }
-
-      return { userId: session.user.id };
-    })
+    .middleware(async ({ req }) => requireUploadSession(req.headers))
     .onUploadComplete(() => {
-      // The client sends the returned file URLs on the plantation create request.
+      // The client sends the returned file URLs on the plantation request.
+    }),
+  irrigationImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 8,
+    },
+  })
+    .middleware(async ({ req }) => requireUploadSession(req.headers))
+    .onUploadComplete(() => {
+      // The client sends the returned file URLs on the irrigation request.
     }),
 } satisfies FileRouter;
 

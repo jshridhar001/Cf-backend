@@ -8,6 +8,7 @@ import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { coldStorageGatePassRoutes } from "./features/cold-storage-gate-pass/cold-storage-gate-pass.routes.js";
 import { dehaulmingRoutes } from "./features/dehaulming/dehaulming.routes.js";
 import { farmerRoutes } from "./features/farmers/farmer.routes.js";
+import { fieldVisitRoutes } from "./features/field-visit/field-visit.routes.js";
 import { fieldRoutes } from "./features/fields/fields.routes.js";
 import { irrigationRoutes } from "./features/irrigation/irrigation.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
@@ -90,6 +91,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(irrigationRoutes, { prefix: "/api/v1/irrigations" });
   await fastify.register(dehaulmingRoutes, { prefix: "/api/v1/dehaulmings" });
+  await fastify.register(fieldVisitRoutes, { prefix: "/api/v1/field-visits" });
   await fastify.register(rougingRoutes, { prefix: "/api/v1/rougings" });
   await fastify.register(stripTestGroupRoutes, { prefix: "/api/v1/strip-test-groups" });
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });

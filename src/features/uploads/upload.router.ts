@@ -72,6 +72,16 @@ export const uploadRouter = {
     .onUploadComplete(() => {
       // The client sends the returned file URLs on the dehaulming request.
     }),
+  fieldVisitImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 8,
+    },
+  })
+    .middleware(async ({ req }) => requireUploadSession(req.headers))
+    .onUploadComplete(() => {
+      // The client sends the returned file URLs on the field visit request.
+    }),
 } satisfies FileRouter;
 
 export type UploadRouter = typeof uploadRouter;

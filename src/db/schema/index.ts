@@ -4,6 +4,7 @@ export * from "@/db/schema/dehaulming.js";
 export * from "@/db/schema/facility-stock.js";
 export * from "@/db/schema/farmer.js";
 export * from "@/db/schema/farmer-stock.js";
+export * from "@/db/schema/field-visit.js";
 export * from "@/db/schema/fields.js";
 export * from "@/db/schema/irrigation.js";
 export * from "@/db/schema/masters.js";

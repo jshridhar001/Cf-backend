@@ -62,6 +62,7 @@ function seedRequisitionBodySchema(
     .object({
       farmerId: z.string().uuid("Invalid farmer ID"),
       varietyId: z.string().uuid("Invalid variety ID"),
+      expectedSizeId: z.string().uuid("Invalid seed size ID").nullish(),
       requestedBags,
       requestedAcres,
       contractDate: z.coerce.date(),

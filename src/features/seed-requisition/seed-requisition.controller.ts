@@ -8,6 +8,7 @@ import type {
 } from "@/features/seed-requisition/seed-requisition.schema.js";
 import {
   ActiveDispatchError,
+  InvalidExpectedSizeError,
   seedRequisitionsService,
 } from "@/features/seed-requisition/seed-requisition.service.js";
 import { isForeignKeyViolation } from "@/lib/postgres-errors.js";
@@ -49,10 +50,16 @@ export async function createSeedRequisition(
     const data = await seedRequisitionsService.createSeedRequisition(request.body, createdById);
     return reply.code(201).send({ success: true, data });
   } catch (error) {
+    if (error instanceof InvalidExpectedSizeError) {
+      return reply.code(400).send({
+        success: false,
+        error: { code: "BAD_REQUEST", message: error.message },
+      });
+    }
     if (isForeignKeyViolation(error)) {
       return reply.code(400).send({
         success: false,
-        error: { code: "BAD_REQUEST", message: "Invalid farmer or variety" },
+        error: { code: "BAD_REQUEST", message: "Invalid farmer, variety, or seed size" },
       });
     }
     throw error;
@@ -84,10 +91,16 @@ export async function updateSeedRequisition(
         error: { code: "CONFLICT", message: error.message },
       });
     }
+    if (error instanceof InvalidExpectedSizeError) {
+      return reply.code(400).send({
+        success: false,
+        error: { code: "BAD_REQUEST", message: error.message },
+      });
+    }
     if (isForeignKeyViolation(error)) {
       return reply.code(400).send({
         success: false,
-        error: { code: "BAD_REQUEST", message: "Invalid farmer or variety" },
+        error: { code: "BAD_REQUEST", message: "Invalid farmer, variety, or seed size" },
       });
     }
     throw error;

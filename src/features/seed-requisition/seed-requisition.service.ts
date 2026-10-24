@@ -1,5 +1,6 @@
 import { and, type asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
+import { seedSizes } from "@/db/schema/masters.js";
 import { dispatches, dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
 import { seedRequisitionDeliveries, seedRequisitions } from "@/db/schema/seed-requisition.js";
 import type {
@@ -13,6 +14,13 @@ export class ActiveDispatchError extends Error {
   constructor() {
     super("This requisition has an active dispatch and cannot be edited.");
     this.name = "ActiveDispatchError";
+  }
+}
+
+export class InvalidExpectedSizeError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidExpectedSizeError";
   }
 }
 
@@ -75,6 +83,28 @@ async function recomputeRequisitionStatus(
     .where(eq(seedRequisitions.id, requisitionId));
 }
 
+async function assertExpectedSize(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  sizeId: string | null | undefined,
+  varietyId: string,
+) {
+  if (!sizeId) return;
+
+  const [size] = await tx
+    .select({ id: seedSizes.id, varietyId: seedSizes.varietyId })
+    .from(seedSizes)
+    .where(eq(seedSizes.id, sizeId))
+    .limit(1);
+
+  if (!size) {
+    throw new InvalidExpectedSizeError("Invalid seed size");
+  }
+
+  if (size.varietyId && size.varietyId !== varietyId) {
+    throw new InvalidExpectedSizeError("Seed size does not belong to this variety.");
+  }
+}
+
 const seedRequisitionWith = {
   farmer: {
     with: {
@@ -89,6 +119,7 @@ const seedRequisitionWith = {
     },
   },
   variety: true,
+  expectedSize: true,
   deliveries: {
     orderBy: (
       deliveries: { deliveryDate: typeof seedRequisitionDeliveries.deliveryDate },
@@ -131,11 +162,14 @@ export const seedRequisitionsService = {
 
   async createSeedRequisition(data: CreateSeedRequisitionBody, createdById: string) {
     const createdId = await db.transaction(async (tx) => {
+      await assertExpectedSize(tx, data.expectedSizeId, data.varietyId);
+
       const [created] = await tx
         .insert(seedRequisitions)
         .values({
           farmerId: data.farmerId,
           varietyId: data.varietyId,
+          expectedSizeId: data.expectedSizeId ?? null,
           requestedBags: data.requestedBags ?? null,
           requestedAcres: data.requestedAcres ?? null,
           contractDate: data.contractDate,
@@ -165,11 +199,14 @@ export const seedRequisitionsService = {
 
   async updateSeedRequisition(id: string, data: UpdateSeedRequisitionBody) {
     const updatedId = await db.transaction(async (tx) => {
+      await assertExpectedSize(tx, data.expectedSizeId, data.varietyId);
+
       const [updated] = await tx
         .update(seedRequisitions)
         .set({
           farmerId: data.farmerId,
           varietyId: data.varietyId,
+          expectedSizeId: data.expectedSizeId ?? null,
           requestedBags: data.requestedBags ?? null,
           requestedAcres: data.requestedAcres ?? null,
           contractDate: data.contractDate,

@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/schema/access-control.js";
 import { farmers } from "@/db/schema/farmer.js";
-import { varieties } from "@/db/schema/masters.js";
+import { seedSizes, varieties } from "@/db/schema/masters.js";
 // Import dispatches to link the relations later
 import { dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
 
@@ -29,6 +29,8 @@ export const seedRequisitions = pgTable(
     varietyId: uuid("variety_id")
       .notNull()
       .references(() => varieties.id),
+    // Forecast only. Dispatch records the size that was actually sent.
+    expectedSizeId: uuid("expected_size_id").references(() => seedSizes.id),
 
     status: reqStatusEnum("status").default("PENDING").notNull(),
 
@@ -100,6 +102,10 @@ export const seedRequisitionRelations = relations(seedRequisitions, ({ one, many
   variety: one(varieties, {
     fields: [seedRequisitions.varietyId],
     references: [varieties.id],
+  }),
+  expectedSize: one(seedSizes, {
+    fields: [seedRequisitions.expectedSizeId],
+    references: [seedSizes.id],
   }),
   deliveries: many(seedRequisitionDeliveries),
   dispatchStops: many(dispatchRequisitions), // Linked from the other file

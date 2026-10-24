@@ -42,6 +42,26 @@ export const uploadRouter = {
     .onUploadComplete(() => {
       // The client sends the returned file URLs on the irrigation request.
     }),
+  rougingImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 8,
+    },
+  })
+    .middleware(async ({ req }) => requireUploadSession(req.headers))
+    .onUploadComplete(() => {
+      // The client sends the returned file URLs on the rouging request.
+    }),
+  stripTestImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 8,
+    },
+  })
+    .middleware(async ({ req }) => requireUploadSession(req.headers))
+    .onUploadComplete(() => {
+      // The client sends the returned file URLs on the strip test request.
+    }),
 } satisfies FileRouter;
 
 export type UploadRouter = typeof uploadRouter;

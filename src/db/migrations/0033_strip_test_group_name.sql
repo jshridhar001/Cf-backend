@@ -1,0 +1,2 @@
+ALTER TABLE "field_strip_test_group" ADD COLUMN "name" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "field_strip_test_group" ADD CONSTRAINT "unique_strip_test_group_name_per_field" UNIQUE("field_id","name");

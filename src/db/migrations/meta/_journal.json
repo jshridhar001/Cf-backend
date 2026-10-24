@@ -218,6 +218,27 @@
       "when": 1792684390295,
       "tag": "0030_expected_seed_size",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792821878785,
+      "tag": "0031_field_rouging",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792831375891,
+      "tag": "0032_field_strip_test",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792831488215,
+      "tag": "0033_strip_test_group_name",
+      "breakpoints": true
     }
   ]
 }

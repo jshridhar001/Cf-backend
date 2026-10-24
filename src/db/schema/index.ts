@@ -7,6 +7,8 @@ export * from "@/db/schema/fields.js";
 export * from "@/db/schema/irrigation.js";
 export * from "@/db/schema/masters.js";
 export * from "@/db/schema/plantation.js";
+export * from "@/db/schema/rouging.js";
 export * from "@/db/schema/seed-dispatch.js";
 export * from "@/db/schema/seed-requisition.js";
 export * from "@/db/schema/stock-transfer.js";
+export * from "@/db/schema/strip-test.js";

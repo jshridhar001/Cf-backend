@@ -11,10 +11,12 @@ import { fieldRoutes } from "./features/fields/fields.routes.js";
 import { irrigationRoutes } from "./features/irrigation/irrigation.routes.js";
 import { masterRoutes } from "./features/master/master.routes.js";
 import { plantationRoutes } from "./features/plantation/plantation.routes.js";
+import { rougingRoutes } from "./features/rouging/rouging.routes.js";
 import { seedDispatchRoutes } from "./features/seed-dispatch/seed-dispatch.routes.js";
 import { googleDriveOAuthRoutes } from "./features/seed-requisition/google-drive/google-drive.routes.js";
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
 import { stockTransferRoutes } from "./features/stock-transfer/stock-transfer.routes.js";
+import { stripTestGroupRoutes } from "./features/strip-test/strip-test.routes.js";
 import { uploadRouter } from "./features/uploads/upload.router.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
@@ -86,6 +88,8 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(fieldRoutes, { prefix: "/api/v1/fields" });
   await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(irrigationRoutes, { prefix: "/api/v1/irrigations" });
+  await fastify.register(rougingRoutes, { prefix: "/api/v1/rougings" });
+  await fastify.register(stripTestGroupRoutes, { prefix: "/api/v1/strip-test-groups" });
   await fastify.register(masterRoutes, { prefix: "/api/v1/masters" });
   await fastify.register(googleDriveOAuthRoutes, {
     prefix: "/api/v1/seed-requisitions/google-drive",

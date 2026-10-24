@@ -62,6 +62,16 @@ export const uploadRouter = {
     .onUploadComplete(() => {
       // The client sends the returned file URLs on the strip test request.
     }),
+  dehaulmingImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 8,
+    },
+  })
+    .middleware(async ({ req }) => requireUploadSession(req.headers))
+    .onUploadComplete(() => {
+      // The client sends the returned file URLs on the dehaulming request.
+    }),
 } satisfies FileRouter;
 
 export type UploadRouter = typeof uploadRouter;

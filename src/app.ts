@@ -3,7 +3,6 @@ import { fromNodeHeaders } from "better-auth/node";
 import { config } from "dotenv";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
-import { createRouteHandler } from "uploadthing/fastify";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { coldStorageGatePassRoutes } from "./features/cold-storage-gate-pass/cold-storage-gate-pass.routes.js";
 import { dehaulmingRoutes } from "./features/dehaulming/dehaulming.routes.js";
@@ -20,7 +19,6 @@ import { googleDriveOAuthRoutes } from "./features/seed-requisition/google-drive
 import { seedRequisitionRoutes } from "./features/seed-requisition/seed-requisition.routes.js";
 import { stockTransferRoutes } from "./features/stock-transfer/stock-transfer.routes.js";
 import { stripTestGroupRoutes } from "./features/strip-test/strip-test.routes.js";
-import { uploadRouter } from "./features/uploads/upload.router.js";
 import { auth } from "./lib/auth.js";
 import { authPlugin } from "./plugins/auth.js";
 
@@ -56,15 +54,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     origin: process.env.CORS_ORIGIN || clientOrigin,
     credentials: false,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "x-uploadthing-package",
-      "x-uploadthing-version",
-      "b3",
-      "traceparent",
-    ],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "b3", "traceparent"],
     exposedHeaders: ["set-auth-token"],
     maxAge: 86400,
   });
@@ -106,9 +96,6 @@ export const buildApp = async (): Promise<FastifyInstance> => {
     prefix: "/api/v1/cold-storage-gate-passes",
   });
   await fastify.register(stockTransferRoutes, { prefix: "/api/v1/stock-transfers" });
-  await fastify.register(createRouteHandler, {
-    router: uploadRouter,
-  });
 
   fastify.get("/health", () => ({
     status: "ok",

@@ -2,6 +2,7 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { farmerFields } from "@/db/schema/fields.js";
 import { fieldRougings } from "@/db/schema/rouging.js";
+import { completeOpenFieldTask } from "@/features/field-task/field-task.service.js";
 import type { CreateRougingBody, UpdateRougingBody } from "@/features/rouging/rouging.schema.js";
 
 const INVALID_FIELD = "Invalid field.";
@@ -74,21 +75,31 @@ export const rougingsService = {
       endDate: data.endDate,
     });
 
-    const [created] = await db
-      .insert(fieldRougings)
-      .values({
-        fieldId: data.fieldId,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        virusInfectedPlantsRemoved: data.virusInfectedPlantsRemoved ?? null,
-        offVarietyTypeRemoval: data.offVarietyTypeRemoval ?? null,
-        mediaUrls: data.mediaUrls ?? null,
-        remarks: data.remarks ?? null,
-        createdById,
-      })
-      .returning({ id: fieldRougings.id });
+    const createdId = await db.transaction(async (tx) => {
+      const [created] = await tx
+        .insert(fieldRougings)
+        .values({
+          fieldId: data.fieldId,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          virusInfectedPlantsRemoved: data.virusInfectedPlantsRemoved ?? null,
+          offVarietyTypeRemoval: data.offVarietyTypeRemoval ?? null,
+          mediaUrls: data.mediaUrls ?? null,
+          remarks: data.remarks ?? null,
+          createdById,
+        })
+        .returning({ id: fieldRougings.id });
 
-    return await this.getRougingById(created.id);
+      await completeOpenFieldTask(tx, {
+        fieldId: data.fieldId,
+        activityType: "ROUGING",
+        completedRougingId: created.id,
+      });
+
+      return created.id;
+    });
+
+    return await this.getRougingById(createdId);
   },
 
   async updateRouging(id: string, data: UpdateRougingBody) {

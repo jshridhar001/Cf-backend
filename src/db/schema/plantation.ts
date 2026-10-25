@@ -23,7 +23,7 @@ export const fieldPlantations = pgTable(
 
     fieldId: uuid("field_id")
       .notNull()
-      .references(() => farmerFields.id, { onDelete: "restrict" }),
+      .references(() => farmerFields.id, { onDelete: "cascade" }),
 
     varietyId: uuid("variety_id")
       .notNull()

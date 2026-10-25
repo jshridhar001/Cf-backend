@@ -85,11 +85,21 @@ export async function deleteField(
   request: FastifyRequest<{ Params: FieldIdParam }>,
   reply: FastifyReply,
 ) {
-  const deleted = await fieldsService.deleteField(request.params.id);
+  try {
+    const deleted = await fieldsService.deleteField(request.params.id);
 
-  if (!deleted) {
-    return reply.status(404).send({ success: false, error: "Field not found." });
+    if (!deleted) {
+      return reply.status(404).send({ success: false, error: "Field not found." });
+    }
+
+    return reply.send({ success: true, message: "Field deleted successfully." });
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      return reply.status(409).send({
+        success: false,
+        error: "This field is still in use and cannot be deleted.",
+      });
+    }
+    throw error;
   }
-
-  return reply.send({ success: true, message: "Field deleted successfully." });
 }

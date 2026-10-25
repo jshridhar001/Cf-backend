@@ -4,6 +4,10 @@ import { farmerFields } from "@/db/schema/fields.js";
 import { seedSizes, varieties } from "@/db/schema/masters.js";
 import { fieldPlantations } from "@/db/schema/plantation.js";
 import { seedRequisitions } from "@/db/schema/seed-requisition.js";
+import {
+  rescheduleFieldTasks,
+  scheduleFieldTasks,
+} from "@/features/field-task/field-task.service.js";
 import type {
   CreatePlantationBody,
   UpdatePlantationBody,
@@ -171,24 +175,36 @@ export const plantationsService = {
       requisitionId,
     });
 
-    const [created] = await db
-      .insert(fieldPlantations)
-      .values({
-        fieldId: data.fieldId,
-        varietyId: data.varietyId,
-        sizeId: data.sizeId,
-        bagCount: data.bagCount,
-        acresPlanted: data.acresPlanted,
-        startDate: data.startDate,
-        endDate,
-        requisitionId,
-        mediaUrls: data.mediaUrls ?? null,
-        remarks: data.remarks ?? null,
-        createdById,
-      })
-      .returning({ id: fieldPlantations.id });
+    const createdId = await db.transaction(async (tx) => {
+      const [created] = await tx
+        .insert(fieldPlantations)
+        .values({
+          fieldId: data.fieldId,
+          varietyId: data.varietyId,
+          sizeId: data.sizeId,
+          bagCount: data.bagCount,
+          acresPlanted: data.acresPlanted,
+          startDate: data.startDate,
+          endDate,
+          requisitionId,
+          mediaUrls: data.mediaUrls ?? null,
+          remarks: data.remarks ?? null,
+          createdById,
+        })
+        .returning({ id: fieldPlantations.id });
 
-    return await this.getPlantationById(created.id);
+      await scheduleFieldTasks(tx, {
+        fieldId: data.fieldId,
+        plantationId: created.id,
+        plantationStartDate: data.startDate,
+        plantationEndDate: endDate,
+        assignedOfficerId: createdById,
+      });
+
+      return created.id;
+    });
+
+    return await this.getPlantationById(createdId);
   },
 
   async updatePlantation(id: string, data: UpdatePlantationBody) {
@@ -200,7 +216,9 @@ export const plantationsService = {
       return undefined;
     }
 
+    const startDate = data.startDate ?? existing.startDate;
     const endDate = data.endDate === undefined ? existing.endDate : data.endDate;
+    const datesChanged = startDate !== existing.startDate || endDate !== existing.endDate;
     const requisitionId =
       data.requisitionId === undefined ? existing.requisitionId : data.requisitionId;
 
@@ -209,22 +227,38 @@ export const plantationsService = {
       varietyId: data.varietyId ?? existing.varietyId,
       sizeId: data.sizeId ?? existing.sizeId,
       acresPlanted: data.acresPlanted ?? existing.acresPlanted,
-      startDate: data.startDate ?? existing.startDate,
+      startDate,
       endDate,
       requisitionId,
     });
 
-    const [updated] = await db
-      .update(fieldPlantations)
-      .set(data)
-      .where(eq(fieldPlantations.id, id))
-      .returning({ id: fieldPlantations.id });
+    const updatedId = await db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(fieldPlantations)
+        .set(data)
+        .where(eq(fieldPlantations.id, id))
+        .returning({ id: fieldPlantations.id });
 
-    if (!updated) {
+      if (!updated) {
+        return undefined;
+      }
+
+      if (datesChanged) {
+        await rescheduleFieldTasks(tx, {
+          plantationId: id,
+          plantationStartDate: startDate,
+          plantationEndDate: endDate,
+        });
+      }
+
+      return updated.id;
+    });
+
+    if (!updatedId) {
       return undefined;
     }
 
-    return await this.getPlantationById(updated.id);
+    return await this.getPlantationById(updatedId);
   },
 
   async deletePlantation(id: string) {

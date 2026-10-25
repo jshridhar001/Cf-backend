@@ -7,9 +7,11 @@ import {
   fieldStripTests,
   fieldStripTestTubers,
 } from "@/db/schema/strip-test.js";
+import { completeOpenFieldTask } from "@/features/field-task/field-task.service.js";
 import type {
   CreateStripTestGroupBody,
   StripTest,
+  StripTestType,
 } from "@/features/strip-test/strip-test.schema.js";
 
 const INVALID_FIELD = "Invalid field.";
@@ -101,6 +103,8 @@ async function insertStrips(
   createdById: string,
   stripTests: StripTest[],
 ) {
+  const createdStrips: { id: string; type: StripTestType }[] = [];
+
   for (const strip of stripTests) {
     const [created] = await tx
       .insert(fieldStripTests)
@@ -128,6 +132,34 @@ async function insertStrips(
         weightKg: record.weightKg,
       })),
     );
+
+    createdStrips.push({ id: created.id, type: strip.type });
+  }
+
+  return createdStrips;
+}
+
+async function completeStripTestTasks(
+  tx: Transaction,
+  fieldId: string,
+  strips: { id: string; type: StripTestType }[],
+) {
+  const completedTypes = new Set<StripTestType>();
+
+  for (const strip of strips) {
+    if (completedTypes.has(strip.type)) {
+      continue;
+    }
+
+    completedTypes.add(strip.type);
+    await completeOpenFieldTask(tx, {
+      fieldId,
+      activityType:
+        strip.type === "PRE_DEHAULMING"
+          ? "STRIP_TEST_PRE_DEHAULMING"
+          : "STRIP_TEST_POST_DEHAULMING",
+      completedStripTestId: strip.id,
+    });
   }
 }
 
@@ -160,7 +192,8 @@ export const stripTestGroupsService = {
         })
         .returning({ id: fieldStripTestGroups.id });
 
-      await insertStrips(tx, created.id, data.fieldId, createdById, data.stripTests);
+      const strips = await insertStrips(tx, created.id, data.fieldId, createdById, data.stripTests);
+      await completeStripTestTasks(tx, data.fieldId, strips);
       return created.id;
     });
 

@@ -6,6 +6,7 @@ import type {
   CreateDehaulmingBody,
   UpdateDehaulmingBody,
 } from "@/features/dehaulming/dehaulming.schema.js";
+import { completeOpenFieldTask } from "@/features/field-task/field-task.service.js";
 
 const INVALID_FIELD = "Invalid field.";
 
@@ -81,19 +82,29 @@ export const dehaulmingsService = {
       endDate: data.endDate,
     });
 
-    const [created] = await db
-      .insert(fieldDehaulmings)
-      .values({
-        fieldId: data.fieldId,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        mediaUrls: data.mediaUrls ?? null,
-        remarks: data.remarks ?? null,
-        createdById,
-      })
-      .returning({ id: fieldDehaulmings.id });
+    const createdId = await db.transaction(async (tx) => {
+      const [created] = await tx
+        .insert(fieldDehaulmings)
+        .values({
+          fieldId: data.fieldId,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          mediaUrls: data.mediaUrls ?? null,
+          remarks: data.remarks ?? null,
+          createdById,
+        })
+        .returning({ id: fieldDehaulmings.id });
 
-    return await this.getDehaulmingById(created.id);
+      await completeOpenFieldTask(tx, {
+        fieldId: data.fieldId,
+        activityType: "DEHAULMING",
+        completedDehaulmingId: created.id,
+      });
+
+      return created.id;
+    });
+
+    return await this.getDehaulmingById(createdId);
   },
 
   async updateDehaulming(id: string, data: UpdateDehaulmingBody) {

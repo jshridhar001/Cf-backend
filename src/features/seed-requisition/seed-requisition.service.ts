@@ -62,6 +62,67 @@ function sameQuantity(existing: Pick<StoredDelivery, "acres" | "bags">, next: Re
   return false;
 }
 
+function sameInstant(existing: Date | null, next: Date | null | undefined) {
+  const normalized = next ?? null;
+  if (existing == null || normalized == null) {
+    return existing == null && normalized == null;
+  }
+  return existing.getTime() === normalized.getTime();
+}
+
+function sameDecimal(existing: string | null, next: string | null | undefined) {
+  const normalized = next ?? null;
+  if (existing == null || normalized == null) {
+    return existing == null && normalized == null;
+  }
+  return Number(existing) === Number(normalized);
+}
+
+function sameDeliveries(
+  existing: Pick<StoredDelivery, "deliveryDate" | "acres" | "bags">[],
+  next: RequestedDelivery[],
+) {
+  if (existing.length !== next.length) return false;
+
+  const used = new Set<number>();
+  return next.every((line) => {
+    const index = existing.findIndex(
+      (row, i) =>
+        !used.has(i) &&
+        calendarDay(row.deliveryDate) === calendarDay(line.deliveryDate) &&
+        sameQuantity(row, line),
+    );
+    if (index === -1) return false;
+    used.add(index);
+    return true;
+  });
+}
+
+function operationalFieldsUnchanged(
+  existing: {
+    farmerId: string;
+    varietyId: string;
+    expectedSizeId: string | null;
+    requestedBags: number | null;
+    requestedAcres: string | null;
+    contractDate: Date;
+    requisitionDate: Date | null;
+  },
+  existingLines: Pick<StoredDelivery, "deliveryDate" | "acres" | "bags">[],
+  data: UpdateSeedRequisitionBody,
+) {
+  return (
+    existing.farmerId === data.farmerId &&
+    existing.varietyId === data.varietyId &&
+    (existing.expectedSizeId ?? null) === (data.expectedSizeId ?? null) &&
+    (existing.requestedBags ?? null) === (data.requestedBags ?? null) &&
+    sameDecimal(existing.requestedAcres, data.requestedAcres) &&
+    sameInstant(existing.contractDate, data.contractDate) &&
+    sameInstant(existing.requisitionDate, data.requisitionDate) &&
+    sameDeliveries(existingLines, data.requestedDeliveries ?? [])
+  );
+}
+
 function rollupStatus(statuses: DeliveryStatus[]): DeliveryStatus {
   if (statuses.length === 0 || statuses.includes("PENDING")) return "PENDING";
   if (statuses.includes("APPROVED")) return "APPROVED";
@@ -199,6 +260,59 @@ export const seedRequisitionsService = {
 
   async updateSeedRequisition(id: string, data: UpdateSeedRequisitionBody) {
     const updatedId = await db.transaction(async (tx) => {
+      const linkedDispatches = await tx
+        .select({ status: dispatches.status })
+        .from(dispatchRequisitions)
+        .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
+        .where(eq(dispatchRequisitions.requisitionId, id));
+
+      if (linkedDispatches.some((row) => row.status !== "NULL")) {
+        const [existing] = await tx
+          .select({
+            farmerId: seedRequisitions.farmerId,
+            varietyId: seedRequisitions.varietyId,
+            expectedSizeId: seedRequisitions.expectedSizeId,
+            requestedBags: seedRequisitions.requestedBags,
+            requestedAcres: seedRequisitions.requestedAcres,
+            contractDate: seedRequisitions.contractDate,
+            requisitionDate: seedRequisitions.requisitionDate,
+          })
+          .from(seedRequisitions)
+          .where(eq(seedRequisitions.id, id))
+          .limit(1);
+
+        if (!existing) {
+          return undefined;
+        }
+
+        const existingLines = await tx
+          .select({
+            deliveryDate: seedRequisitionDeliveries.deliveryDate,
+            acres: seedRequisitionDeliveries.acres,
+            bags: seedRequisitionDeliveries.bags,
+          })
+          .from(seedRequisitionDeliveries)
+          .where(eq(seedRequisitionDeliveries.requisitionId, id));
+
+        if (!operationalFieldsUnchanged(existing, existingLines, data)) {
+          throw new ActiveDispatchError();
+        }
+
+        const contractPatch = {
+          ...(data.remarks !== undefined ? { remarks: data.remarks } : {}),
+          ...(data.engContractUrl !== undefined ? { engContractUrl: data.engContractUrl } : {}),
+          ...(data.hindiContractUrl !== undefined
+            ? { hindiContractUrl: data.hindiContractUrl }
+            : {}),
+        };
+
+        if (Object.keys(contractPatch).length > 0) {
+          await tx.update(seedRequisitions).set(contractPatch).where(eq(seedRequisitions.id, id));
+        }
+
+        return id;
+      }
+
       await assertExpectedSize(tx, data.expectedSizeId, data.varietyId);
 
       const [updated] = await tx
@@ -222,16 +336,6 @@ export const seedRequisitionsService = {
 
       if (!updated) {
         return undefined;
-      }
-
-      const linkedDispatches = await tx
-        .select({ status: dispatches.status })
-        .from(dispatchRequisitions)
-        .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
-        .where(eq(dispatchRequisitions.requisitionId, updated.id));
-
-      if (linkedDispatches.some((row) => row.status !== "NULL")) {
-        throw new ActiveDispatchError();
       }
 
       if (linkedDispatches.length > 0) {

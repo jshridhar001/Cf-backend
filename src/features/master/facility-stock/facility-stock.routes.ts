@@ -14,6 +14,8 @@ export async function facilityStockRoutes(fastify: FastifyInstance) {
     facilityStockController.getAllFacilityStocks,
   );
 
+  fastify.get("/summary", facilityStockController.getFacilityStockSummary);
+
   fastify.post(
     "/",
     { schema: { body: createFacilityStockBodySchema } },

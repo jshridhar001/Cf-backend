@@ -55,3 +55,46 @@ export const farmerIdParamSchema = z.object({
 });
 
 export type FarmerIdParam = z.infer<typeof farmerIdParamSchema>;
+
+export const farmerReportQuerySchema = z.object({
+  stationId: z.string().uuid("Invalid station ID").optional(),
+  farmerId: z.string().uuid("Invalid farmer ID").optional(),
+  varietyId: z.string().uuid("Invalid variety ID").optional(),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+});
+
+export type FarmerReportQuery = z.infer<typeof farmerReportQuerySchema>;
+
+export type FarmerReportStatus = NonNullable<FarmerReportQuery["status"]>;
+
+export type FarmerReportQuantityUnit = "BAGS" | "ACRES";
+
+export type FarmerSeedReportRow = {
+  requisitionId: string;
+  status: FarmerReportStatus;
+  requisitionDate: Date | null;
+  contractDate: Date;
+  farmer: {
+    id: string;
+    name: string;
+    accountNumber: string;
+    station: { id: string; name: string };
+    family: { id: string; name: string } | null;
+  };
+  variety: { id: string; name: string };
+  quantityUnit: FarmerReportQuantityUnit;
+  expectedSize: { id: string; name: string; seedBagsPerAcre: number | null } | null;
+  requestedBags: number | null;
+  requestedAcres: string | null;
+  dispatchedBags: number;
+  dispatchedAcres: string | null;
+  remainingBags: number | null;
+  remainingAcres: string | null;
+  dispatchedSizes: {
+    sizeId: string;
+    sizeName: string;
+    seedBagsPerAcre: number | null;
+    bags: number;
+    acres: string | null;
+  }[];
+};

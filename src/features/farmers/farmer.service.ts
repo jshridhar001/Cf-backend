@@ -1,4 +1,5 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, ne, type SQL, sum } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/db/index.js";
 import { farmerFamilies, farmers } from "@/db/schema/farmer.js";
 import { farmerStockBalances } from "@/db/schema/farmer-stock.js";
@@ -14,7 +15,16 @@ import {
   varieties,
   villages,
 } from "@/db/schema/masters.js";
-import type { CreateFarmerBody } from "@/features/farmers/farmer.schema.js";
+import {
+  dispatches,
+  dispatchRequisitionSizeLines,
+  dispatchRequisitions,
+} from "@/db/schema/seed-dispatch.js";
+import { seedRequisitions } from "@/db/schema/seed-requisition.js";
+import type { CreateFarmerBody, FarmerReportQuery } from "@/features/farmers/farmer.schema.js";
+import { buildFarmerSeedReportRow } from "@/features/farmers/farmer-report.js";
+
+const expectedSeedSizes = alias(seedSizes, "expected_seed_size");
 
 const farmerAddressWith = {
   family: true,
@@ -253,4 +263,147 @@ export const farmersService = {
       villages: villageRows,
     };
   },
+
+  async getSeedReport(query: FarmerReportQuery) {
+    const conditions = reportConditions(query);
+    const requisitionWhere = combineConditions(conditions);
+    const sizeWhere = combineConditions([ne(dispatches.status, "NULL"), ...conditions]);
+
+    const requisitionQuery = db
+      .select({
+        requisitionId: seedRequisitions.id,
+        status: seedRequisitions.status,
+        requisitionDate: seedRequisitions.requisitionDate,
+        contractDate: seedRequisitions.contractDate,
+        requestedBags: seedRequisitions.requestedBags,
+        requestedAcres: seedRequisitions.requestedAcres,
+        farmerId: farmers.id,
+        farmerName: farmers.name,
+        accountNumber: farmers.accountNumber,
+        stationId: stations.id,
+        stationName: stations.name,
+        familyId: farmerFamilies.id,
+        familyName: farmerFamilies.name,
+        varietyId: varieties.id,
+        varietyName: varieties.name,
+        expectedSizeId: expectedSeedSizes.id,
+        expectedSizeName: expectedSeedSizes.name,
+        expectedSeedBagsPerAcre: expectedSeedSizes.seedBagsPerAcre,
+      })
+      .from(seedRequisitions)
+      .innerJoin(farmers, eq(seedRequisitions.farmerId, farmers.id))
+      .innerJoin(stations, eq(farmers.stationId, stations.id))
+      .innerJoin(varieties, eq(seedRequisitions.varietyId, varieties.id))
+      .leftJoin(farmerFamilies, eq(farmers.familyId, farmerFamilies.id))
+      .leftJoin(expectedSeedSizes, eq(seedRequisitions.expectedSizeId, expectedSeedSizes.id));
+
+    const filteredRequisitions = requisitionWhere
+      ? requisitionQuery.where(requisitionWhere)
+      : requisitionQuery;
+
+    const sizeQuery = db
+      .select({
+        requisitionId: dispatchRequisitions.requisitionId,
+        sizeId: seedSizes.id,
+        sizeName: seedSizes.name,
+        seedBagsPerAcre: seedSizes.seedBagsPerAcre,
+        bags: sum(dispatchRequisitionSizeLines.bagQuantity),
+      })
+      .from(dispatchRequisitionSizeLines)
+      .innerJoin(
+        dispatchRequisitions,
+        eq(dispatchRequisitionSizeLines.dispatchRequisitionId, dispatchRequisitions.id),
+      )
+      .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
+      .innerJoin(seedSizes, eq(dispatchRequisitionSizeLines.sizeId, seedSizes.id))
+      .innerJoin(seedRequisitions, eq(dispatchRequisitions.requisitionId, seedRequisitions.id))
+      .innerJoin(farmers, eq(seedRequisitions.farmerId, farmers.id))
+      .where(sizeWhere)
+      .groupBy(
+        dispatchRequisitions.requisitionId,
+        seedSizes.id,
+        seedSizes.name,
+        seedSizes.seedBagsPerAcre,
+      );
+
+    const [requisitionRows, sizeRows] = await Promise.all([
+      filteredRequisitions.orderBy(
+        asc(farmers.name),
+        asc(farmers.accountNumber),
+        asc(varieties.name),
+        asc(seedRequisitions.contractDate),
+        asc(seedRequisitions.id),
+      ),
+      sizeQuery,
+    ]);
+
+    const sizesByRequisition = new Map<
+      string,
+      { sizeId: string; sizeName: string; seedBagsPerAcre: number | null; bags: number }[]
+    >();
+    for (const row of sizeRows) {
+      const sizes = sizesByRequisition.get(row.requisitionId) ?? [];
+      sizes.push({
+        sizeId: row.sizeId,
+        sizeName: row.sizeName,
+        seedBagsPerAcre: row.seedBagsPerAcre,
+        bags: bagCount(row.bags),
+      });
+      sizesByRequisition.set(row.requisitionId, sizes);
+    }
+
+    return requisitionRows.map((row) =>
+      buildFarmerSeedReportRow(
+        {
+          requisitionId: row.requisitionId,
+          status: row.status,
+          requisitionDate: row.requisitionDate,
+          contractDate: row.contractDate,
+          farmer: {
+            id: row.farmerId,
+            name: row.farmerName,
+            accountNumber: row.accountNumber,
+            station: { id: row.stationId, name: row.stationName },
+            family:
+              row.familyId != null && row.familyName != null
+                ? { id: row.familyId, name: row.familyName }
+                : null,
+          },
+          variety: { id: row.varietyId, name: row.varietyName },
+          expectedSize:
+            row.expectedSizeId != null && row.expectedSizeName != null
+              ? {
+                  id: row.expectedSizeId,
+                  name: row.expectedSizeName,
+                  seedBagsPerAcre: row.expectedSeedBagsPerAcre,
+                }
+              : null,
+          requestedBags: row.requestedBags,
+          requestedAcres: row.requestedAcres,
+        },
+        sizesByRequisition.get(row.requisitionId) ?? [],
+      ),
+    );
+  },
 };
+
+function reportConditions(query: FarmerReportQuery): SQL[] {
+  const conditions: SQL[] = [];
+  if (query.stationId) conditions.push(eq(farmers.stationId, query.stationId));
+  if (query.farmerId) conditions.push(eq(seedRequisitions.farmerId, query.farmerId));
+  if (query.varietyId) conditions.push(eq(seedRequisitions.varietyId, query.varietyId));
+  if (query.status) conditions.push(eq(seedRequisitions.status, query.status));
+  return conditions;
+}
+
+function combineConditions(conditions: SQL[]): SQL | undefined {
+  const [first, ...rest] = conditions;
+  if (!first) return undefined;
+  return rest.reduce<SQL>((current, condition) => and(current, condition) ?? current, first);
+}
+
+function bagCount(value: string | null): number {
+  if (value == null) return 0;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}

@@ -6,6 +6,7 @@ import type {
   CreateFacilityStockBody,
   UpdateFacilityStockBody,
 } from "@/features/master/facility-stock/facility-stock.schema.js";
+import { buildFacilityStockSummary } from "@/features/master/facility-stock/facility-stock-summary.js";
 
 export class FacilityStockCrudError extends Error {
   statusCode: 400 | 404;
@@ -70,6 +71,34 @@ export const facilityStockService = {
       where: facilityId ? eq(facilityStocks.facilityId, facilityId) : undefined,
       orderBy: [desc(facilityStocks.createdAt)],
     });
+  },
+
+  async getFacilityStockSummary() {
+    const rows = await db
+      .select({
+        varietyId: varieties.id,
+        varietyName: varieties.name,
+        varietyCreatedAt: varieties.createdAt,
+        varietyUpdatedAt: varieties.updatedAt,
+        sizeId: seedSizes.id,
+        sizeName: seedSizes.name,
+        sizeVarietyId: seedSizes.varietyId,
+        seedBagsPerAcre: seedSizes.seedBagsPerAcre,
+        sizeCreatedAt: seedSizes.createdAt,
+        sizeUpdatedAt: seedSizes.updatedAt,
+        generationId: generations.id,
+        generationName: generations.name,
+        generationCreatedAt: generations.createdAt,
+        generationUpdatedAt: generations.updatedAt,
+        initialQuantity: facilityStocks.initialQuantity,
+        currentQuantity: facilityStocks.currentQuantity,
+      })
+      .from(facilityStocks)
+      .innerJoin(varieties, eq(facilityStocks.varietyId, varieties.id))
+      .innerJoin(seedSizes, eq(facilityStocks.sizeId, seedSizes.id))
+      .innerJoin(generations, eq(facilityStocks.generationId, generations.id));
+
+    return buildFacilityStockSummary(rows);
   },
 
   async createFacilityStock(data: CreateFacilityStockBody) {

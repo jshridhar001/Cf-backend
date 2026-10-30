@@ -32,3 +32,40 @@ export type CreateFacilityStockBody = z.infer<typeof createFacilityStockBodySche
 export type UpdateFacilityStockBody = z.infer<typeof updateFacilityStockBodySchema>;
 export type FacilityStockIdParam = z.infer<typeof facilityStockIdParamSchema>;
 export type ListFacilityStockQuery = z.infer<typeof listFacilityStockQuerySchema>;
+
+export type FacilityStockSummaryGeneration = {
+  generation: {
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  initialQuantity: number;
+  currentQuantity: number;
+};
+
+export type FacilityStockSummarySize = {
+  size: {
+    id: string;
+    name: string;
+    varietyId: string | null;
+    seedBagsPerAcre: number | null;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  initialQuantity: number;
+  currentQuantity: number;
+  generations: FacilityStockSummaryGeneration[];
+};
+
+export type FacilityStockSummaryVariety = {
+  variety: {
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  initialQuantity: number;
+  currentQuantity: number;
+  sizes: FacilityStockSummarySize[];
+};

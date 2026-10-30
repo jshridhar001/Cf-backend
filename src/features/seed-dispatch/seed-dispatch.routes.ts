@@ -8,6 +8,7 @@ import * as seedDispatchesController from "@/features/seed-dispatch/seed-dispatc
 import {
   createDispatchBodySchema,
   dispatchIdParamSchema,
+  updateDispatchBodySchema,
   updateDispatchStatusBodySchema,
 } from "@/features/seed-dispatch/seed-dispatch.schema.js";
 import { requireAuth } from "@/middleware/require-auth.js";
@@ -55,6 +56,17 @@ export const seedDispatchRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     lotReceiptController.confirmReceipt,
+  );
+
+  fastify.put(
+    "/:id",
+    {
+      schema: {
+        params: dispatchIdParamSchema,
+        body: updateDispatchBodySchema,
+      },
+    },
+    seedDispatchesController.updateDispatch,
   );
 
   fastify.get(

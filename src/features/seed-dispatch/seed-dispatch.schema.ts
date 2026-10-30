@@ -71,6 +71,21 @@ export const updateDispatchStatusBodySchema = z.object({
   remarks: z.string().trim().min(1).optional(),
 });
 
+export const updateDispatchBodySchema = z
+  .object({
+    toLocation: z.string().trim().min(1, "Destination is required").optional(),
+    truckNumber: z.string().trim().min(1, "Truck number is required").optional(),
+    dispatchDate: optionalDate,
+    driverMobile: z.string().trim().min(1).optional(),
+    manualGatePassNumber: z.string().trim().min(1).optional(),
+    weightSlipNumber: z.string().trim().min(1).optional(),
+    grossWeight: weightSchema.optional(),
+    tareWeight: weightSchema.optional(),
+    remarks: z.string().trim().min(1).optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, "At least one field is required");
+
 export type CreateDispatchBody = z.infer<typeof createDispatchBodySchema>;
 export type DispatchIdParam = z.infer<typeof dispatchIdParamSchema>;
 export type UpdateDispatchStatusBody = z.infer<typeof updateDispatchStatusBodySchema>;
+export type UpdateDispatchBody = z.infer<typeof updateDispatchBodySchema>;

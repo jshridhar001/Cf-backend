@@ -81,7 +81,7 @@ export const updateDispatchBodySchema = z
     weightSlipNumber: z.string().trim().min(1).optional(),
     grossWeight: weightSchema.optional(),
     tareWeight: weightSchema.optional(),
-    remarks: z.string().trim().min(1).optional(),
+    remarks: z.string().trim().min(1).nullable().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, "At least one field is required");
 

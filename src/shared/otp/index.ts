@@ -29,7 +29,7 @@ export function getOtpProvider() {
       });
 
       return {
-        devOtp: process.env.NODE_ENV === "development" ? code : undefined,
+        devOtp: code,
       };
     },
 

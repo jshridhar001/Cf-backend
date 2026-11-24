@@ -22,6 +22,11 @@ export async function getAllFacilityStocks(
   return reply.send({ success: true, data });
 }
 
+export async function getFacilityStockSummary(_request: FastifyRequest, reply: FastifyReply) {
+  const data = await facilityStockService.getFacilityStockSummary();
+  return reply.send({ success: true, data });
+}
+
 export async function createFacilityStock(
   request: FastifyRequest<{ Body: CreateFacilityStockBody }>,
   reply: FastifyReply,

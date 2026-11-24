@@ -1,5 +1,9 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { CreateFarmerBody, FarmerIdParam } from "@/features/farmers/farmer.schema.js";
+import type {
+  CreateFarmerBody,
+  FarmerIdParam,
+  FarmerReportQuery,
+} from "@/features/farmers/farmer.schema.js";
 import { farmersService } from "@/features/farmers/farmer.service.js";
 import {
   isForeignKeyViolation,
@@ -51,6 +55,14 @@ export async function getFarmerStock(
 
 export async function getFamilies(_request: FastifyRequest, reply: FastifyReply) {
   const data = await farmersService.getFamilies();
+  return reply.send({ success: true, data });
+}
+
+export async function getSeedReport(
+  request: FastifyRequest<{ Querystring: FarmerReportQuery }>,
+  reply: FastifyReply,
+) {
+  const data = await farmersService.getSeedReport(request.query);
   return reply.send({ success: true, data });
 }
 

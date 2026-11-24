@@ -20,6 +20,7 @@ import {
 } from "@/features/seed-dispatch/quantity.js";
 import type {
   CreateDispatchBody,
+  UpdateDispatchBody,
   UpdateDispatchStatusBody,
 } from "@/features/seed-dispatch/seed-dispatch.schema.js";
 import { debitFarmerStockFromLot } from "@/features/seed-dispatch/stock-balance.js";
@@ -53,7 +54,9 @@ type DispatchErrorCode =
   | "not_found"
   | "already_null"
   | "invalid_transition"
-  | "stock_debit_failed";
+  | "stock_debit_failed"
+  | "not_editable"
+  | "invalid_weight";
 
 class DispatchFlowError extends Error {
   constructor(
@@ -95,6 +98,18 @@ function asQuantityError(error: unknown): DispatchFlowError | null {
     return new DispatchFlowError("quantity_exceeded", error.message);
   }
   return null;
+}
+
+function resolvedNetWeight(gross: string | null, tare: string | null): string | undefined {
+  if (gross == null || tare == null) return undefined;
+
+  const grossCents = Math.round(Number.parseFloat(gross) * 100);
+  const tareCents = Math.round(Number.parseFloat(tare) * 100);
+  if (!Number.isFinite(grossCents) || !Number.isFinite(tareCents) || grossCents < tareCents) {
+    throw new DispatchFlowError("invalid_weight", "Gross weight cannot be less than tare weight");
+  }
+
+  return ((grossCents - tareCents) / 100).toFixed(2);
 }
 
 async function loadDispatch(id: string) {
@@ -513,6 +528,49 @@ export const seedDispatchesService = {
         .set({
           status: payload.status,
           ...(payload.remarks !== undefined ? { remarks: payload.remarks } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(dispatches.id, dispatchId));
+
+      const updated = await loadDispatch(dispatchId);
+      if (!updated) {
+        throw new DispatchFlowError("not_found", "Seed dispatch not found");
+      }
+      return updated;
+    });
+  },
+
+  async updateDispatch(dispatchId: string, payload: UpdateDispatchBody) {
+    return await runDispatchFlow(async () => {
+      const existing = await loadDispatch(dispatchId);
+      if (!existing) {
+        throw new DispatchFlowError("not_found", "Seed dispatch not found");
+      }
+      if (existing.status === "NULL") {
+        throw new DispatchFlowError("not_editable", "A nullified dispatch cannot be edited");
+      }
+
+      const grossWeight = payload.grossWeight ?? existing.grossWeight;
+      const tareWeight = payload.tareWeight ?? existing.tareWeight;
+      const netWeight = resolvedNetWeight(grossWeight, tareWeight);
+
+      await db
+        .update(dispatches)
+        .set({
+          ...(payload.toLocation !== undefined ? { toLocation: payload.toLocation } : {}),
+          ...(payload.truckNumber !== undefined ? { truckNumber: payload.truckNumber } : {}),
+          ...(payload.dispatchDate !== undefined ? { dispatchDate: payload.dispatchDate } : {}),
+          ...(payload.driverMobile !== undefined ? { driverMobile: payload.driverMobile } : {}),
+          ...(payload.manualGatePassNumber !== undefined
+            ? { manualGatePassNumber: payload.manualGatePassNumber }
+            : {}),
+          ...(payload.weightSlipNumber !== undefined
+            ? { weightSlipNumber: payload.weightSlipNumber }
+            : {}),
+          ...(payload.grossWeight !== undefined ? { grossWeight: payload.grossWeight } : {}),
+          ...(payload.tareWeight !== undefined ? { tareWeight: payload.tareWeight } : {}),
+          ...(payload.remarks !== undefined ? { remarks: payload.remarks } : {}),
+          ...(netWeight !== undefined ? { netWeight } : {}),
           updatedAt: new Date(),
         })
         .where(eq(dispatches.id, dispatchId));

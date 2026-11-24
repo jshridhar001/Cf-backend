@@ -1,4 +1,4 @@
-import { and, type asc, desc, eq } from "drizzle-orm";
+import { and, type asc, desc, eq, inArray, notInArray } from "drizzle-orm";
 import { db } from "@/db/index.js";
 import { seedSizes } from "@/db/schema/masters.js";
 import { dispatches, dispatchRequisitions } from "@/db/schema/seed-dispatch.js";
@@ -12,7 +12,7 @@ import { isUniqueViolation } from "@/lib/postgres-errors.js";
 
 export class ActiveDispatchError extends Error {
   constructor() {
-    super("This requisition has an active dispatch and cannot be edited.");
+    super("A delivery line on an active dispatch cannot be changed or removed.");
     this.name = "ActiveDispatchError";
   }
 }
@@ -62,64 +62,13 @@ function sameQuantity(existing: Pick<StoredDelivery, "acres" | "bags">, next: Re
   return false;
 }
 
-function sameInstant(existing: Date | null, next: Date | null | undefined) {
-  const normalized = next ?? null;
-  if (existing == null || normalized == null) {
-    return existing == null && normalized == null;
-  }
-  return existing.getTime() === normalized.getTime();
-}
-
-function sameDecimal(existing: string | null, next: string | null | undefined) {
-  const normalized = next ?? null;
-  if (existing == null || normalized == null) {
-    return existing == null && normalized == null;
-  }
-  return Number(existing) === Number(normalized);
-}
-
-function sameDeliveries(
-  existing: Pick<StoredDelivery, "deliveryDate" | "acres" | "bags">[],
-  next: RequestedDelivery[],
-) {
-  if (existing.length !== next.length) return false;
-
-  const used = new Set<number>();
-  return next.every((line) => {
-    const index = existing.findIndex(
-      (row, i) =>
-        !used.has(i) &&
-        calendarDay(row.deliveryDate) === calendarDay(line.deliveryDate) &&
-        sameQuantity(row, line),
-    );
-    if (index === -1) return false;
-    used.add(index);
-    return true;
-  });
-}
-
-function operationalFieldsUnchanged(
-  existing: {
-    farmerId: string;
-    varietyId: string;
-    expectedSizeId: string | null;
-    requestedBags: number | null;
-    requestedAcres: string | null;
-    contractDate: Date;
-    requisitionDate: Date | null;
-  },
-  existingLines: Pick<StoredDelivery, "deliveryDate" | "acres" | "bags">[],
-  data: UpdateSeedRequisitionBody,
+function sameDelivery(
+  existing: Pick<StoredDelivery, "deliveryDate" | "acres" | "bags">,
+  next: RequestedDelivery,
 ) {
   return (
-    existing.farmerId === data.farmerId &&
-    existing.varietyId === data.varietyId &&
-    (existing.expectedSizeId ?? null) === (data.expectedSizeId ?? null) &&
-    (existing.requestedBags ?? null) === (data.requestedBags ?? null) &&
-    sameDecimal(existing.requestedAcres, data.requestedAcres) &&
-    sameInstant(existing.contractDate, data.contractDate) &&
-    sameInstant(existing.requisitionDate, data.requisitionDate) &&
-    sameDeliveries(existingLines, data.requestedDeliveries ?? [])
+    calendarDay(existing.deliveryDate) === calendarDay(next.deliveryDate) &&
+    sameQuantity(existing, next)
   );
 }
 
@@ -260,59 +209,6 @@ export const seedRequisitionsService = {
 
   async updateSeedRequisition(id: string, data: UpdateSeedRequisitionBody) {
     const updatedId = await db.transaction(async (tx) => {
-      const linkedDispatches = await tx
-        .select({ status: dispatches.status })
-        .from(dispatchRequisitions)
-        .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
-        .where(eq(dispatchRequisitions.requisitionId, id));
-
-      if (linkedDispatches.some((row) => row.status !== "NULL")) {
-        const [existing] = await tx
-          .select({
-            farmerId: seedRequisitions.farmerId,
-            varietyId: seedRequisitions.varietyId,
-            expectedSizeId: seedRequisitions.expectedSizeId,
-            requestedBags: seedRequisitions.requestedBags,
-            requestedAcres: seedRequisitions.requestedAcres,
-            contractDate: seedRequisitions.contractDate,
-            requisitionDate: seedRequisitions.requisitionDate,
-          })
-          .from(seedRequisitions)
-          .where(eq(seedRequisitions.id, id))
-          .limit(1);
-
-        if (!existing) {
-          return undefined;
-        }
-
-        const existingLines = await tx
-          .select({
-            deliveryDate: seedRequisitionDeliveries.deliveryDate,
-            acres: seedRequisitionDeliveries.acres,
-            bags: seedRequisitionDeliveries.bags,
-          })
-          .from(seedRequisitionDeliveries)
-          .where(eq(seedRequisitionDeliveries.requisitionId, id));
-
-        if (!operationalFieldsUnchanged(existing, existingLines, data)) {
-          throw new ActiveDispatchError();
-        }
-
-        const contractPatch = {
-          ...(data.remarks !== undefined ? { remarks: data.remarks } : {}),
-          ...(data.engContractUrl !== undefined ? { engContractUrl: data.engContractUrl } : {}),
-          ...(data.hindiContractUrl !== undefined
-            ? { hindiContractUrl: data.hindiContractUrl }
-            : {}),
-        };
-
-        if (Object.keys(contractPatch).length > 0) {
-          await tx.update(seedRequisitions).set(contractPatch).where(eq(seedRequisitions.id, id));
-        }
-
-        return id;
-      }
-
       await assertExpectedSize(tx, data.expectedSizeId, data.varietyId);
 
       const [updated] = await tx
@@ -338,15 +234,18 @@ export const seedRequisitionsService = {
         return undefined;
       }
 
-      if (linkedDispatches.length > 0) {
-        await tx
-          .update(dispatchRequisitions)
-          .set({ deliveryId: null })
-          .where(eq(dispatchRequisitions.requisitionId, updated.id));
-      }
+      const linkedStops = await tx
+        .select({
+          deliveryId: dispatchRequisitions.deliveryId,
+          status: dispatches.status,
+        })
+        .from(dispatchRequisitions)
+        .innerJoin(dispatches, eq(dispatchRequisitions.dispatchId, dispatches.id))
+        .where(eq(dispatchRequisitions.requisitionId, updated.id));
 
       const existingLines = await tx
         .select({
+          id: seedRequisitionDeliveries.id,
           deliveryDate: seedRequisitionDeliveries.deliveryDate,
           acres: seedRequisitionDeliveries.acres,
           bags: seedRequisitionDeliveries.bags,
@@ -360,29 +259,69 @@ export const seedRequisitionsService = {
         .from(seedRequisitionDeliveries)
         .where(eq(seedRequisitionDeliveries.requisitionId, updated.id));
 
+      const incoming = data.requestedDeliveries ?? [];
+      const lockedIds = new Set<string>();
+      for (const stop of linkedStops) {
+        if (stop.status === "NULL" || !stop.deliveryId) continue;
+        const existing = existingLines.find((line) => line.id === stop.deliveryId);
+        if (!existing || !incoming.some((line) => sameDelivery(existing, line))) {
+          throw new ActiveDispatchError();
+        }
+        lockedIds.add(stop.deliveryId);
+      }
+
+      const deliveryIdsToClear = new Set<string>();
+      for (const stop of linkedStops) {
+        if (stop.status === "NULL" && stop.deliveryId && !lockedIds.has(stop.deliveryId)) {
+          deliveryIdsToClear.add(stop.deliveryId);
+        }
+      }
+
+      if (deliveryIdsToClear.size > 0) {
+        await tx
+          .update(dispatchRequisitions)
+          .set({ deliveryId: null })
+          .where(
+            and(
+              eq(dispatchRequisitions.requisitionId, updated.id),
+              inArray(dispatchRequisitions.deliveryId, [...deliveryIdsToClear]),
+            ),
+          );
+      }
+
       await tx
         .delete(seedRequisitionDeliveries)
-        .where(eq(seedRequisitionDeliveries.requisitionId, updated.id));
-
-      const deliveries = (data.requestedDeliveries ?? []).map((line) => {
-        const preserved = existingLines.find(
-          (existing) =>
-            calendarDay(existing.deliveryDate) === calendarDay(line.deliveryDate) &&
-            sameQuantity(existing, line),
+        .where(
+          lockedIds.size === 0
+            ? eq(seedRequisitionDeliveries.requisitionId, updated.id)
+            : and(
+                eq(seedRequisitionDeliveries.requisitionId, updated.id),
+                notInArray(seedRequisitionDeliveries.id, [...lockedIds]),
+              ),
         );
-        return {
-          requisitionId: updated.id,
-          deliveryDate: line.deliveryDate,
-          acres: line.acres ?? null,
-          bags: line.bags ?? null,
-          status: preserved?.status ?? "PENDING",
-          approvedById: preserved?.approvedById ?? null,
-          approvedAt: preserved?.approvedAt ?? null,
-          rejectedById: preserved?.rejectedById ?? null,
-          rejectedAt: preserved?.rejectedAt ?? null,
-          rejectionRemarks: preserved?.rejectionRemarks ?? null,
-        } satisfies StoredDelivery & { requisitionId: string };
-      });
+
+      const deliveries = incoming
+        .filter(
+          (line) =>
+            !existingLines.some(
+              (existing) => lockedIds.has(existing.id) && sameDelivery(existing, line),
+            ),
+        )
+        .map((line) => {
+          const preserved = existingLines.find((existing) => sameDelivery(existing, line));
+          return {
+            requisitionId: updated.id,
+            deliveryDate: line.deliveryDate,
+            acres: line.acres ?? null,
+            bags: line.bags ?? null,
+            status: preserved?.status ?? "PENDING",
+            approvedById: preserved?.approvedById ?? null,
+            approvedAt: preserved?.approvedAt ?? null,
+            rejectedById: preserved?.rejectedById ?? null,
+            rejectedAt: preserved?.rejectedAt ?? null,
+            rejectionRemarks: preserved?.rejectionRemarks ?? null,
+          } satisfies StoredDelivery & { requisitionId: string };
+        });
       if (deliveries.length > 0) {
         await tx.insert(seedRequisitionDeliveries).values(deliveries);
       }

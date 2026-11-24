@@ -1,6 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import * as farmersController from "@/features/farmers/farmer.controller.js";
-import { createFarmerBodySchema, farmerIdParamSchema } from "@/features/farmers/farmer.schema.js";
+import {
+  createFarmerBodySchema,
+  farmerIdParamSchema,
+  farmerReportQuerySchema,
+} from "@/features/farmers/farmer.schema.js";
 import { requireAuth } from "@/middleware/require-auth.js";
 
 export async function farmerRoutes(fastify: FastifyInstance) {
@@ -9,6 +13,11 @@ export async function farmerRoutes(fastify: FastifyInstance) {
   fastify.get("/", farmersController.getAllFarmers);
   fastify.get("/address-options", farmersController.getAddressOptions);
   fastify.get("/families", farmersController.getFamilies);
+  fastify.get(
+    "/report",
+    { schema: { querystring: farmerReportQuerySchema } },
+    farmersController.getSeedReport,
+  );
   fastify.get(
     "/:id/stock",
     { schema: { params: farmerIdParamSchema } },

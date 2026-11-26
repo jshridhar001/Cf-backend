@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { user } from "@/db/schema/access-control.js";
 // Assuming all geographic master tables are exported from here
 import {
   districts,
@@ -65,6 +66,11 @@ export const farmers = pgTable(
     pincodeId: uuid("pincode_id").references(() => pincodes.id, { onDelete: "restrict" }),
 
     familyId: uuid("family_id").references(() => farmerFamilies.id),
+    confirmationOtpSentAt: timestamp("confirmation_otp_sent_at"),
+    confirmationOtpVerifiedAt: timestamp("confirmation_otp_verified_at"),
+    confirmationOtpVerifiedById: text("confirmation_otp_verified_by_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

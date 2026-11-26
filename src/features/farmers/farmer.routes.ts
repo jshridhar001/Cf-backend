@@ -5,6 +5,8 @@ import {
   farmerIdParamSchema,
   farmerReportQuerySchema,
 } from "@/features/farmers/farmer.schema.js";
+import * as farmerConfirmationController from "@/features/farmers/farmer-confirmation.controller.js";
+import { confirmFarmerOtpBodySchema } from "@/features/farmers/farmer-confirmation.schema.js";
 import { requireAuth } from "@/middleware/require-auth.js";
 
 export async function farmerRoutes(fastify: FastifyInstance) {
@@ -22,6 +24,21 @@ export async function farmerRoutes(fastify: FastifyInstance) {
     "/:id/stock",
     { schema: { params: farmerIdParamSchema } },
     farmersController.getFarmerStock,
+  );
+  fastify.get(
+    "/:id/confirmation",
+    { schema: { params: farmerIdParamSchema } },
+    farmerConfirmationController.getConfirmation,
+  );
+  fastify.post(
+    "/:id/confirmation-otp",
+    { schema: { params: farmerIdParamSchema } },
+    farmerConfirmationController.sendOtp,
+  );
+  fastify.post(
+    "/:id/confirmation-otp/verify",
+    { schema: { params: farmerIdParamSchema, body: confirmFarmerOtpBodySchema } },
+    farmerConfirmationController.verifyOtp,
   );
 
   fastify.post("/", { schema: { body: createFarmerBodySchema } }, farmersController.createFarmer);

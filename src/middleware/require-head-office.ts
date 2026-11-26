@@ -18,3 +18,26 @@ export async function requireHeadOffice(request: FastifyRequest, reply: FastifyR
     });
   }
 }
+
+const READ_METHODS = new Set(["GET", "HEAD"]);
+
+export async function requireMasterAccess(request: FastifyRequest, reply: FastifyReply) {
+  await requireAuth(request, reply);
+  if (reply.sent) {
+    return;
+  }
+
+  if (READ_METHODS.has(request.method.toUpperCase())) {
+    return;
+  }
+
+  if (!isHeadOfficeRole(request.user?.role)) {
+    return reply.code(403).send({
+      success: false,
+      error: {
+        code: "FORBIDDEN",
+        message: "Head office access required",
+      },
+    });
+  }
+}

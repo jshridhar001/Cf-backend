@@ -43,4 +43,5 @@ export const accountsSeedSupplyManager = ac.newRole({
 
 export const fieldOfficer = ac.newRole({
   ...userAc.statements,
+  module: ["read"],
 });

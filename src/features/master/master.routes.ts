@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { requireHeadOffice } from "@/middleware/require-head-office.js";
+import { requireMasterAccess } from "@/middleware/require-head-office.js";
 import { districtRoutes } from "./districts/districts.routes.js";
 import { facilityRoutes } from "./facilities/facilities.routes.js";
 import { facilityStockRoutes } from "./facility-stock/facility-stock.routes.js";
@@ -15,8 +15,8 @@ import { varietyRoutes } from "./varieties/varieties.routes.js";
 import { villageRoutes } from "./villages/villages.routes.js";
 
 export async function masterRoutes(fastify: FastifyInstance) {
-  // SUPER_DEVELOPER | MANAGING_DIRECTOR | PROGRAMME_MANAGER
-  fastify.addHook("preHandler", requireHeadOffice);
+  // Reads are available to any signed-in role. Writes stay head office.
+  fastify.addHook("preHandler", requireMasterAccess);
 
   await fastify.register(varietyRoutes, { prefix: "/varieties" });
   await fastify.register(generationRoutes, { prefix: "/generations" });

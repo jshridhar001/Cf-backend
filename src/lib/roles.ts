@@ -63,6 +63,18 @@ export function isHeadOfficeRole(role: string | null | undefined) {
   return HEAD_OFFICE_ROLES.includes(role as HeadOfficeRoleValue);
 }
 
+export const DASHBOARD_ROLES = [
+  SUPER_DEVELOPER_ROLE,
+  "MANAGING_DIRECTOR",
+  "PROGRAMME_MANAGER",
+] as const;
+
+export type DashboardRoleValue = (typeof DASHBOARD_ROLES)[number];
+
+export function isDashboardRole(role: string | null | undefined) {
+  return DASHBOARD_ROLES.includes(role as DashboardRoleValue);
+}
+
 export const SEED_REQUISITION_DECISION_ROLES = [
   SUPER_DEVELOPER_ROLE,
   "MANAGING_DIRECTOR",

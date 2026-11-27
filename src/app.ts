@@ -5,6 +5,7 @@ import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest }
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { adminRoutes } from "./features/access-control/admin.routes.js";
 import { coldStorageGatePassRoutes } from "./features/cold-storage-gate-pass/cold-storage-gate-pass.routes.js";
+import { dashboardRoutes } from "./features/dashboard/dashboard.routes.js";
 import { dehaulmingRoutes } from "./features/dehaulming/dehaulming.routes.js";
 import { farmerRoutes } from "./features/farmers/farmer.routes.js";
 import { fieldTaskRoutes } from "./features/field-task/field-task.routes.js";
@@ -81,6 +82,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
   await fastify.register(fieldRoutes, { prefix: "/api/v1/fields" });
   await fastify.register(plantationRoutes, { prefix: "/api/v1/plantations" });
   await fastify.register(fieldTaskRoutes, { prefix: "/api/v1/field-tasks" });
+  await fastify.register(dashboardRoutes, { prefix: "/api/v1/dashboard" });
   await fastify.register(irrigationRoutes, { prefix: "/api/v1/irrigations" });
   await fastify.register(dehaulmingRoutes, { prefix: "/api/v1/dehaulmings" });
   await fastify.register(fieldVisitRoutes, { prefix: "/api/v1/field-visits" });
